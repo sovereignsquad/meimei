@@ -45,6 +45,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `scripts/oc-agent` - agent turn wrapper with deterministic model routing inputs.
 - `scripts/oc-launch` - launch helper for the gateway.
 - `scripts/oc-status` - health and readiness helper.
+- `scripts/oc-readiness` - unified PASS/FAIL readiness gate (blocks on critical findings).
 - `scripts/web-search` - local DuckDuckGo-based web search fallback.
 - `Makefile` - convenience targets for launch, status, doctor, skills, and agent turns.
 - `dashboard/server.mjs` - localhost control panel for settings, search, and OpenClaw operations.
@@ -69,6 +70,7 @@ Start by reading `agent.md`, `architecture.md`, and `skills/catalog.md`.
 Use one of these from the repo root:
 
 - `./scripts/oc-status`
+- `./scripts/oc-readiness`
 - `./scripts/oc-launch`
 - `make status`
 - `make launch`
@@ -77,3 +79,4 @@ Use one of these from the repo root:
 - `npm run setup` for the one-step local domain start/open flow
 - `npm run bootstrap` for the full target-machine bootstrap and verification flow
 - `npm run config:seed` to render the live OpenClaw config from the repo seed
+- `npm run readiness` for the unified go/no-go readiness gate

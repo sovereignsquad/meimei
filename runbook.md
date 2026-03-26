@@ -47,6 +47,7 @@ Escalate to OC when:
 - Add `--channel`, `--task-type`, and `--cost-target` when you want deterministic routing.
 - Add `--route-report` to print the selected route and reason.
 - Use `./scripts/oc-doctor --non-interactive` when checking the runtime state.
+- Use `./scripts/oc-readiness` for a single PASS/FAIL go-live readiness decision.
 - Use `npm run config:seed` when you need to render or refresh the live OpenClaw config from the repo seed.
 - Use `npm run bootstrap` when you are bringing up a fresh Mac mini or validating the migration path.
 

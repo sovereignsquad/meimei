@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: launch status doctor skills agent config
+.PHONY: launch status doctor readiness skills agent config
 
 launch:
 	./scripts/oc-launch
@@ -10,6 +10,9 @@ status:
 
 doctor:
 	./scripts/oc-doctor
+
+readiness:
+	./scripts/oc-readiness
 
 skills:
 	./scripts/oc-skills
