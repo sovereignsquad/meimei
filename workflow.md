@@ -12,7 +12,7 @@ The first task is to classify it:
 - operational fix
 - review or audit
 
-For a new product function, also classify it against the standard function delivery lifecycle in [function-lifecycle.md](./function-lifecycle.md).
+For a new product function, also classify it against the standard function delivery lifecycle in [function-lifecycle.md](./function-lifecycle.md) and the required miniapp contract in [miniapp-contract-v1.md](./miniapp-contract-v1.md).
 
 ## Triage
 

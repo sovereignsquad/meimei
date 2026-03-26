@@ -136,4 +136,6 @@ Use [naming-conventions.md](./naming-conventions.md) to decide whether a future 
 
 This lifecycle is the default delivery method for MeiMei functions unless OC explicitly approves a different path.
 
+All new functions/miniapps must conform to [miniapp-contract-v1.md](./miniapp-contract-v1.md).
+
 For naming consistency, use [naming-conventions.md](./naming-conventions.md) alongside this lifecycle.
