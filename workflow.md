@@ -23,6 +23,11 @@ For each item, determine:
 - whether OC approval is required
 - whether it should be implemented now or queued
 
+Before moving any implementation issue to `Ready (NEXT)`, apply:
+
+- [issue-quality-standard.md](./issue-quality-standard.md)
+- [issue-ready-gate-checklist.md](./issue-ready-gate-checklist.md)
+
 ## Design
 
 Before execution, define:

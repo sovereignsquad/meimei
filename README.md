@@ -24,6 +24,8 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `architecture.md` - system shape and boundaries.
 - `foundation-contradiction-audit.md` - contradiction matrix and remediation order for foundation hardening.
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
+- `issue-quality-standard.md` - required quality rules for implementation issues.
+- `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
 - `functions/registry.v1.json` - machine-readable registry of active miniapp contracts.
 - `function-lifecycle.md` - standard delivery method for new MeiMei functions.
 - `model-routing-spec.md` - deterministic routing policy for channel, task type, and cost.
