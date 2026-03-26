@@ -7,11 +7,13 @@ import { fileURLToPath } from "node:url";
 import { PDFParse } from "pdf-parse";
 import { createRuntimeHelpers } from "./lib/runtime.mjs";
 import { routeViaApiAdapter } from "./lib/api-channel-adapter.mjs";
+import { createReliabilityTelemetry } from "./lib/reliability-telemetry.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 const { runScript, launchDetached, readJson } = createRuntimeHelpers(repoRoot);
+const { getSummary: getTelemetrySummary } = createReliabilityTelemetry(repoRoot);
 const configPath = process.env.OPENCLAW_CONFIG_PATH || path.join(os.homedir(), ".openclaw", "openclaw.json");
 const launchScript = path.join(repoRoot, "scripts", "oc-launch");
 const statusScript = path.join(repoRoot, "scripts", "oc-status");
@@ -2278,6 +2280,12 @@ const server = http.createServer(async (req, res) => {
       const cmd = url.searchParams.get("cmd") || "status";
       const result = await executeCommand(cmd, {});
       sendJson(res, 200, result);
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/telemetry/summary") {
+      const summary = await getTelemetrySummary();
+      sendJson(res, 200, { ok: true, summary });
       return;
     }
 

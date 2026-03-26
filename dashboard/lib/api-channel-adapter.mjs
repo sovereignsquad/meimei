@@ -1,5 +1,6 @@
 import { evaluateExternalChannelPolicy } from "./external-channel-policy-engine.mjs";
 import { createAuditTrail } from "./audit-trail.mjs";
+import { createReliabilityTelemetry } from "./reliability-telemetry.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
 const { appendAuditEvent } = createAuditTrail(repoRoot);
+const { record } = createReliabilityTelemetry(repoRoot);
 
 function nowIso() {
   return new Date().toISOString();
@@ -50,6 +52,7 @@ function policyCheck(event) {
 }
 
 export async function routeViaApiAdapter(input, { previewModelRouting, method = "POST" }) {
+  const startedAt = Date.now();
   const stages = [];
   const event = normalizeRoutingInput(input, method);
   stages.push({ stage: "ingress", at: nowIso() });
@@ -85,6 +88,18 @@ export async function routeViaApiAdapter(input, { previewModelRouting, method = 
       approved: event.input.approved,
       details: { state: "blocked" }
     });
+    await record({
+      type: "request-completed",
+      channel: event.input.channel,
+      eventId: event.eventId,
+      ok: false,
+      state: "blocked",
+      latencyMs: Date.now() - startedAt,
+      riskTier: policy.riskTier,
+      requiresApproval: policy.requiresApproval,
+      approved: event.input.approved,
+      reason: policy.reason
+    });
     return {
       ok: false,
       code: 400,
@@ -97,12 +112,30 @@ export async function routeViaApiAdapter(input, { previewModelRouting, method = 
     };
   }
 
-  const route = await previewModelRouting({
-    channel: event.input.channel,
-    taskType: event.input.taskType,
-    costTarget: event.input.costTarget,
-    message: event.input.message
-  });
+  let route = null;
+  try {
+    route = await previewModelRouting({
+      channel: event.input.channel,
+      taskType: event.input.taskType,
+      costTarget: event.input.costTarget,
+      message: event.input.message
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await record({
+      type: "request-completed",
+      channel: event.input.channel,
+      eventId: event.eventId,
+      ok: false,
+      state: "failed",
+      latencyMs: Date.now() - startedAt,
+      riskTier: policy.riskTier,
+      requiresApproval: policy.requiresApproval,
+      approved: event.input.approved,
+      reason: message
+    });
+    throw error;
+  }
   await appendAuditEvent({
     type: "routing-decision",
     channel: event.input.channel,
@@ -115,6 +148,18 @@ export async function routeViaApiAdapter(input, { previewModelRouting, method = 
     details: {
       route
     }
+  });
+  await record({
+    type: "request-completed",
+    channel: event.input.channel,
+    eventId: event.eventId,
+    ok: true,
+    state: "delivered",
+    latencyMs: Date.now() - startedAt,
+    riskTier: policy.riskTier,
+    requiresApproval: policy.requiresApproval,
+    approved: event.input.approved,
+    reason: "adapter flow completed"
   });
   stages.push({ stage: "dispatch", at: nowIso(), ok: true });
   stages.push({ stage: "egress", at: nowIso(), ok: true });

@@ -32,6 +32,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `release-gates-dod-v1.md` - machine-checkable release gates mapped to Definition of Done and testing rules.
 - `external-channel-policy-engine-v1.md` - risk-tier policy-as-code contract for outbound channel actions.
 - `decision-action-audit-trail-v1.md` - append-only hash-chained audit pipeline for policy/routing/delivery events.
+- `reliability-telemetry-baseline-v1.md` - baseline telemetry event schema and SLO summary metrics.
 - `channel-adapter-contract-v1.md` - canonical interface for all channel adapters.
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
 - `sovereign-agent-role-taxonomy-v1.md` - role boundaries and authority matrix for sovereign multi-agent delivery.
@@ -107,3 +108,5 @@ Use one of these from the repo root:
 - `npm run release:gates -- releases/sample.release-gate.v1.json` to validate release readiness gates
 - `npm run policy:validate` to validate external-channel risk-tier policy enforcement
 - `npm run audit:validate` to validate audit trail chain integrity
+- `npm run telemetry:seed` to seed deterministic sample telemetry events
+- `npm run telemetry:validate` to validate telemetry summary/SLO schema integrity

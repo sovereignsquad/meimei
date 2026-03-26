@@ -14,6 +14,8 @@
     "release:gates": "node scripts/validate-release-gates.mjs",
     "policy:validate": "node scripts/validate-external-channel-policy.mjs",
     "audit:validate": "node scripts/validate-audit-trail.mjs",
+    "telemetry:seed": "node scripts/seed-telemetry.mjs",
+    "telemetry:validate": "node scripts/validate-telemetry.mjs",
     "bootstrap": "./scripts/meimei-bootstrap",
     "rebuild": "./scripts/meimei-rebuild",
     "setup": "./scripts/meimei-setup",

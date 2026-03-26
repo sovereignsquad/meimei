@@ -52,6 +52,7 @@ Escalate to OC when:
 - Use `npm run release:gates -- <artifact.json>` before release decisions to enforce DoD/testing gates.
 - Use `npm run policy:validate` before external-channel policy or risk-tier changes.
 - Use `npm run audit:validate` to verify audit trail chain integrity after policy/routing work.
+- Use `npm run telemetry:seed` and `npm run telemetry:validate` when validating reliability telemetry and SLO outputs.
 - Use `npm run config:seed` when you need to render or refresh the live OpenClaw config from the repo seed.
 - Use `npm run bootstrap` when you are bringing up a fresh Mac mini or validating the migration path.
 
