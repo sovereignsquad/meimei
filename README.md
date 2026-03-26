@@ -28,6 +28,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
 - `channel-adapter-contract-v1.md` - canonical interface for all channel adapters.
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
+- `sovereign-agent-role-taxonomy-v1.md` - role boundaries and authority matrix for sovereign multi-agent delivery.
 - `imessage-adapter-architecture-v1.md` - phased architecture and implementation plan for iMessage adapter.
 - `email-adapter-architecture-v1.md` - phased architecture and provider strategy for Email adapter.
 - `discord-adapter-architecture-v1.md` - phased architecture and provider strategy for Discord adapter.

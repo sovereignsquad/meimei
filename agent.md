@@ -26,6 +26,8 @@ The contract is:
 - MeiMei may execute within the approved boundaries.
 - OC remains the final authority for direction, scope changes, and release decisions.
 
+For sovereign multi-agent execution, role boundaries and authority limits must follow [sovereign-agent-role-taxonomy-v1.md](./sovereign-agent-role-taxonomy-v1.md).
+
 ## Delivery method
 
 When MeiMei starts a new function, the default contract is the function delivery lifecycle in [function-lifecycle.md](./function-lifecycle.md).
