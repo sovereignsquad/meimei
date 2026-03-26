@@ -8,6 +8,7 @@ import { PDFParse } from "pdf-parse";
 import { createRuntimeHelpers } from "./lib/runtime.mjs";
 import { routeViaApiAdapter } from "./lib/api-channel-adapter.mjs";
 import { createReliabilityTelemetry } from "./lib/reliability-telemetry.mjs";
+import { createImessageAdapter } from "./lib/imessage-adapter.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,6 +36,7 @@ const dailyBriefingLabel = "Daily briefing";
 const routingRoute = "/Per-channel_model_routing_by_task_type_and_cost";
 const routingApiRoute = "/api/functions/model-routing";
 const routingLabel = "Per-channel model routing by task type and cost";
+const imessageInboundApiRoute = "/api/channels/imessage/inbound";
 
 function escapeHtml(value) {
   return String(value)
@@ -2353,6 +2355,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "POST" && url.pathname === imessageInboundApiRoute) {
+      const body = await readJson(req);
+      const result = await handleImessageInbound(body);
+      sendJson(res, result.code || (result.ok ? 200 : 400), result);
+      return;
+    }
+
     if (req.method === "POST" && url.pathname === "/api/config") {
       const body = await readJson(req);
       const config = await readConfig();
@@ -2485,6 +2494,26 @@ async function executeCommand(cmd, body) {
       };
   }
 }
+
+const { handleInbound: handleImessageInbound } = createImessageAdapter({
+  runAgentTurn: async (event) => {
+    const args = [
+      agentScript,
+      "--channel",
+      "imessage",
+      "--task-type",
+      event.input.taskType || "chat",
+      "--cost-target",
+      event.input.costTarget || "low",
+      "--message",
+      event.payload.text || "Hello from iMessage bridge."
+    ];
+    if (event.input.actionIntent === "reply") {
+      args.push("--deliver", "--reply-channel", "imessage", "--reply-to", event.actor.userId);
+    }
+    return await runScript("bash", args, { timeoutMs: 120000 });
+  }
+});
 
 server.listen(port, "127.0.0.1", () => {
   console.log(`agent.meimei dashboard listening on http://127.0.0.1:${port}`);

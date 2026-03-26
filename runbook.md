@@ -53,6 +53,7 @@ Escalate to OC when:
 - Use `npm run policy:validate` before external-channel policy or risk-tier changes.
 - Use `npm run audit:validate` to verify audit trail chain integrity after policy/routing work.
 - Use `npm run telemetry:seed` and `npm run telemetry:validate` when validating reliability telemetry and SLO outputs.
+- Use `npm run imessage:validate` before iMessage bridge changes and before live reply testing.
 - Use `npm run always-on:install` to keep gateway running across restarts with auto-restart on crash.
 - Use `npm run always-on:status` to inspect launchd service and gateway health.
 - Use `npm run always-on:uninstall` if you need to disable always-on mode.

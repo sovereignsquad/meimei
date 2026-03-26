@@ -152,6 +152,7 @@ Reference adapter rollout order:
 iMessage implementation plan artifact:
 
 - `imessage-adapter-architecture-v1.md`
+- `imessage-live-bridge-v1.md`
 
 Email implementation plan artifact:
 

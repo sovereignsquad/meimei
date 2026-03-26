@@ -37,6 +37,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
 - `sovereign-agent-role-taxonomy-v1.md` - role boundaries and authority matrix for sovereign multi-agent delivery.
 - `imessage-adapter-architecture-v1.md` - phased architecture and implementation plan for iMessage adapter.
+- `imessage-live-bridge-v1.md` - live inbound/outbound iMessage bridge endpoint and test protocol.
 - `email-adapter-architecture-v1.md` - phased architecture and provider strategy for Email adapter.
 - `discord-adapter-architecture-v1.md` - phased architecture and provider strategy for Discord adapter.
 - `whatsapp-adapter-parity-v1.md` - enforced parity requirements for WhatsApp config and policy.
@@ -113,6 +114,7 @@ Use one of these from the repo root:
 - `npm run audit:validate` to validate audit trail chain integrity
 - `npm run telemetry:seed` to seed deterministic sample telemetry events
 - `npm run telemetry:validate` to validate telemetry summary/SLO schema integrity
+- `npm run imessage:validate` to validate iMessage adapter lifecycle and idempotency behavior
 - `npm run always-on:install` to install and start always-on gateway auto-restart service
 - `npm run always-on:status` to inspect launchd service state and gateway health
 - `npm run always-on:uninstall` to remove always-on gateway service
