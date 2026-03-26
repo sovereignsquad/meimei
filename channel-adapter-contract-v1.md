@@ -145,6 +145,10 @@ Reference adapter rollout order:
 4. Email adapter
 5. Discord adapter
 
+iMessage implementation plan artifact:
+
+- `imessage-adapter-architecture-v1.md`
+
 ## Acceptance Checks
 
 - [ ] all channels can normalize to the canonical event shape

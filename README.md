@@ -28,6 +28,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
 - `channel-adapter-contract-v1.md` - canonical interface for all channel adapters.
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
+- `imessage-adapter-architecture-v1.md` - phased architecture and implementation plan for iMessage adapter.
 - `whatsapp-adapter-parity-v1.md` - enforced parity requirements for WhatsApp config and policy.
 - `functions/registry.v1.json` - machine-readable registry of active miniapp contracts.
 - `function-lifecycle.md` - standard delivery method for new MeiMei functions.
