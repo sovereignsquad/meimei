@@ -67,3 +67,62 @@ The add-on backlog and user stories live in [per-channel-model-routing-by-task-t
 ## Policy
 
 The routing policy lives in [model-routing-spec.md](../model-routing-spec.md).
+
+## Miniapp Contract v1 Instance
+
+```json
+{
+  "id": "model-routing",
+  "version": "v1",
+  "displayName": "Per-channel model routing by task type and cost",
+  "route": "/dashboard/Per-channel_model_routing_by_task_type_and_cost",
+  "api": {
+    "method": "POST",
+    "path": "/dashboard/api/functions/model-routing"
+  },
+  "input": {
+    "required": [
+      "channel",
+      "taskType",
+      "costTarget"
+    ],
+    "optional": [
+      "message"
+    ],
+    "examples": [
+      {
+        "channel": "dashboard",
+        "taskType": "chat",
+        "costTarget": "low"
+      }
+    ]
+  },
+  "output": {
+    "statusField": "ok",
+    "payloadShape": "object",
+    "requiredFields": [
+      "ok",
+      "route"
+    ]
+  },
+  "safety": {
+    "untrustedInput": false,
+    "allowedProtocols": [],
+    "notes": [
+      "Preview-only flow; does not execute the task."
+    ]
+  },
+  "capabilities": {
+    "channels": [
+      "dashboard",
+      "api"
+    ],
+    "sideEffects": [],
+    "requiresApproval": false
+  },
+  "failureModel": {
+    "clearErrorMessages": true,
+    "fallbackBehavior": "return route calculation error"
+  }
+}
+```

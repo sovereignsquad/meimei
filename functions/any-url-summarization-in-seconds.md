@@ -51,3 +51,62 @@ After MVP, this function can grow into:
 The add-on backlog and user story live in [any-url-summarization-in-seconds-addon.md](./any-url-summarization-in-seconds-addon.md).
 
 The shared naming rules live in [naming-conventions.md](../naming-conventions.md).
+
+## Miniapp Contract v1 Instance
+
+```json
+{
+  "id": "url-summary",
+  "version": "v1",
+  "displayName": "Any-URL summarization in seconds",
+  "route": "/dashboard/Any-URL_summarization_in_seconds",
+  "api": {
+    "method": "POST",
+    "path": "/dashboard/api/functions/url-summary"
+  },
+  "input": {
+    "required": [
+      "url"
+    ],
+    "optional": [],
+    "examples": [
+      {
+        "url": "https://example.com"
+      }
+    ]
+  },
+  "output": {
+    "statusField": "ok",
+    "payloadShape": "object",
+    "requiredFields": [
+      "ok",
+      "source",
+      "result"
+    ]
+  },
+  "safety": {
+    "untrustedInput": true,
+    "allowedProtocols": [
+      "http",
+      "https"
+    ],
+    "notes": [
+      "Source content is treated as untrusted and instruction-resistant."
+    ]
+  },
+  "capabilities": {
+    "channels": [
+      "dashboard",
+      "api"
+    ],
+    "sideEffects": [
+      "network-fetch"
+    ],
+    "requiresApproval": false
+  },
+  "failureModel": {
+    "clearErrorMessages": true,
+    "fallbackBehavior": "return structured failure payload"
+  }
+}
+```

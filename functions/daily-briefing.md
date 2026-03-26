@@ -42,3 +42,56 @@ As a MeiMei user, I want one button that creates my daily briefing and stores it
   - `miniapp` for the user-facing surface
   - `add-on` for future expansion
 - Treat multiple sources and multiple outputs as add-ons, not as part of the core MVP.
+
+## Miniapp Contract v1 Instance
+
+```json
+{
+  "id": "daily-briefing",
+  "version": "v1",
+  "displayName": "Daily briefing",
+  "route": "/dashboard/Daily_briefing",
+  "api": {
+    "method": "POST",
+    "path": "/dashboard/api/functions/daily-briefing"
+  },
+  "input": {
+    "required": [],
+    "optional": [],
+    "examples": [
+      {}
+    ]
+  },
+  "output": {
+    "statusField": "ok",
+    "payloadShape": "object",
+    "requiredFields": [
+      "ok",
+      "title",
+      "sink"
+    ]
+  },
+  "safety": {
+    "untrustedInput": false,
+    "allowedProtocols": [],
+    "notes": [
+      "Writes to Apple Notes first and markdown fallback."
+    ]
+  },
+  "capabilities": {
+    "channels": [
+      "dashboard",
+      "api"
+    ],
+    "sideEffects": [
+      "apple-notes-write",
+      "local-file-write"
+    ],
+    "requiresApproval": false
+  },
+  "failureModel": {
+    "clearErrorMessages": true,
+    "fallbackBehavior": "markdown fallback when Apple Notes is unavailable"
+  }
+}
+```
