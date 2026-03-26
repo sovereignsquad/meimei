@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${HOME}/.openclaw/.env"
+PLIST_PATH="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-proxy.plist"
+DASHBOARD_PLIST_PATH="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-ui.plist"
+LABEL="ai.openclaw.meimei.dashboard-proxy"
+UI_LABEL="ai.openclaw.meimei.dashboard-ui"
+NODE_BIN="$(command -v node)"
+
+if [[ -f "${ENV_FILE}" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "${ENV_FILE}"
+  set +a
+fi
+
+install_plist() {
+  mkdir -p "$(dirname "${PLIST_PATH}")"
+  cat > "${PLIST_PATH}" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${LABEL}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${NODE_BIN}</string>
+    <string>${ROOT_DIR}/scripts/meimei-domain.mjs</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-proxy.out</string>
+  <key>StandardErrorPath</key>
+  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-proxy.err</string>
+</dict>
+</plist>
+PLIST
+}
+
+install_dashboard_plist() {
+  mkdir -p "$(dirname "${DASHBOARD_PLIST_PATH}")"
+  cat > "${DASHBOARD_PLIST_PATH}" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${UI_LABEL}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${NODE_BIN}</string>
+    <string>${ROOT_DIR}/dashboard/server.mjs</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PORT</key>
+    <string>3030</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-ui.out</string>
+  <key>StandardErrorPath</key>
+  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-ui.err</string>
+</dict>
+</plist>
+PLIST
+}
+
+status() {
+  echo "Domain: https://meimei.localhost:8443/dashboard"
+  launchctl print "gui/$(id -u)/${LABEL}" 2>/dev/null || true
+  launchctl print "gui/$(id -u)/${UI_LABEL}" 2>/dev/null || true
+}
+
+case "${1:-status}" in
+  install)
+    install_dashboard_plist
+    install_plist
+    launchctl bootout "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}" 2>/dev/null || true
+    launchctl bootout "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}"
+    launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}"
+    launchctl kickstart -k "gui/$(id -u)/${UI_LABEL}"
+    launchctl kickstart -k "gui/$(id -u)/${LABEL}"
+    ;;
+  start)
+    launchctl kickstart -k "gui/$(id -u)/${UI_LABEL}"
+    launchctl kickstart -k "gui/$(id -u)/${LABEL}"
+    ;;
+  stop)
+    launchctl bootout "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}" 2>/dev/null || true
+    launchctl bootout "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null || true
+    ;;
+  restart)
+    install_dashboard_plist
+    launchctl bootout "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null || true
+    install_plist
+    launchctl bootout "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}"
+    launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}"
+    launchctl kickstart -k "gui/$(id -u)/${UI_LABEL}"
+    launchctl kickstart -k "gui/$(id -u)/${LABEL}"
+    ;;
+  status)
+    status
+    ;;
+  *)
+    echo "Usage: $0 [install|start|stop|restart|status]" >&2
+    exit 2
+    ;;
+esac

@@ -12,6 +12,8 @@ The first task is to classify it:
 - operational fix
 - review or audit
 
+For a new product function, also classify it against the standard function delivery lifecycle in [function-lifecycle.md](./function-lifecycle.md).
+
 ## Triage
 
 For each item, determine:
@@ -29,6 +31,7 @@ Before execution, define:
 - the scope boundary
 - the acceptance checks
 - the skill or docs that should own the work
+- the function route and primary action if this is a product function
 
 ## Execution
 
@@ -38,6 +41,15 @@ Prefer one of these paths:
 - add or refine a skill
 - create a new capability module
 - split the work into smaller tasks
+
+For a new function, follow the default sequence:
+
+1. define
+2. shape
+3. route
+4. build
+5. verify
+6. handoff
 
 ## Verification
 
@@ -57,3 +69,4 @@ When work is ready for OC, provide:
 - what was verified
 - what remains open
 
+For product functions, include the live route, the back path, and the next extension layer if any.

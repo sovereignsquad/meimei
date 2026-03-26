@@ -4,7 +4,14 @@
   "type": "module",
   "scripts": {
     "dashboard": "node dashboard/server.mjs",
+    "config:seed": "node scripts/meimei-config.mjs seed",
+    "config:export": "node scripts/meimei-config.mjs export-template",
+    "bootstrap": "./scripts/meimei-bootstrap",
+    "rebuild": "./scripts/meimei-rebuild",
+    "setup": "./scripts/meimei-setup",
     "start": "node dashboard/server.mjs"
+  },
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
   }
 }
-

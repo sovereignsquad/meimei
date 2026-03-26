@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+cd "$ROOT_DIR"
+
+note() {
+  printf '%s\n' "$1"
+}
+
+ensure_formula() {
+  local formula="$1"
+  if brew list --formula --versions "$formula" >/dev/null 2>&1; then
+    note "Homebrew formula already present: $formula"
+    return 0
+  fi
+  note "Installing Homebrew formula: $formula"
+  brew install "$formula"
+}
+
+require_cmd() {
+  local cmd="$1"
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Missing required command: $cmd" >&2
+    return 1
+  fi
+}
+
+install_brew_tools() {
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew is required on the target Mac mini." >&2
+    exit 1
+  fi
+
+  local formulae=(git node jq gh openssl docker ollama)
+  note "Ensuring base tooling with Homebrew..."
+  for formula in "${formulae[@]}"; do
+    ensure_formula "$formula"
+  done
+}
+
+verify_required_commands() {
+  for cmd in git node npm jq gh openssl docker ollama openclaw osascript curl; do
+    require_cmd "$cmd"
+  done
+}
+
+ensure_ollama_model() {
+  local model="$1"
+  if ollama list 2>/dev/null | tail -n +2 | awk -v want="$model" '$1 == want {found=1} END {exit found ? 0 : 1}'; then
+    note "Ollama model already present: $model"
+    return 0
+  fi
+  note "Pulling Ollama model: $model"
+  ollama pull "$model"
+}
+
+ensure_models() {
+  note "Ensuring local Ollama models are present..."
+  ensure_ollama_model granite4:350m
+  ensure_ollama_model gemma3:1b
+  ensure_ollama_model qwen3.5:0.8b
+}
+
+seed_openclaw_config() {
+  "$ROOT_DIR/scripts/meimei-config.mjs" seed
+}
+
+ensure_npm_dependencies() {
+  note "Installing repository dependencies..."
+  npm install
+}
+
+ensure_domain_services() {
+  note "Installing local dashboard services..."
+  "$ROOT_DIR/scripts/meimei-domain" install
+}
+
+ensure_gateway_service() {
+  note "Installing or refreshing the OpenClaw gateway service..."
+  openclaw gateway install --force --bind loopback --port 18789
+  openclaw gateway start --bind loopback --port 18789
+}
+
+wait_for_http() {
+  local url="$1"
+  local tries=0
+  while [ "$tries" -lt 30 ]; do
+    if curl -sk --max-time 2 "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    tries=$((tries + 1))
+    sleep 1
+  done
+  echo "Timed out waiting for $url" >&2
+  return 1
+}
+
+start_gateway_if_needed() {
+  ensure_gateway_service
+}
+
+main() {
+  note "MeiMei bootstrap starting..."
+  install_brew_tools
+  verify_required_commands
+  seed_openclaw_config
+  ensure_npm_dependencies
+  ensure_models
+  ensure_domain_services
+  start_gateway_if_needed
+  "$ROOT_DIR/scripts/meimei-domain" status || true
+  wait_for_http "http://127.0.0.1:3030/"
+  wait_for_http "https://meimei.localhost:8443/dashboard/"
+  note "Running OpenClaw status..."
+  "$ROOT_DIR/scripts/oc-status" || true
+  note "Running OpenClaw doctor..."
+  "$ROOT_DIR/scripts/oc-doctor" --non-interactive || true
+  note "Ready: https://meimei.localhost:8443/dashboard/"
+}
+
+main "$@"

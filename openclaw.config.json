@@ -1,11 +1,697 @@
 {
+  "meta": {
+    "lastTouchedVersion": "2026.3.13",
+    "lastTouchedAt": "2026-03-26T02:37:24.372Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-24T12:07:14.556Z",
+    "lastRunVersion": "2026.2.23",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
   "agents": {
     "defaults": {
-      "workspace": "/Users/moldovancsaba/Projects/agent.meimei"
+      "model": {
+        "primary": "openrouter/openrouter/free",
+        "fallbacks": [
+          "openrouter/arcee-ai/trinity-large-preview:free",
+          "openrouter/arcee-ai/trinity-mini:free",
+          "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+          "openrouter/google/gemma-3-12b-it:free",
+          "openrouter/google/gemma-3-27b-it:free",
+          "openrouter/google/gemma-3-4b-it:free",
+          "openrouter/google/gemma-3n-e2b-it:free",
+          "openrouter/google/gemma-3n-e4b-it:free",
+          "openrouter/liquid/lfm-2.5-1.2b-instruct:free",
+          "openrouter/liquid/lfm-2.5-1.2b-thinking:free",
+          "openrouter/meta-llama/llama-3.2-3b-instruct:free",
+          "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+          "openrouter/minimax/minimax-m2.5:free",
+          "openrouter/mistralai/mistral-small-3.1-24b-instruct:free",
+          "openrouter/nousresearch/hermes-3-llama-3.1-405b:free",
+          "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
+          "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+          "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
+          "openrouter/nvidia/nemotron-nano-9b-v2:free",
+          "openrouter/openai/gpt-oss-120b:free",
+          "openrouter/openai/gpt-oss-20b:free",
+          "openrouter/qwen/qwen3-4b:free",
+          "openrouter/qwen/qwen3-coder:free",
+          "openrouter/qwen/qwen3-next-80b-a3b-instruct:free",
+          "openrouter/stepfun/step-3.5-flash:free",
+          "openrouter/z-ai/glm-4.5-air:free",
+          "ollama/granite4:350m",
+          "ollama/gemma3:1b",
+          "ollama/qwen3.5:0.8b"
+        ]
+      },
+      "workspace": "__MEIMEI_OPENCLAW_HOME__/workspace",
+      "memorySearch": {
+        "enabled": true,
+        "provider": "ollama",
+        "fallback": "none"
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "sandbox": {
+        "mode": "all"
+      },
+      "imageModel": {
+        "primary": "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
+        "fallbacks": [
+          "openrouter/google/gemma-3n-e2b-it:free",
+          "openrouter/google/gemma-3n-e4b-it:free",
+          "openrouter/openrouter/free"
+        ]
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "identity": {
+          "name": "Writer",
+          "theme": "AI assistant with a human-like presence",
+          "emoji": "✍️"
+        }
+      },
+      {
+        "id": "judge",
+        "name": "judge",
+        "workspace": "__MEIMEI_OPENCLAW_HOME__/workspace-judge",
+        "agentDir": "__MEIMEI_OPENCLAW_HOME__/agents/judge/agent",
+        "model": "ollama/qwen3.5:0.8b",
+        "identity": {
+          "name": "Judge"
+        }
+      },
+      {
+        "id": "drafter",
+        "name": "drafter",
+        "workspace": "__MEIMEI_OPENCLAW_HOME__/workspace-drafter",
+        "agentDir": "__MEIMEI_OPENCLAW_HOME__/agents/drafter/agent",
+        "model": "ollama/gemma3:1b",
+        "identity": {
+          "name": "Drafter"
+        }
+      }
+    ]
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "ollama": {
+        "api": "ollama",
+        "apiKey": "ollama-local",
+        "baseUrl": "http://127.0.0.1:11434",
+        "models": [
+          {
+            "id": "granite4:350m",
+            "name": "granite4:350m",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gemma3:1b",
+            "name": "gemma3:1b",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen3.5:0.8b",
+            "name": "qwen3.5:0.8b",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32000,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "arcee-ai/trinity-large-preview:free",
+            "name": "Arcee AI: Trinity Large Preview (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131000,
+            "maxTokens": 16375
+          },
+          {
+            "id": "arcee-ai/trinity-mini:free",
+            "name": "Arcee AI: Trinity Mini (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+            "name": "Venice: Uncensored (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "google/gemma-3-12b-it:free",
+            "name": "Google: Gemma 3 12B (free)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "google/gemma-3-27b-it:free",
+            "name": "Google: Gemma 3 27B (free)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "google/gemma-3-4b-it:free",
+            "name": "Google: Gemma 3 4B (free)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "google/gemma-3n-e2b-it:free",
+            "name": "Google: Gemma 3n 2B (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 8192,
+            "maxTokens": 2048
+          },
+          {
+            "id": "google/gemma-3n-e4b-it:free",
+            "name": "Google: Gemma 3n 4B (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 8192,
+            "maxTokens": 2048
+          },
+          {
+            "id": "liquid/lfm-2.5-1.2b-instruct:free",
+            "name": "LiquidAI: LFM2.5-1.2B-Instruct (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "liquid/lfm-2.5-1.2b-thinking:free",
+            "name": "LiquidAI: LFM2.5-1.2B-Thinking (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "meta-llama/llama-3.2-3b-instruct:free",
+            "name": "Meta: Llama 3.2 3B Instruct (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "meta-llama/llama-3.3-70b-instruct:free",
+            "name": "Meta: Llama 3.3 70B Instruct (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 65536,
+            "maxTokens": 8192
+          },
+          {
+            "id": "minimax/minimax-m2.5:free",
+            "name": "MiniMax: MiniMax M2.5 (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 196608,
+            "maxTokens": 24576
+          },
+          {
+            "id": "mistralai/mistral-small-3.1-24b-instruct:free",
+            "name": "Mistral: Mistral Small 3.1 24B (free)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 16000
+          },
+          {
+            "id": "nousresearch/hermes-3-llama-3.1-405b:free",
+            "name": "Nous: Hermes 3 405B Instruct (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+            "name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 256000,
+            "maxTokens": 32000
+          },
+          {
+            "id": "nvidia/nemotron-3-super-120b-a12b:free",
+            "name": "NVIDIA: Nemotron 3 Super (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262144,
+            "maxTokens": 32768
+          },
+          {
+            "id": "nvidia/nemotron-nano-12b-v2-vl:free",
+            "name": "NVIDIA: Nemotron Nano 12B 2 VL (free)",
+            "reasoning": true,
+            "input": [
+              "image",
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 16000
+          },
+          {
+            "id": "nvidia/nemotron-nano-9b-v2:free",
+            "name": "NVIDIA: Nemotron Nano 9B V2 (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 16000
+          },
+          {
+            "id": "openai/gpt-oss-120b:free",
+            "name": "OpenAI: gpt-oss-120b (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "openai/gpt-oss-20b:free",
+            "name": "OpenAI: gpt-oss-20b (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "openrouter/free",
+            "name": "Free Models Router",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": 25000
+          },
+          {
+            "id": "qwen/qwen3-4b:free",
+            "name": "Qwen: Qwen3 4B (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 40960,
+            "maxTokens": 5120
+          },
+          {
+            "id": "qwen/qwen3-coder:free",
+            "name": "Qwen: Qwen3 Coder 480B A35B (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262000,
+            "maxTokens": 32750
+          },
+          {
+            "id": "qwen/qwen3-next-80b-a3b-instruct:free",
+            "name": "Qwen: Qwen3 Next 80B A3B Instruct (free)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262144,
+            "maxTokens": 32768
+          },
+          {
+            "id": "stepfun/step-3.5-flash:free",
+            "name": "StepFun: Step 3.5 Flash (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 256000,
+            "maxTokens": 32000
+          },
+          {
+            "id": "z-ai/glm-4.5-air:free",
+            "name": "Z.ai: GLM 4.5 Air (free)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          }
+        ],
+        "apiKey": "OPENROUTER_API_KEY"
+      }
+    }
+  },
+  "tools": {
+    "deny": [
+      "group:web",
+      "browser"
+    ],
+    "web": {
+      "search": {
+        "enabled": false
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "dmPolicy": "disabled",
+      "groupAllowFrom": [
+        "*"
+      ],
+      "groupPolicy": "allowlist",
+      "debounceMs": 0,
+      "accounts": {
+        "default": {
+          "enabled": true,
+          "dmPolicy": "disabled",
+          "groupAllowFrom": [
+            "*"
+          ],
+          "groupPolicy": "allowlist",
+          "debounceMs": 0
+        }
+      },
+      "mediaMaxMb": 50
     }
   },
   "gateway": {
+    "port": 18789,
     "mode": "local",
-    "bind": "loopback"
+    "bind": "loopback",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://127.0.0.1:3030",
+        "http://localhost:3030",
+        "http://127.0.0.1:18789",
+        "http://localhost:18789"
+      ],
+      "dangerouslyAllowHostHeaderOriginFallback": false
+    },
+    "auth": {
+      "mode": "token",
+      "token": "__MEIMEI_GATEWAY_TOKEN__",
+      "rateLimit": {
+        "maxAttempts": 10,
+        "windowMs": 60000,
+        "lockoutMs": 300000
+      }
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "plugins": {
+    "allow": [
+      "whatsapp"
+    ],
+    "entries": {
+      "whatsapp": {
+        "enabled": true
+      }
+    }
   }
 }

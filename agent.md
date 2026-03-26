@@ -26,6 +26,21 @@ The contract is:
 - MeiMei may execute within the approved boundaries.
 - OC remains the final authority for direction, scope changes, and release decisions.
 
+## Delivery method
+
+When MeiMei starts a new function, the default contract is the function delivery lifecycle in [function-lifecycle.md](./function-lifecycle.md).
+
+That lifecycle is mandatory unless OC explicitly asks for a different delivery path.
+
+The core shape is:
+
+- define the function
+- shape the smallest useful UI
+- route it to a stable page
+- build the function and its handler
+- verify the page, action, and result
+- hand it off with updated docs
+
 ## Skill philosophy
 
 MeiMei is expected to grow into a very large skill library.
@@ -43,4 +58,3 @@ The skill library should be:
 - Do not drop context when condensing work.
 - Do not use a skill outside its declared scope.
 - Do not let a skill become a hidden policy override.
-

@@ -2,8 +2,343 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-config_path="${OPENCLAW_CONFIG_PATH:-$repo_root/openclaw.config.json}"
+config_path="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+openclaw_bin="${OPENCLAW_BIN:-}"
+if [ -z "$openclaw_bin" ]; then
+  openclaw_bin="$(command -v openclaw 2>/dev/null || true)"
+fi
+if [ -z "$openclaw_bin" ] && [ -x /opt/homebrew/bin/openclaw ]; then
+  openclaw_bin="/opt/homebrew/bin/openclaw"
+fi
+if [ -z "$openclaw_bin" ] && [ -x /usr/local/bin/openclaw ]; then
+  openclaw_bin="/usr/local/bin/openclaw"
+fi
+if [ -z "$openclaw_bin" ]; then
+  echo "openclaw binary not found" >&2
+  exit 127
+fi
+
+if [ -f "$HOME/.openclaw/.env" ]; then
+  set -a
+  # Load local OpenClaw secrets and opt-ins for the gateway/wrapper commands.
+  source "$HOME/.openclaw/.env"
+  set +a
+fi
+
+"$repo_root/scripts/meimei-config.mjs" seed >/dev/null
 
 export OPENCLAW_CONFIG_PATH="$config_path"
 
-exec openclaw agent "$@"
+explicit_agent=""
+agent_name="${OPENCLAW_AGENT:-main}"
+channel="${OPENCLAW_CHANNEL:-}"
+task_type="${OPENCLAW_TASK_TYPE:-}"
+cost_target="${OPENCLAW_COST_TARGET:-}"
+route_report="${OPENCLAW_ROUTE_REPORT:-0}"
+route_only="${OPENCLAW_ROUTE_ONLY:-0}"
+message=""
+thinking_override=""
+forward_args=()
+has_agent_flag=0
+
+lowercase() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+infer_task_type() {
+  local text
+  text="$(lowercase "${1:-}")"
+  if [[ "$text" =~ (audit|review|verify|verification|judge|safety|policy) ]]; then
+    printf '%s' "review"
+    return
+  fi
+  if [[ "$text" =~ (research|synth|synthesis|analysis|analyz|investig|plan|roadmap) ]]; then
+    printf '%s' "research"
+    return
+  fi
+  if [[ "$text" =~ (summar|extract|url|pdf|article|document) ]]; then
+    printf '%s' "summary"
+    return
+  fi
+  if [[ "$text" =~ (reply|chat|message|hi|hello|thanks|status update|quick) ]]; then
+    printf '%s' "chat"
+    return
+  fi
+  printf '%s' "general"
+}
+
+infer_cost_target() {
+  local ch task
+  ch="$(lowercase "${1:-}")"
+  task="$(lowercase "${2:-}")"
+
+  case "$ch" in
+    whatsapp|imessage|telegram|discord|irc|slack|signal|line|feishu|matrix|bluebubbles|zalo|zalouser|synology-chat|tlon)
+      case "$task" in
+        chat|general|summary)
+          printf '%s' "low"
+          return
+          ;;
+      esac
+      printf '%s' "medium"
+      return
+      ;;
+    api)
+      case "$task" in
+        research|review)
+          printf '%s' "medium"
+          return
+          ;;
+      esac
+      printf '%s' "low"
+      return
+      ;;
+    dashboard|last|"")
+      case "$task" in
+        research|review)
+          printf '%s' "medium"
+          return
+          ;;
+      esac
+      printf '%s' "low"
+      return
+      ;;
+  esac
+
+  printf '%s' "medium"
+}
+
+select_route() {
+  local ch task cost
+  ch="$(lowercase "${1:-}")"
+  task="$(lowercase "${2:-}")"
+  cost="$(lowercase "${3:-}")"
+
+  case "$task" in
+    review|audit|verify|verification|safety|policy)
+      printf '%s\t%s\t%s' "judge" "medium" "review and safety checks should use the judge path"
+      return
+      ;;
+    research|synthesis|analysis|plan|roadmap)
+      case "$cost" in
+        high|xhigh)
+          printf '%s\t%s\t%s' "main" "high" "deep work requested for a research or planning task"
+          return
+          ;;
+        *)
+          printf '%s\t%s\t%s' "main" "medium" "research and synthesis need balanced reasoning"
+          return
+          ;;
+      esac
+      ;;
+    summary|extract|document|url|pdf)
+      case "$cost" in
+        low)
+          printf '%s\t%s\t%s' "drafter" "minimal" "keep simple extraction cheap and fast"
+          return
+          ;;
+        *)
+          printf '%s\t%s\t%s' "main" "low" "summary and extraction stay on the balanced path"
+          return
+          ;;
+      esac
+      ;;
+    chat|reply|general)
+      case "$ch" in
+        whatsapp|imessage|telegram|discord|irc|slack|signal|line|feishu|matrix|bluebubbles|zalo|zalouser|synology-chat|tlon)
+          printf '%s\t%s\t%s' "drafter" "minimal" "messaging channels use the fast drafting path"
+          return
+          ;;
+      esac
+      case "$cost" in
+        low)
+          printf '%s\t%s\t%s' "drafter" "minimal" "simple general work stays cheap"
+          return
+          ;;
+      esac
+      printf '%s\t%s\t%s' "main" "low" "defaulting to the balanced general path"
+      return
+      ;;
+  esac
+
+  case "$cost" in
+    low)
+      printf '%s\t%s\t%s' "drafter" "minimal" "default low-cost route"
+      ;;
+    high|xhigh)
+      printf '%s\t%s\t%s' "main" "high" "default high-confidence route"
+      ;;
+    *)
+      printf '%s\t%s\t%s' "main" "low" "default balanced route"
+      ;;
+  esac
+}
+
+select_fallback() {
+  local agent
+  agent="$(lowercase "${1:-}")"
+  case "$agent" in
+    judge)
+      printf '%s\t%s' "main" "low"
+      ;;
+    drafter)
+      printf '%s\t%s' "main" "low"
+      ;;
+    *)
+      printf '%s\t%s' "drafter" "minimal"
+      ;;
+  esac
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --agent|-a)
+      has_agent_flag=1
+      explicit_agent="${2:-}"
+      forward_args+=("$1" "${2:-}")
+      shift 2
+      ;;
+    --channel)
+      channel="${2:-}"
+      forward_args+=("$1" "${2:-}")
+      shift 2
+      ;;
+    --task-type)
+      task_type="${2:-}"
+      shift 2
+      ;;
+    --cost-target)
+      cost_target="${2:-}"
+      shift 2
+      ;;
+    --route-report)
+      route_report=1
+      shift
+      ;;
+    --route-only)
+      route_only=1
+      shift
+      ;;
+    -m|--message)
+      message="${2:-}"
+      forward_args+=("$1" "${2:-}")
+      shift 2
+      ;;
+    --thinking)
+      thinking_override="${2:-}"
+      forward_args+=("$1" "${2:-}")
+      shift 2
+      ;;
+    --timeout|--verbose|--reply-account|--reply-channel|--reply-to|--session-id|-t|--deliver|--json|--local)
+      forward_args+=("$1")
+      if [ "${1#*=}" = "$1" ] && [ "${1}" != "--deliver" ] && [ "${1}" != "--json" ] && [ "${1}" != "--local" ]; then
+        forward_args+=("${2:-}")
+        shift 2
+      else
+        shift
+      fi
+      ;;
+    --help|-h)
+      forward_args+=("$1")
+      shift
+      ;;
+    *)
+      forward_args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [ "$has_agent_flag" -eq 1 ]; then
+  exec "$openclaw_bin" agent "${forward_args[@]}"
+fi
+
+if [ -z "$task_type" ]; then
+  task_type="$(infer_task_type "$message")"
+fi
+
+if [ -z "$cost_target" ]; then
+  cost_target="$(infer_cost_target "$channel" "$task_type")"
+fi
+
+route_output="$(select_route "$channel" "$task_type" "$cost_target")"
+route_agent="${route_output%%$'\t'*}"
+rest="${route_output#*$'\t'}"
+route_thinking="${rest%%$'\t'*}"
+route_reason="${rest#*$'\t'}"
+
+if [ -n "$thinking_override" ]; then
+  route_thinking="$thinking_override"
+fi
+
+fallback_output="$(select_fallback "$route_agent")"
+fallback_agent="${fallback_output%%$'\t'*}"
+fallback_thinking="${fallback_output#*$'\t'}"
+
+case "$route_agent" in
+  judge)
+    route_tier="tier_local_reasoning"
+    ;;
+  drafter)
+    route_tier="tier_local_fast"
+    ;;
+  *)
+    case "$cost_target" in
+      high|xhigh)
+        route_tier="tier_openrouter_strong"
+        ;;
+      *)
+        route_tier="tier_openrouter_free"
+        ;;
+    esac
+    ;;
+esac
+
+export OPENCLAW_ROUTING_CHANNEL="$channel"
+export OPENCLAW_ROUTING_TASK_TYPE="$task_type"
+export OPENCLAW_ROUTING_COST_TARGET="$cost_target"
+export OPENCLAW_ROUTING_AGENT="$route_agent"
+export OPENCLAW_ROUTING_THINKING="$route_thinking"
+export OPENCLAW_ROUTING_REASON="$route_reason"
+export OPENCLAW_ROUTING_FALLBACK_AGENT="$fallback_agent"
+export OPENCLAW_ROUTING_FALLBACK_THINKING="$fallback_thinking"
+export OPENCLAW_ROUTING_TIER="$route_tier"
+
+if [ "${route_report:-0}" = "1" ]; then
+  {
+    echo "[routing] channel=${channel:-last} task_type=${task_type} cost_target=${cost_target} agent=${route_agent} thinking=${route_thinking} fallback=${fallback_agent}/${fallback_thinking}"
+    echo "[routing] reason=${route_reason}"
+  } >&2
+fi
+
+if [ "${route_only:-0}" = "1" ]; then
+  if command -v jq >/dev/null 2>&1; then
+    jq -n \
+      --arg channel "${channel:-last}" \
+      --arg taskType "$task_type" \
+      --arg costTarget "$cost_target" \
+      --arg agent "$route_agent" \
+      --arg thinking "$route_thinking" \
+      --arg fallbackAgent "$fallback_agent" \
+      --arg fallbackThinking "$fallback_thinking" \
+      --arg reason "$route_reason" \
+      --arg tier "$route_tier" \
+      '{channel:$channel, taskType:$taskType, costTarget:$costTarget, agent:$agent, thinking:$thinking, tier:$tier, fallbackAgent:$fallbackAgent, fallbackThinking:$fallbackThinking, reason:$reason}'
+  else
+    printf '{"channel":"%s","taskType":"%s","costTarget":"%s","agent":"%s","thinking":"%s","tier":"%s","fallbackAgent":"%s","fallbackThinking":"%s","reason":"%s"}\n' \
+      "${channel:-last}" \
+      "$task_type" \
+      "$cost_target" \
+      "$route_agent" \
+      "$route_thinking" \
+      "$route_tier" \
+      "$fallback_agent" \
+      "$fallback_thinking" \
+      "$route_reason"
+  fi
+  exit 0
+fi
+
+exec "$openclaw_bin" agent --agent "$route_agent" --thinking "$route_thinking" "${forward_args[@]}"

@@ -26,3 +26,6 @@ Use this skill when a task needs a deliberate choice between speed, cost, depth,
 - Do not overuse heavyweight routes.
 - Do not hide routing decisions from OC.
 
+## Policy Reference
+
+The delivery-ready routing policy lives in [model-routing-spec.md](../../model-routing-spec.md).

@@ -15,3 +15,9 @@ For higher-risk work, also require:
 - security check
 - verification notes
 
+For new product functions, also require:
+
+- the function delivery lifecycle was followed
+- the route is stable and documented
+- the back path to the dashboard root exists
+- the primary action and output are obvious in the UI

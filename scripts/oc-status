@@ -2,10 +2,34 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-config_path="${OPENCLAW_CONFIG_PATH:-$repo_root/openclaw.config.json}"
+config_path="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+openclaw_bin="${OPENCLAW_BIN:-}"
+if [ -z "$openclaw_bin" ]; then
+  openclaw_bin="$(command -v openclaw 2>/dev/null || true)"
+fi
+if [ -z "$openclaw_bin" ] && [ -x /opt/homebrew/bin/openclaw ]; then
+  openclaw_bin="/opt/homebrew/bin/openclaw"
+fi
+if [ -z "$openclaw_bin" ] && [ -x /usr/local/bin/openclaw ]; then
+  openclaw_bin="/usr/local/bin/openclaw"
+fi
+if [ -z "$openclaw_bin" ]; then
+  echo "openclaw binary not found" >&2
+  exit 127
+fi
+
+if [ -f "$HOME/.openclaw/.env" ]; then
+  set -a
+  source "$HOME/.openclaw/.env"
+  set +a
+fi
+
+"$repo_root/scripts/meimei-config.mjs" seed >/dev/null
 
 export OPENCLAW_CONFIG_PATH="$config_path"
 
-openclaw config validate
-openclaw skills check
-openclaw gateway status
+"$openclaw_bin" config validate
+"$openclaw_bin" skills check
+"$openclaw_bin" gateway status

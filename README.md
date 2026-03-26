@@ -22,18 +22,31 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 
 - `agent.md` - identity and behavioral contract.
 - `architecture.md` - system shape and boundaries.
+- `function-lifecycle.md` - standard delivery method for new MeiMei functions.
+- `model-routing-spec.md` - deterministic routing policy for channel, task type, and cost.
+- `mac-mini-migration-audit.md` - dependency and portability audit for moving the product to another Mac mini.
+- `mac-mini-go-live-checklist.md` - strict pass/fail gates for cutover.
+- `vercel-env-inventory.md` - secret inventory and Vercel sync notes.
+- `second-mac-mini-handoff.md` - copy-paste task for the migration agent.
 - `workflow.md` - intake to delivery flow.
 - `runbook.md` - day-to-day operating steps.
 - `security.md` - safety and access rules.
 - `testing.md` - verification expectations.
 - `definition-of-done.md` - shipping bar.
 - `skills/` - skill packs and catalog scaffolding.
-- `openclaw.config.json` - repo-local OpenClaw config that points the runtime at this workspace.
-- `scripts/oc` - wrapper that pins `openclaw` to this repo-local config.
+- `functions/` - product function pages and API contracts.
+- `functions/daily-briefing.md` - Apple Notes-first daily briefing miniapp.
+- `functions/any-url-summarization-in-seconds.md` - URL summarization miniapp.
+- `functions/per-channel-model-routing-by-task-type-and-cost.md` - routing preview miniapp.
+- `openclaw.config.json` - portable OpenClaw seed template for new machines.
+- `~/.openclaw/openclaw.json` - live OpenClaw config rendered from the seed template and used by the dashboard and wrapper scripts.
+- `scripts/oc` - wrapper that pins `openclaw` to the live OpenClaw config.
+- `scripts/oc-agent` - agent turn wrapper with deterministic model routing inputs.
 - `scripts/oc-launch` - launch helper for the gateway.
 - `scripts/oc-status` - health and readiness helper.
+- `scripts/web-search` - local DuckDuckGo-based web search fallback.
 - `Makefile` - convenience targets for launch, status, doctor, skills, and agent turns.
-- `dashboard/server.mjs` - localhost control panel for settings and OpenClaw operations.
+- `dashboard/server.mjs` - localhost control panel for settings, search, and OpenClaw operations.
 - `package.json` - `npm run dashboard` entry point for the control panel.
 
 ## Current state
@@ -59,3 +72,7 @@ Use one of these from the repo root:
 - `make status`
 - `make launch`
 - `npm run dashboard` then open `http://127.0.0.1:3030`
+- `./scripts/meimei-domain` then open `https://meimei.localhost:8443/dashboard/`
+- `npm run setup` for the one-step local domain start/open flow
+- `npm run bootstrap` for the full target-machine bootstrap and verification flow
+- `npm run config:seed` to render the live OpenClaw config from the repo seed

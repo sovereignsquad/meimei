@@ -30,6 +30,7 @@ The operating layer defines how work enters the system and how it moves to compl
 Primary files:
 
 - `workflow.md`
+- `function-lifecycle.md`
 - `runbook.md`
 - `testing.md`
 - `roadmap.md`
@@ -90,4 +91,3 @@ agent.meimei/
 - Skills are composable and narrow.
 - Operational decisions are explicit and documented.
 - The project should be easy to understand before it is easy to automate.
-

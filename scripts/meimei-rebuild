@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+note() {
+  printf '%s\n' "$1"
+}
+
+main() {
+  note "Stopping dashboard services..."
+  "$ROOT_DIR/scripts/meimei-domain" stop || true
+
+  note "Stopping OpenClaw gateway service..."
+  openclaw gateway stop || true
+
+  note "Recreating sandbox containers..."
+  openclaw sandbox recreate --all --force || true
+
+  note "Rebuilding the MeiMei bootstrap state..."
+  "$ROOT_DIR/scripts/meimei-bootstrap"
+}
+
+main "$@"
