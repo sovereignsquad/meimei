@@ -51,6 +51,15 @@ The collaboration boundary is:
 - OpenClaw manages sessions, skills, and execution flow.
 - OC defines priorities, approves sensitive moves, and reviews outputs.
 
+### 5. Channel adapter layer
+
+The channel adapter layer standardizes how channels enter and exit the system.
+
+Primary files:
+
+- `channel-adapter-contract-v1.md`
+- `channel-adapter-lifecycle-v1.md`
+
 ## Skill scale model
 
 The system is designed to support hundreds of skills by using:
