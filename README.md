@@ -23,6 +23,8 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `agent.md` - identity and behavioral contract.
 - `architecture.md` - system shape and boundaries.
 - `foundation-contradiction-audit.md` - contradiction matrix and remediation order for foundation hardening.
+- `VERSION.md` - current foundation version and issue-delivery mapping.
+- `CHANGELOG.md` - chronological release notes and foundation delivery history.
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
 - `issue-quality-standard.md` - required quality rules for implementation issues.
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
@@ -73,6 +75,10 @@ It is designed to support:
 - repeatable delivery
 - safe collaboration with OC
 - future implementation work without rethinking the base structure
+
+Current version line:
+
+- `foundation 0.7.0` (`foundation-hardening-wave`, `2026-03-26`)
 
 ## Next step
 
