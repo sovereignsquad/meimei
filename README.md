@@ -28,6 +28,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
 - `channel-adapter-contract-v1.md` - canonical interface for all channel adapters.
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
+- `whatsapp-adapter-parity-v1.md` - enforced parity requirements for WhatsApp config and policy.
 - `functions/registry.v1.json` - machine-readable registry of active miniapp contracts.
 - `function-lifecycle.md` - standard delivery method for new MeiMei functions.
 - `model-routing-spec.md` - deterministic routing policy for channel, task type, and cost.
@@ -87,3 +88,4 @@ Use one of these from the repo root:
 - `npm run config:seed` to render the live OpenClaw config from the repo seed
 - `npm run readiness` for the unified go/no-go readiness gate
 - `npm run registry:validate` to validate all miniapp contract entries
+- `npm run adapter:whatsapp:validate` to validate WhatsApp adapter parity requirements

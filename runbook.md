@@ -48,6 +48,7 @@ Escalate to OC when:
 - Add `--route-report` to print the selected route and reason.
 - Use `./scripts/oc-doctor --non-interactive` when checking the runtime state.
 - Use `./scripts/oc-readiness` for a single PASS/FAIL go-live readiness decision.
+- Use `npm run adapter:whatsapp:validate` before WhatsApp-facing release changes.
 - Use `npm run config:seed` when you need to render or refresh the live OpenClaw config from the repo seed.
 - Use `npm run bootstrap` when you are bringing up a fresh Mac mini or validating the migration path.
 
