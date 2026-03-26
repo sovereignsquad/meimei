@@ -26,6 +26,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
 - `issue-quality-standard.md` - required quality rules for implementation issues.
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
+- `handoff-artifact-schema-v1.md` - required structured handoff artifact and stage-gate enforcement rules.
 - `channel-adapter-contract-v1.md` - canonical interface for all channel adapters.
 - `channel-adapter-lifecycle-v1.md` - required ingress-to-delivery adapter lifecycle.
 - `sovereign-agent-role-taxonomy-v1.md` - role boundaries and authority matrix for sovereign multi-agent delivery.
@@ -93,3 +94,4 @@ Use one of these from the repo root:
 - `npm run readiness` for the unified go/no-go readiness gate
 - `npm run registry:validate` to validate all miniapp contract entries
 - `npm run adapter:whatsapp:validate` to validate WhatsApp adapter parity requirements
+- `npm run handoff:validate -- handoffs/sample.stage-gate.v1.json` to validate role handoff artifacts and stage gates

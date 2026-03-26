@@ -1,0 +1,56 @@
+{
+  "version": "v1",
+  "workItem": {
+    "id": "mvp-factory-control#706",
+    "title": "Handoff artifact schema and stage-gate enforcement"
+  },
+  "fromRole": "implementer",
+  "toRole": "reviewer",
+  "stage": "review",
+  "objective": "Deliver schema and validator for structured role handoffs.",
+  "scope": {
+    "in": [
+      "handoff schema doc",
+      "validator script",
+      "example artifact"
+    ],
+    "out": [
+      "runtime release automation"
+    ]
+  },
+  "acceptanceChecks": [
+    {
+      "id": "A1",
+      "text": "Schema document exists and defines deterministic required fields.",
+      "status": "pass"
+    },
+    {
+      "id": "A2",
+      "text": "Validator enforces stage-gate rules.",
+      "status": "pass"
+    }
+  ],
+  "evidence": {
+    "commit": "pending-fill-on-delivery",
+    "files": [
+      "handoff-artifact-schema-v1.md",
+      "scripts/validate-handoff-artifact.mjs",
+      "handoffs/sample.stage-gate.v1.json"
+    ],
+    "validation": [
+      {
+        "command": "npm run handoff:validate -- handoffs/sample.stage-gate.v1.json",
+        "result": "pass"
+      }
+    ]
+  },
+  "risks": [
+    "Validator only enforces schema/gate constraints, not business intent quality."
+  ],
+  "openQuestions": [],
+  "gate": {
+    "decision": "pass",
+    "blockedBy": []
+  },
+  "timestamp": "2026-03-26T16:00:00Z"
+}
