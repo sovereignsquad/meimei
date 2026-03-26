@@ -1,0 +1,162 @@
+{
+  "version": "v1",
+  "generatedAt": "2026-03-26",
+  "functions": [
+    {
+      "id": "daily-briefing",
+      "version": "v1",
+      "displayName": "Daily briefing",
+      "route": "/dashboard/Daily_briefing",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/daily-briefing"
+      },
+      "input": {
+        "required": [],
+        "optional": [],
+        "examples": [
+          {}
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": [
+          "ok",
+          "title",
+          "sink"
+        ]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Writes to Apple Notes first and markdown fallback."
+        ]
+      },
+      "capabilities": {
+        "channels": [
+          "dashboard",
+          "api"
+        ],
+        "sideEffects": [
+          "apple-notes-write",
+          "local-file-write"
+        ],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "markdown fallback when Apple Notes is unavailable"
+      }
+    },
+    {
+      "id": "url-summary",
+      "version": "v1",
+      "displayName": "Any-URL summarization in seconds",
+      "route": "/dashboard/Any-URL_summarization_in_seconds",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/url-summary"
+      },
+      "input": {
+        "required": [
+          "url"
+        ],
+        "optional": [],
+        "examples": [
+          {
+            "url": "https://example.com"
+          }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": [
+          "ok",
+          "source",
+          "result"
+        ]
+      },
+      "safety": {
+        "untrustedInput": true,
+        "allowedProtocols": [
+          "http",
+          "https"
+        ],
+        "notes": [
+          "Source content is treated as untrusted and instruction-resistant."
+        ]
+      },
+      "capabilities": {
+        "channels": [
+          "dashboard",
+          "api"
+        ],
+        "sideEffects": [
+          "network-fetch"
+        ],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "return structured failure payload"
+      }
+    },
+    {
+      "id": "model-routing",
+      "version": "v1",
+      "displayName": "Per-channel model routing by task type and cost",
+      "route": "/dashboard/Per-channel_model_routing_by_task_type_and_cost",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/model-routing"
+      },
+      "input": {
+        "required": [
+          "channel",
+          "taskType",
+          "costTarget"
+        ],
+        "optional": [
+          "message"
+        ],
+        "examples": [
+          {
+            "channel": "dashboard",
+            "taskType": "chat",
+            "costTarget": "low"
+          }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": [
+          "ok",
+          "route"
+        ]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Preview-only flow; does not execute the task."
+        ]
+      },
+      "capabilities": {
+        "channels": [
+          "dashboard",
+          "api"
+        ],
+        "sideEffects": [],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "return route calculation error"
+      }
+    }
+  ]
+}

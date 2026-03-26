@@ -24,6 +24,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `architecture.md` - system shape and boundaries.
 - `foundation-contradiction-audit.md` - contradiction matrix and remediation order for foundation hardening.
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
+- `functions/registry.v1.json` - machine-readable registry of active miniapp contracts.
 - `function-lifecycle.md` - standard delivery method for new MeiMei functions.
 - `model-routing-spec.md` - deterministic routing policy for channel, task type, and cost.
 - `mac-mini-migration-audit.md` - dependency and portability audit for moving the product to another Mac mini.
@@ -81,3 +82,4 @@ Use one of these from the repo root:
 - `npm run bootstrap` for the full target-machine bootstrap and verification flow
 - `npm run config:seed` to render the live OpenClaw config from the repo seed
 - `npm run readiness` for the unified go/no-go readiness gate
+- `npm run registry:validate` to validate all miniapp contract entries

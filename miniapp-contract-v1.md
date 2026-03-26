@@ -137,3 +137,13 @@ Contract migration order:
 3. `model-routing`
 
 These three become reference implementations for all future miniapps.
+
+## Registry Binding
+
+The machine-readable source of active contract instances is:
+
+- `functions/registry.v1.json`
+
+Validation command:
+
+- `npm run registry:validate`
