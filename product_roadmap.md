@@ -22,8 +22,9 @@ These are **Done** on the MVP Factory board and **live** in the dashboard (issue
 | **Any-URL summarization** | [#516](https://github.com/moldovancsaba/mvp-factory-control/issues/516) | Paste a link (including PDF); get a fast, structured summary. |
 | **Per-channel model routing** | [#517](https://github.com/moldovancsaba/mvp-factory-control/issues/517) | See which model path fits a channel, task type, and cost target before you spend a turn. |
 | **Daily briefing** | [#518](https://github.com/moldovancsaba/mvp-factory-control/issues/518) | Generate a day-start briefing and land it in Apple Notes (with markdown fallback). |
+| **API channel adapter (reference)** | [#700](https://github.com/moldovancsaba/mvp-factory-control/issues/700) | Inspect the adapter spine (policy, audit, telemetry, lifecycle) that WhatsApp, iMessage, and Discord attach to. |
 
-Together they prove the **end-to-end pattern**: one place to run the function, one contract, one honest result.
+Together they prove the **end-to-end pattern**: one place to run the function, one contract, one honest result. **#700** is the **channel basement**, not a consumer chat app by itself.
 
 ---
 

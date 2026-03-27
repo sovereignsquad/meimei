@@ -37,6 +37,9 @@ const dailyBriefingLabel = "Daily briefing";
 const routingRoute = "/Per-channel_model_routing_by_task_type_and_cost";
 const routingApiRoute = "/api/functions/model-routing";
 const routingLabel = "Per-channel model routing by task type and cost";
+const apiAdapterRoute = "/API_channel_adapter";
+const apiAdapterApiRoute = "/api/functions/api-channel-adapter";
+const apiAdapterLabel = "API channel adapter (reference)";
 const imessageInboundApiRoute = "/api/channels/imessage/inbound";
 const knowmoreRoute = "/knowmore";
 const openclawChatUrl = process.env.MEIMEI_OPENCLAW_CHAT_URL || "http://127.0.0.1:18789/chat?session=main";
@@ -45,6 +48,12 @@ const knowmoreLogoPath = "/images/logo_knowmore.png";
 const adminLogoPath = "/images/logo_admin.png";
 const openclawLogoPath = "/images/logo_openclaw.png";
 const appCards = [
+  {
+    issueId: 700,
+    name: "API channel adapter (reference)",
+    route: "/700/API_channel_adapter",
+    description: "Run the API reference adapter: policy, audit, telemetry, and lifecycle—the spine that future WhatsApp, iMessage, and Discord adapters attach to."
+  },
   {
     issueId: 516,
     name: "Any-URL summarization in seconds",
@@ -66,6 +75,7 @@ const appCards = [
 ];
 
 const miniappIssueRoute = new Map([
+  [700, apiAdapterRoute],
   [516, urlSummaryRoute],
   [517, routingRoute],
   [518, dailyBriefingRoute]
@@ -152,12 +162,12 @@ const knowmoreReleases = [
   {
     issue: 700,
     title: "API reference adapter implementation",
-    summary: "Built reference API adapter implementing lifecycle stages and policy checks, proving contract viability with concrete runtime behavior and responses.",
-    details: "Implemented dashboard/lib/api-channel-adapter.mjs and routed model-routing API through this shared adapter path.",
+    summary: "Built reference API adapter implementing lifecycle stages and policy checks, plus a dedicated miniapp and API route for operator inspection.",
+    details: "Implemented dashboard/lib/api-channel-adapter.mjs; HTTP POST /api/functions/api-channel-adapter; dashboard page /700/API_channel_adapter; see channel-api-adapter-reference-v1.md.",
     manual: [
-      "Call /api/functions/model-routing endpoint.",
-      "Inspect adapter lifecycle in JSON response.",
-      "Verify policy blocks invalid inputs."
+      "Open /700/API_channel_adapter and run the adapter.",
+      "Call POST /api/functions/api-channel-adapter with channel, taskType, costTarget; optional message and approved.",
+      "Inspect adapter lifecycle JSON; confirm policy blocks return adapter state."
     ]
   },
   {
@@ -1822,6 +1832,209 @@ function renderRoutingPage() {
 </html>`;
 }
 
+function renderApiChannelAdapterPage() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(apiAdapterLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="/styles/design-system.css" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+    <div class="topbar">
+      <a class="button secondary" href="/">&larr; Back to dashboard</a>
+      <span class="title">${escapeHtml(apiAdapterLabel)}</span>
+    </div>
+    <main class="hero">
+      <section class="route-card">
+        <h1>${escapeHtml(apiAdapterLabel)}</h1>
+        <p class="lede u-mb12">Issue <strong>#700</strong> — reference path for <code>dashboard/lib/api-channel-adapter.mjs</code>. Same policy, audit trail, and telemetry hooks that WhatsApp, iMessage, and Discord will reuse. Optional message and approval simulate higher-risk intents.</p>
+        <div class="route-form">
+          <div class="route-grid">
+            <div class="field">
+              <label for="channel700">Channel</label>
+              <select id="channel700" data-channel>
+                ${[
+                  ["dashboard", "Dashboard"],
+                  ["whatsapp", "WhatsApp"],
+                  ["imessage", "iMessage"],
+                  ["api", "API"],
+                  ["discord", "Discord"],
+                  ["internal-ops", "Internal ops"]
+                ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field">
+              <label for="taskType700">Task type</label>
+              <select id="taskType700" data-task-type>
+                ${[
+                  ["chat", "Chat / reply"],
+                  ["summary", "Summary / extraction"],
+                  ["research", "Research / synthesis"],
+                  ["review", "Review / safety"],
+                  ["utility", "Deterministic utility"],
+                  ["general", "General"]
+                ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field">
+              <label for="costTarget700">Cost target</label>
+              <select id="costTarget700" data-cost-target>
+                ${[
+                  ["low", "Low"],
+                  ["medium", "Medium"],
+                  ["high", "High"],
+                  ["xhigh", "Extra high"]
+                ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="message700">Message (optional)</label>
+            <textarea id="message700" data-message rows="2" placeholder="Optional text for routing context"></textarea>
+          </div>
+          <div class="field briefing-sink-field">
+            <label>
+              <input type="checkbox" id="approved700" data-approved />
+              Mark request as <strong>approved</strong> (for policy paths that require explicit approval)
+            </label>
+          </div>
+          <div class="route-actions">
+            <button type="button" class="good" data-adapter-submit>Run adapter</button>
+          </div>
+        </div>
+      </section>
+      <section class="result-shell" id="resultShell700">
+        <div class="result-card">
+          <p class="muted u-m0">Set inputs and press <strong>Run adapter</strong> to see lifecycle JSON and routing output.</p>
+        </div>
+      </section>
+      <div class="footer">Preview only: does not send a chat message on WhatsApp, iMessage, or Discord.</div>
+    </main>
+  </div>
+  <script>
+    const channelInput = document.querySelector("[data-channel]");
+    const taskTypeInput = document.querySelector("[data-task-type]");
+    const costTargetInput = document.querySelector("[data-cost-target]");
+    const messageInput = document.querySelector("[data-message]");
+    const approvedInput = document.querySelector("[data-approved]");
+    const runButton = document.querySelector("[data-adapter-submit]");
+    const resultShell = document.getElementById("resultShell700");
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function prettyAgent(value) {
+      const text = String(value || "");
+      if (!text) return "Unknown";
+      if (text === "main") return "Writer / main";
+      if (text === "drafter") return "Drafter";
+      if (text === "judge") return "Judge";
+      return text;
+    }
+
+    function prettyChannel(value) {
+      const text = String(value || "").replace(/[-_]/g, " ");
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function renderAdapterResult(data) {
+      const adapterJson = JSON.stringify(data.adapter || {}, null, 2);
+      const route = data.route;
+      let routeHtml = "";
+      if (route && data.ok) {
+        const agent = prettyAgent(route.agent);
+        const fallbackAgent = prettyAgent(route.fallbackAgent);
+        const statusClass = route.agent === "judge" ? "status-ok" : route.agent === "drafter" ? "status-limited" : "status-ok";
+        routeHtml = [
+          '<h3 class="u-mt12">Routing recommendation</h3>',
+          '<div class="pill ' + statusClass + ' u-mb12">Route ready</div>',
+          '<p class="muted">' + escapeHtml(route.reason || "") + '</p>',
+          '<div class="grid">',
+          '<section class="panel"><h3>Recommended</h3><div class="value value-lg">' + escapeHtml(agent) + '</div></section>',
+          '<section class="panel"><h3>Fallback</h3><div class="value value-lg">' + escapeHtml(fallbackAgent) + '</div></section>',
+          '<section class="panel"><h3>Tier</h3><div class="value value-lg">' + escapeHtml(route.tier || "") + '</div></section>',
+          '</div>'
+        ].join("");
+      }
+      resultShell.innerHTML = [
+        '<div class="result-card">',
+        '<h3>Adapter response</h3>',
+        '<p class="muted u-mt0">Lifecycle stages and channel state from <code>routeViaApiAdapter</code>.</p>',
+        '<pre class="terminal-shell u-mt12 u-prewrap">' + escapeHtml(adapterJson) + '</pre>',
+        routeHtml,
+        '</div>'
+      ].join("");
+      document.body.classList.add("has-result");
+    }
+
+    function renderError(message) {
+      resultShell.innerHTML = [
+        '<div class="result-card">',
+        '<div class="pill status-failed u-mb12">Failed</div>',
+        '<h2>Adapter run failed</h2>',
+        '<p class="muted u-m0">' + escapeHtml(message) + '</p>',
+        '</div>'
+      ].join("");
+      document.body.classList.add("has-result");
+    }
+
+    async function runAdapter() {
+      resultShell.innerHTML = '<div class="result-card"><div class="pill">Working</div><p class="muted u-mt12">Running reference adapter.</p></div>';
+      document.body.classList.add("has-result");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        const response = await fetch("${apiAdapterApiRoute}", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            channel: String(channelInput.value || "").trim(),
+            taskType: String(taskTypeInput.value || "").trim(),
+            costTarget: String(costTargetInput.value || "").trim(),
+            message: String(messageInput.value || "").trim(),
+            actionIntent: "execute",
+            approved: approvedInput.checked === true
+          })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          const adapterJson = data.adapter ? JSON.stringify(data.adapter, null, 2) : "";
+          const errMsg = data.error || "Policy blocked or request failed.";
+          if (adapterJson) {
+            resultShell.innerHTML = [
+              '<div class="result-card">',
+              '<div class="pill status-failed u-mb12">Blocked or failed</div>',
+              '<p class="muted u-mt0">' + escapeHtml(errMsg) + '</p>',
+              '<h3 class="u-mt12">Adapter response</h3>',
+              '<pre class="terminal-shell u-mt12 u-prewrap">' + escapeHtml(adapterJson) + '</pre>',
+              '</div>'
+            ].join("");
+            document.body.classList.add("has-result");
+            return;
+          }
+          throw new Error(errMsg);
+        }
+        renderAdapterResult(data);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        renderError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    runButton.addEventListener("click", runAdapter);
+  </script>
+</body>
+</html>`;
+}
+
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     "content-type": "application/json; charset=utf-8",
@@ -1941,6 +2154,16 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && resolvedMiniappRoute === apiAdapterRoute) {
+      const html = renderApiChannelAdapterPage();
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, max-age=0"
+      });
+      res.end(html);
+      return;
+    }
+
     if (req.method === "GET" && normalizedPath === knowmoreRoute) {
       const html = renderKnowmorePage();
       res.writeHead(200, {
@@ -1977,12 +2200,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "GET" && url.pathname === routingApiRoute) {
+    if (req.method === "GET" && (url.pathname === routingApiRoute || url.pathname === apiAdapterApiRoute)) {
+      const isAdapter = url.pathname === apiAdapterApiRoute;
       const result = await routeViaApiAdapter({
         channel: url.searchParams.get("channel") || "dashboard",
         taskType: url.searchParams.get("taskType") || "chat",
         costTarget: url.searchParams.get("costTarget") || "low",
-        message: "",
+        message: isAdapter ? (url.searchParams.get("message") || "") : "",
         actionIntent: url.searchParams.get("actionIntent") || "execute",
         approved: url.searchParams.get("approved") === "true"
       }, {
@@ -2005,7 +2229,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && url.pathname === routingApiRoute) {
+    if (req.method === "POST" && (url.pathname === routingApiRoute || url.pathname === apiAdapterApiRoute)) {
       const body = await readJson(req);
       const result = await routeViaApiAdapter({
         channel: body.channel || "dashboard",

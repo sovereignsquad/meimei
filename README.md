@@ -62,6 +62,8 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `functions/daily-briefing.md` - Apple Notes-first daily briefing miniapp.
 - `functions/any-url-summarization-in-seconds.md` - URL summarization miniapp.
 - `functions/per-channel-model-routing-by-task-type-and-cost.md` - routing preview miniapp.
+- `functions/api-channel-adapter.md` - API reference channel adapter miniapp (`#700`).
+- `channel-api-adapter-reference-v1.md` - delivery artifact and verification for the API adapter basement.
 - `openclaw.config.json` - portable OpenClaw seed template for new machines.
 - `~/.openclaw/openclaw.json` - live OpenClaw config rendered from the seed template and used by the dashboard and wrapper scripts.
 - `scripts/oc` - wrapper that pins `openclaw` to the live OpenClaw config.
@@ -93,7 +95,7 @@ Current baseline includes:
 
 Current version line:
 
-- `foundation 0.7.3` (`design-system-v1-mobile-nav-hardened`, `2026-03-27`)
+- `foundation 0.7.4` (`api-channel-adapter-miniapp-700`, `2026-03-27`)
 
 Release metadata source of truth:
 

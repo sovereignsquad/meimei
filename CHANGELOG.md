@@ -4,6 +4,14 @@
 
 - No unreleased changes.
 
+## 2026-03-27 - API channel adapter miniapp (`0.7.4`)
+
+### Channel reference (`mvp-factory-control#700`)
+
+- Added miniapp route `/700/API_channel_adapter` and HTTP `GET`/`POST` `/api/functions/api-channel-adapter` (same adapter engine as model routing; dedicated contract path).
+- Documented delivery artifact in `channel-api-adapter-reference-v1.md` and `functions/api-channel-adapter.md`; registry entry `api-channel-adapter`.
+- Updated knowmore card for issue 700, `product_roadmap.md`, and `architecture.md` channel layer references.
+
 ## 2026-03-27 - Design system hardening wave (`0.7.3`)
 
 ### Documentation and communication quality

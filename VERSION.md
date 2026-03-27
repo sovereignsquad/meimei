@@ -3,9 +3,9 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.7.3`
+- Version: `0.7.4`
 - Date: `2026-03-27`
-- Codename: `design-system-v1-mobile-nav-hardened`
+- Codename: `api-channel-adapter-miniapp-700`
 
 ## Included issue deliveries
 
@@ -16,7 +16,7 @@
 - `mvp-factory-control#696` - Dashboard runtime helper modularization
 - `mvp-factory-control#697` - Issue quality standard + ready gate checklist
 - `mvp-factory-control#699` - Channel adapter contract + lifecycle
-- `mvp-factory-control#700` - API reference channel adapter implementation
+- `mvp-factory-control#700` - API reference channel adapter + miniapp `/700/API_channel_adapter` + delivery doc
 - `mvp-factory-control#701` - WhatsApp parity requirements + validator
 - `mvp-factory-control#702` - iMessage adapter architecture plan
 - `mvp-factory-control#703` - Email adapter architecture plan

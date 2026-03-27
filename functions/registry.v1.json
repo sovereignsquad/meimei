@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "generatedAt": "2026-03-26",
+  "generatedAt": "2026-03-27",
   "functions": [
     {
       "id": "daily-briefing",
@@ -156,6 +156,68 @@
       "failureModel": {
         "clearErrorMessages": true,
         "fallbackBehavior": "return route calculation error"
+      }
+    },
+    {
+      "id": "api-channel-adapter",
+      "version": "v1",
+      "displayName": "API channel adapter (reference)",
+      "route": "/dashboard/700/API_channel_adapter",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/api-channel-adapter"
+      },
+      "input": {
+        "required": [
+          "channel",
+          "taskType",
+          "costTarget"
+        ],
+        "optional": [
+          "message",
+          "actionIntent",
+          "approved"
+        ],
+        "examples": [
+          {
+            "channel": "dashboard",
+            "taskType": "chat",
+            "costTarget": "low",
+            "message": "",
+            "approved": false
+          }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": [
+          "ok",
+          "adapter"
+        ]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Reference adapter: policy, audit trail, telemetry. Same engine as model-routing; dedicated route for issue #700.",
+          "On success includes route; on policy block may omit route but includes adapter."
+        ]
+      },
+      "capabilities": {
+        "channels": [
+          "dashboard",
+          "api"
+        ],
+        "sideEffects": [
+          "audit-append",
+          "telemetry-record"
+        ],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "return structured error with adapter lifecycle"
       }
     }
   ]

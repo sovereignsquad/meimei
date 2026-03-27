@@ -85,6 +85,7 @@ Normalizes channel behavior and delivery lifecycle.
 Key artifacts:
 
 - `dashboard/lib/api-channel-adapter.mjs`
+- `channel-api-adapter-reference-v1.md` (reference adapter delivery and verification, `mvp-factory-control#700`)
 - `dashboard/lib/imessage-adapter.mjs`
 - `imessage-adapter-architecture-v1.md`
 - `email-adapter-architecture-v1.md`
