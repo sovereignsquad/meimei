@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Reload dashboard processes so git-pulled code is picked up (LaunchAgents do not auto-reload).
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+PROXY_PLIST="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-proxy.plist"
+if [[ -f "$PROXY_PLIST" ]]; then
+  exec "${ROOT_DIR}/scripts/meimei-domain" restart
+fi
+
+UID_NUM="$(id -u)"
+DASH_LABEL="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
+WATCH_LABEL="${MEIMEI_DASHBOARD_WATCHDOG_LABEL:-com.agent.meimei.dashboard-health}"
+if launchctl print "gui/${UID_NUM}/${DASH_LABEL}" &>/dev/null; then
+  echo "Kicking ${DASH_LABEL} (and watchdog if present)…"
+  launchctl kickstart -k "gui/${UID_NUM}/${DASH_LABEL}" || true
+  launchctl kickstart -k "gui/${UID_NUM}/${WATCH_LABEL}" 2>/dev/null || true
+  echo "Done. Try http://127.0.0.1:${PORT:-3030}"
+  exit 0
+fi
+
+echo "No MeiMei dashboard LaunchAgent found." >&2
+echo "  HTTPS + UI:  ./scripts/meimei-domain install" >&2
+echo "  Foreground:  npm run dashboard" >&2
+exit 1

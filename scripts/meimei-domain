@@ -30,6 +30,8 @@ install_plist() {
     <string>${NODE_BIN}</string>
     <string>${ROOT_DIR}/scripts/meimei-domain.mjs</string>
   </array>
+  <key>WorkingDirectory</key>
+  <string>${ROOT_DIR}</string>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
@@ -57,6 +59,8 @@ install_dashboard_plist() {
     <string>${NODE_BIN}</string>
     <string>${ROOT_DIR}/dashboard/server.mjs</string>
   </array>
+  <key>WorkingDirectory</key>
+  <string>${ROOT_DIR}</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>PORT</key>

@@ -66,6 +66,7 @@ Escalate to OC when:
 ## Local Dashboard
 
 - Run `npm run dashboard` from the repo root.
+- After `git pull`, reload launchd services so new code runs: `npm run dashboard:reload` (or `./scripts/meimei-domain restart` when using `meimei.localhost:8443`).
 - Open `http://127.0.0.1:3030` in a browser.
 - Use the settings form to update the repo-local OpenClaw config.
 - Use the operations panel to run status, skills, doctor, and launch checks.
