@@ -1053,9 +1053,7 @@ function renderKnowmorePage() {
         <a class="button secondary" href="/admin">Admin / Settings</a>
       </div>
     </div>
-    <section class="card summary">
-      <p>Release notes as flashcards. Each card shows a 160-character summary; click to open issue link, details, and simple user manual.</p>
-    </section>
+    <section class="card summary"></section>
     <section class="card section">
       <h2>Release flashcards</h2>
       <p class="sub">Click any card for linked issue details and how-to steps.</p>
