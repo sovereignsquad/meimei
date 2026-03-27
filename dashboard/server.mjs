@@ -889,7 +889,6 @@ function renderPage(state, lastResult) {
       <div class="nav-actions">
         <a class="button secondary" href="${knowmoreRoute}">knowmore</a>
         <a class="button secondary" href="/admin">Admin / Settings</a>
-        <a class="button good" href="${escapeHtml(publicDashboardUrl)}">Open local domain</a>
       </div>
     </div>
     <section class="card summary">
@@ -1180,7 +1179,6 @@ function renderAdminPage(state, lastResult) {
       <div class="nav-actions">
         <a class="button secondary" href="${knowmoreRoute}">knowmore</a>
         <a class="button secondary" href="/">Dashboard</a>
-        <a class="button good" href="${escapeHtml(publicDashboardUrl)}">Open local domain</a>
       </div>
     </div>
 
