@@ -456,33 +456,8 @@ async function summarizeUrlSource(inputUrl) {
   };
 }
 
-function renderPage(state, lastResult) {
-  const config = state.config;
-  const workspace = configValue(config, ["agents", "defaults", "workspace"]);
-  const gatewayMode = configValue(config, ["gateway", "mode"]);
-  const gatewayBind = configValue(config, ["gateway", "bind"]);
-  const defaultModel = configValue(config, ["agents", "defaults", "model", "primary"]);
-  const imageModel = configValue(config, ["agents", "defaults", "imageModel", "primary"]);
-  const memoryProvider = configValue(config, ["agents", "defaults", "memorySearch", "provider"]);
-  const whatsappGroupPolicy = configValue(config, ["channels", "whatsapp", "groupPolicy"]);
-  const whatsappGroupAllowFrom = Array.isArray(configValue(config, ["channels", "whatsapp", "groupAllowFrom"]))
-    ? configValue(config, ["channels", "whatsapp", "groupAllowFrom"]).join(", ")
-    : String(configValue(config, ["channels", "whatsapp", "groupAllowFrom"]) || "");
-  const controlOrigins = Array.isArray(configValue(config, ["gateway", "controlUi", "allowedOrigins"]))
-    ? configValue(config, ["gateway", "controlUi", "allowedOrigins"]).join("\n")
-    : String(configValue(config, ["gateway", "controlUi", "allowedOrigins"]) || "");
-  const modelOptions = collectModelOptions(config);
-  const imageModelOptions = modelOptions.filter((option) => option.input.includes("image"));
-  const statusText = lastResult?.stdout || "";
-  const statusError = lastResult?.stderr || "";
-
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>agent.meimei dashboard</title>
-  <style>
+function dashboardShellStyles() {
+  return `
     :root {
       --bg: #08111f;
       --panel: rgba(12, 19, 34, 0.9);
@@ -510,13 +485,24 @@ function renderPage(state, lastResult) {
     .shell {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 32px 20px 48px;
+      padding: 28px 20px 48px;
     }
-    .hero {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
-      align-items: stretch;
+    .topnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     .card {
       background: var(--panel);
@@ -525,67 +511,17 @@ function renderPage(state, lastResult) {
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
     }
-    .hero-main {
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-main::after {
-      content: "";
-      position: absolute;
-      inset: auto -20% -40% auto;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(143, 211, 255, 0.2), transparent 68%);
-      pointer-events: none;
-    }
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
-    }
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2rem, 4vw, 4rem);
-      line-height: 0.96;
-      max-width: 10ch;
-    }
-    .lede {
-      max-width: 64ch;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.6;
-    }
-    .stat-grid {
-      display: grid;
-      gap: 14px;
+    .summary {
       padding: 20px;
+      margin-bottom: 18px;
     }
-    .stat {
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-    }
-    .stat .label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .summary p {
+      margin: 0;
       color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .stat .value {
-      font-size: 18px;
-      font-weight: 650;
-      word-break: break-word;
+      font-size: 14px;
+      line-height: 1.5;
     }
     .grid {
-      margin-top: 20px;
       display: grid;
       gap: 20px;
       grid-template-columns: 1fr 1fr;
@@ -677,78 +613,68 @@ function renderPage(state, lastResult) {
       line-height: 1.6;
       max-height: 420px;
     }
-    .split {
-      display: grid;
-      gap: 14px;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-    }
     .footer {
       margin-top: 20px;
       color: var(--muted);
       font-size: 12px;
     }
-    @media (max-width: 900px) {
-      .hero, .grid, .row { grid-template-columns: 1fr; }
-      .shell { padding: 18px 14px 34px; }
-      .hero-main { padding: 20px; }
+    .meta-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
     }
-  </style>
+    .meta {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .meta .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .meta .value {
+      font-size: 16px;
+      font-weight: 650;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 900px) {
+      .grid, .row { grid-template-columns: 1fr; }
+      .shell { padding: 18px 14px 34px; }
+      .topnav { align-items: flex-start; flex-direction: column; }
+    }
+  `;
+}
+
+function renderPage(state, lastResult) {
+  const config = state.config;
+  const statusText = lastResult?.stdout || "";
+  const statusError = lastResult?.stderr || "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>agent.meimei dashboard</title>
+  <style>${dashboardShellStyles()}</style>
 </head>
 <body>
   <div class="shell">
-    <div class="hero">
-      <section class="card hero-main">
-        <div class="eyebrow">agent.meimei control room</div>
-        <h1>OpenClaw settings and launch dashboard.</h1>
-        <p class="lede">
-          Edit the live OpenClaw config, validate the workspace, inspect runtime status,
-          and start the gateway from one localhost panel. This is the operator surface
-          for the feature we just delivered.
-        </p>
-        <div class="actions" style="margin-top:18px">
-          <a class="button good" href="${escapeHtml(publicDashboardUrl)}">Open local domain</a>
-          <a class="button secondary" href="http://127.0.0.1:${port}">Open localhost</a>
-        </div>
-        <div class="actions" style="margin-top:12px">
-          <button class="button good" type="button" data-run="status">Run status</button>
-          <button class="button secondary" type="button" data-run="skills">Check skills</button>
-          <button class="button warn" type="button" data-run="doctor">Run doctor</button>
-          <button class="button" type="button" data-run="setup">Setup and open</button>
-        </div>
-      </section>
-      <aside class="card stat-grid">
-        <div class="stat">
-          <div class="label">Config path</div>
-          <div class="value">${escapeHtml(state.configPath)}</div>
-        </div>
-        <div class="stat">
-          <div class="label">Workspace</div>
-          <div class="value">${escapeHtml(workspace || "(unset)")}</div>
-        </div>
-        <div class="stat">
-          <div class="label">Gateway</div>
-          <div class="value">${escapeHtml(gatewayMode || "(unset)")} / ${escapeHtml(gatewayBind || "(unset)")}</div>
-        </div>
-        <div class="stat">
-          <div class="label">Default model</div>
-          <div class="value">${escapeHtml(defaultModel || "(unset)")}</div>
-        </div>
-        <div class="stat">
-          <div class="label">Memory</div>
-          <div class="value">${escapeHtml(memoryProvider || "(unset)")}</div>
-        </div>
-      </aside>
+    <div class="topnav">
+      <h1 class="title">MeiMei Operator Dashboard</h1>
+      <div class="nav-actions">
+        <a class="button secondary" href="/admin">Admin / Settings</a>
+        <a class="button good" href="${escapeHtml(publicDashboardUrl)}">Open local domain</a>
+      </div>
     </div>
+    <section class="card summary">
+      <p>Operate functions, runtime commands, and direct agent turns from one clean surface.</p>
+    </section>
 
     <div class="grid">
       <section class="card section">
@@ -760,74 +686,6 @@ function renderPage(state, lastResult) {
           <a class="button secondary" href="./Per-channel_model_routing_by_task_type_and_cost">Per-channel model routing</a>
         </div>
         <div class="footer">This area will grow into the MeiMei function catalog.</div>
-      </section>
-
-      <section class="card section">
-        <h2>Settings</h2>
-        <p class="sub">Update the values that control how OpenClaw uses this workspace.</p>
-        <form class="form" method="post" action="/api/config" data-config-form>
-          <div class="field">
-            <label for="workspace">Workspace</label>
-            <input id="workspace" name="workspace" value="${escapeHtml(workspace || "")}" placeholder="/Users/you/Projects/agent.meimei" />
-          </div>
-          <div class="field">
-            <label for="defaultModel">Default model</label>
-            <input id="defaultModel" name="defaultModel" value="${escapeHtml(defaultModel || "")}" placeholder="openrouter/openrouter/free" list="modelOptions" />
-          </div>
-          <div class="field">
-            <label for="imageModel">Image model</label>
-            <input id="imageModel" name="imageModel" value="${escapeHtml(imageModel || "")}" placeholder="openrouter/nvidia/nemotron-nano-12b-v2-vl:free" list="imageModelOptions" />
-          </div>
-          <datalist id="modelOptions">
-            ${modelOptions.map((option) => `<option value="${escapeHtml(option.ref)}">${escapeHtml(option.label)}</option>`).join("")}
-          </datalist>
-          <datalist id="imageModelOptions">
-            ${imageModelOptions.map((option) => `<option value="${escapeHtml(option.ref)}">${escapeHtml(option.label)}</option>`).join("")}
-          </datalist>
-          <div class="field">
-            <label for="memoryProvider">Memory provider</label>
-            <select id="memoryProvider" name="memoryProvider">
-              ${["", "ollama", "local"].map((value) => {
-                const label = value || "(unset)";
-                return `<option value="${escapeHtml(value)}" ${value === memoryProvider ? "selected" : ""}>${label}</option>`;
-              }).join("")}
-            </select>
-          </div>
-          <div class="row">
-            <div class="field">
-              <label for="gatewayMode">Gateway mode</label>
-              <select id="gatewayMode" name="gatewayMode">
-                ${["local", "remote"].map((mode) => `<option value="${mode}" ${mode === gatewayMode ? "selected" : ""}>${mode}</option>`).join("")}
-              </select>
-            </div>
-            <div class="field">
-              <label for="gatewayBind">Gateway bind</label>
-              <select id="gatewayBind" name="gatewayBind">
-                ${["loopback", "lan", "tailnet", "auto", "custom"].map((mode) => `<option value="${mode}" ${mode === gatewayBind ? "selected" : ""}>${mode}</option>`).join("")}
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="controlOrigins">Control UI origins</label>
-            <textarea id="controlOrigins" name="controlOrigins" placeholder="http://127.0.0.1:3030">${escapeHtml(controlOrigins)}</textarea>
-          </div>
-          <div class="row">
-            <div class="field">
-              <label for="whatsappGroupPolicy">WhatsApp group policy</label>
-              <select id="whatsappGroupPolicy" name="whatsappGroupPolicy">
-                ${["allowlist", "open", "disabled"].map((mode) => `<option value="${mode}" ${mode === whatsappGroupPolicy ? "selected" : ""}>${mode}</option>`).join("")}
-              </select>
-            </div>
-            <div class="field">
-              <label for="whatsappGroupAllowFrom">WhatsApp group allow from</label>
-              <input id="whatsappGroupAllowFrom" name="whatsappGroupAllowFrom" value="${escapeHtml(whatsappGroupAllowFrom)}" placeholder="*, +15551234567" />
-            </div>
-          </div>
-          <div class="actions">
-            <button type="submit" class="good">Save settings</button>
-            <a class="button secondary" href="/api/config">View raw config</a>
-          </div>
-        </form>
       </section>
 
       <section class="card section">
@@ -909,13 +767,10 @@ function renderPage(state, lastResult) {
       output.textContent = JSON.stringify(data, null, 2);
       return data;
     }
-    document.querySelectorAll('[data-run-form], [data-config-form], [data-agent-form], [data-search-form]').forEach((form) => {
+    document.querySelectorAll('[data-run-form], [data-agent-form], [data-search-form]').forEach((form) => {
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const data = await postForm(form);
-        if (form.matches('[data-config-form]') && data.ok) {
-          window.location.reload();
-        }
+        await postForm(form);
       });
     });
     document.querySelectorAll('button[data-run]').forEach((button) => {
@@ -926,6 +781,173 @@ function renderPage(state, lastResult) {
           body: JSON.stringify({ cmd: button.dataset.run })
         }).then((response) => response.json());
         output.textContent = JSON.stringify(data, null, 2);
+      });
+    });
+  </script>
+</body>
+</html>`;
+}
+
+function renderAdminPage(state, lastResult) {
+  const config = state.config;
+  const workspace = configValue(config, ["agents", "defaults", "workspace"]);
+  const gatewayMode = configValue(config, ["gateway", "mode"]);
+  const gatewayBind = configValue(config, ["gateway", "bind"]);
+  const defaultModel = configValue(config, ["agents", "defaults", "model", "primary"]);
+  const imageModel = configValue(config, ["agents", "defaults", "imageModel", "primary"]);
+  const memoryProvider = configValue(config, ["agents", "defaults", "memorySearch", "provider"]);
+  const whatsappGroupPolicy = configValue(config, ["channels", "whatsapp", "groupPolicy"]);
+  const whatsappGroupAllowFrom = Array.isArray(configValue(config, ["channels", "whatsapp", "groupAllowFrom"]))
+    ? configValue(config, ["channels", "whatsapp", "groupAllowFrom"]).join(", ")
+    : String(configValue(config, ["channels", "whatsapp", "groupAllowFrom"]) || "");
+  const controlOrigins = Array.isArray(configValue(config, ["gateway", "controlUi", "allowedOrigins"]))
+    ? configValue(config, ["gateway", "controlUi", "allowedOrigins"]).join("\n")
+    : String(configValue(config, ["gateway", "controlUi", "allowedOrigins"]) || "");
+  const modelOptions = collectModelOptions(config);
+  const imageModelOptions = modelOptions.filter((option) => option.input.includes("image"));
+  const statusText = lastResult?.stdout || "";
+  const statusError = lastResult?.stderr || "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>agent.meimei admin/settings</title>
+  <style>${dashboardShellStyles()}</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topnav">
+      <h1 class="title">Admin / Settings</h1>
+      <div class="nav-actions">
+        <a class="button secondary" href="/">Dashboard</a>
+        <a class="button good" href="${escapeHtml(publicDashboardUrl)}">Open local domain</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card section">
+        <h2>Runtime metadata</h2>
+        <p class="sub">Moved from operator page for cleaner daily operation.</p>
+        <div class="meta-grid">
+          <div class="meta">
+            <div class="label">Config path</div>
+            <div class="value">${escapeHtml(state.configPath)}</div>
+          </div>
+          <div class="meta">
+            <div class="label">Workspace</div>
+            <div class="value">${escapeHtml(workspace || "(unset)")}</div>
+          </div>
+          <div class="meta">
+            <div class="label">Gateway</div>
+            <div class="value">${escapeHtml(gatewayMode || "(unset)")} / ${escapeHtml(gatewayBind || "(unset)")}</div>
+          </div>
+          <div class="meta">
+            <div class="label">Default model</div>
+            <div class="value">${escapeHtml(defaultModel || "(unset)")}</div>
+          </div>
+          <div class="meta">
+            <div class="label">Memory</div>
+            <div class="value">${escapeHtml(memoryProvider || "(unset)")}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Settings</h2>
+        <p class="sub">Update the values that control how OpenClaw uses this workspace.</p>
+        <form class="form" method="post" action="/api/config" data-config-form>
+          <div class="field">
+            <label for="workspace">Workspace</label>
+            <input id="workspace" name="workspace" value="${escapeHtml(workspace || "")}" placeholder="/Users/you/Projects/agent.meimei" />
+          </div>
+          <div class="field">
+            <label for="defaultModel">Default model</label>
+            <input id="defaultModel" name="defaultModel" value="${escapeHtml(defaultModel || "")}" placeholder="openrouter/openrouter/free" list="modelOptions" />
+          </div>
+          <div class="field">
+            <label for="imageModel">Image model</label>
+            <input id="imageModel" name="imageModel" value="${escapeHtml(imageModel || "")}" placeholder="openrouter/nvidia/nemotron-nano-12b-v2-vl:free" list="imageModelOptions" />
+          </div>
+          <datalist id="modelOptions">
+            ${modelOptions.map((option) => `<option value="${escapeHtml(option.ref)}">${escapeHtml(option.label)}</option>`).join("")}
+          </datalist>
+          <datalist id="imageModelOptions">
+            ${imageModelOptions.map((option) => `<option value="${escapeHtml(option.ref)}">${escapeHtml(option.label)}</option>`).join("")}
+          </datalist>
+          <div class="field">
+            <label for="memoryProvider">Memory provider</label>
+            <select id="memoryProvider" name="memoryProvider">
+              ${["", "ollama", "local"].map((value) => {
+                const label = value || "(unset)";
+                return `<option value="${escapeHtml(value)}" ${value === memoryProvider ? "selected" : ""}>${label}</option>`;
+              }).join("")}
+            </select>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="gatewayMode">Gateway mode</label>
+              <select id="gatewayMode" name="gatewayMode">
+                ${["local", "remote"].map((mode) => `<option value="${mode}" ${mode === gatewayMode ? "selected" : ""}>${mode}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field">
+              <label for="gatewayBind">Gateway bind</label>
+              <select id="gatewayBind" name="gatewayBind">
+                ${["loopback", "lan", "tailnet", "auto", "custom"].map((mode) => `<option value="${mode}" ${mode === gatewayBind ? "selected" : ""}>${mode}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="controlOrigins">Control UI origins</label>
+            <textarea id="controlOrigins" name="controlOrigins" placeholder="http://127.0.0.1:3030">${escapeHtml(controlOrigins)}</textarea>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="whatsappGroupPolicy">WhatsApp group policy</label>
+              <select id="whatsappGroupPolicy" name="whatsappGroupPolicy">
+                ${["allowlist", "open", "disabled"].map((mode) => `<option value="${mode}" ${mode === whatsappGroupPolicy ? "selected" : ""}>${mode}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field">
+              <label for="whatsappGroupAllowFrom">WhatsApp group allow from</label>
+              <input id="whatsappGroupAllowFrom" name="whatsappGroupAllowFrom" value="${escapeHtml(whatsappGroupAllowFrom)}" placeholder="*, +15551234567" />
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="good">Save settings</button>
+            <a class="button secondary" href="/api/config">View raw config</a>
+          </div>
+        </form>
+      </section>
+
+      <section class="card section">
+        <h2>Latest output</h2>
+        <p class="sub">Last operation result returned by the dashboard server.</p>
+        <pre>${escapeHtml(statusText || statusError || "No command has been run yet.")}</pre>
+      </section>
+    </div>
+  </div>
+  <script>
+    const output = document.querySelector('pre');
+    async function postForm(form) {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+      });
+      const data = await response.json();
+      output.textContent = JSON.stringify(data, null, 2);
+      return data;
+    }
+    document.querySelectorAll('[data-config-form]').forEach((form) => {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = await postForm(form);
+        if (data.ok) {
+          window.location.reload();
+        }
       });
     });
   </script>
@@ -2231,6 +2253,20 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname === "/") {
       const config = await readConfig();
       const html = renderPage({
+        config,
+        configPath
+      });
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, max-age=0"
+      });
+      res.end(html);
+      return;
+    }
+
+    if (req.method === "GET" && normalizedPath === "/admin") {
+      const config = await readConfig();
+      const html = renderAdminPage({
         config,
         configPath
       });
