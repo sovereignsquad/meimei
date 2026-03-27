@@ -37,6 +37,225 @@ const routingRoute = "/Per-channel_model_routing_by_task_type_and_cost";
 const routingApiRoute = "/api/functions/model-routing";
 const routingLabel = "Per-channel model routing by task type and cost";
 const imessageInboundApiRoute = "/api/channels/imessage/inbound";
+const knowmoreRoute = "/knowmore";
+
+const knowmoreReleases = [
+  {
+    issue: 692,
+    title: "Foundation contradiction audit baseline",
+    summary: "Mapped core docs/runtime contradictions into one baseline matrix so implementation starts from verified truth instead of assumptions and silent drift.",
+    details: "Introduced a contradiction audit artifact to identify and prioritize the biggest truth gaps between docs, config, scripts, and runtime behavior.",
+    manual: [
+      "Open foundation-contradiction-audit.md.",
+      "Review contradiction IDs and severity.",
+      "Apply remediation in order from highest impact."
+    ]
+  },
+  {
+    issue: 693,
+    title: "Unified readiness gate",
+    summary: "Added a single PASS/FAIL readiness gate that combines config checks, runtime probes, and doctor signals to block unsafe launches and releases.",
+    details: "Created scripts/oc-readiness and npm run readiness so operators have one deterministic go/no-go command.",
+    manual: [
+      "Run npm run readiness.",
+      "If FAIL, inspect reported critical findings.",
+      "Fix issues and rerun until PASS."
+    ]
+  },
+  {
+    issue: 694,
+    title: "Miniapp contract v1",
+    summary: "Locked a canonical miniapp contract schema with versioning and governance rules so all new functions follow one consistent, reviewable standard.",
+    details: "Added miniapp-contract-v1.md and linked lifecycle/workflow requirements to enforce one miniapp shape across delivery.",
+    manual: [
+      "Read miniapp-contract-v1.md.",
+      "Author miniapp metadata using the v1 schema.",
+      "Ensure docs and registry stay aligned."
+    ]
+  },
+  {
+    issue: 695,
+    title: "Function registry + validator",
+    summary: "Implemented machine-readable miniapp registry plus schema validator to keep function contracts consistent, typed, and automatically verifiable over time.",
+    details: "Added functions/registry.v1.json and scripts/validate-function-registry.mjs with npm run registry:validate.",
+    manual: [
+      "Update functions/registry.v1.json entries.",
+      "Run npm run registry:validate.",
+      "Fix validation errors before shipping."
+    ]
+  },
+  {
+    issue: 696,
+    title: "Dashboard runtime modularization",
+    summary: "Refactored dashboard runtime helpers out of server monolith into reusable module, reducing coupling and enabling safer incremental feature delivery.",
+    details: "Extracted runScript, launchDetached, and readJson into dashboard/lib/runtime.mjs and wired server import usage.",
+    manual: [
+      "Use dashboard/lib/runtime.mjs for runtime helpers.",
+      "Keep server route logic separate from helper internals.",
+      "Run dashboard and smoke-test command actions."
+    ]
+  },
+  {
+    issue: 697,
+    title: "Issue quality standard + ready gate",
+    summary: "Defined strict issue quality format and ready-gate checklist so board items are implementation-ready, testable, and objectively reviewable before coding.",
+    details: "Added issue-quality-standard.md and issue-ready-gate-checklist.md with mandatory sections and status transition rules.",
+    manual: [
+      "Draft issue with all required sections.",
+      "Apply ready-gate checklist before Ready (NEXT).",
+      "Attach evidence when moving to Review."
+    ]
+  },
+  {
+    issue: 699,
+    title: "Channel adapter contract + lifecycle",
+    summary: "Established one adapter contract and lifecycle for all channels to standardize ingress, policy, dispatch, egress, and delivery-state visibility.",
+    details: "Added channel-adapter-contract-v1.md and channel-adapter-lifecycle-v1.md as cross-channel foundation documents.",
+    manual: [
+      "Normalize channel events to canonical shape.",
+      "Enforce lifecycle stages without silent skips.",
+      "Emit explicit delivery states."
+    ]
+  },
+  {
+    issue: 700,
+    title: "API reference adapter implementation",
+    summary: "Built reference API adapter implementing lifecycle stages and policy checks, proving contract viability with concrete runtime behavior and responses.",
+    details: "Implemented dashboard/lib/api-channel-adapter.mjs and routed model-routing API through this shared adapter path.",
+    manual: [
+      "Call /api/functions/model-routing endpoint.",
+      "Inspect adapter lifecycle in JSON response.",
+      "Verify policy blocks invalid inputs."
+    ]
+  },
+  {
+    issue: 701,
+    title: "WhatsApp parity validator",
+    summary: "Added WhatsApp parity rules and validator to enforce config consistency with adapter contract expectations and reduce channel-specific policy drift.",
+    details: "Introduced whatsapp-adapter-parity-v1.md and scripts/validate-whatsapp-adapter.mjs with npm run adapter:whatsapp:validate.",
+    manual: [
+      "Update WhatsApp config fields.",
+      "Run npm run adapter:whatsapp:validate.",
+      "Resolve parity mismatches before release."
+    ]
+  },
+  {
+    issue: 702,
+    title: "iMessage adapter architecture",
+    summary: "Documented phased iMessage adapter architecture with provider boundaries, policy requirements, lifecycle behavior, and production-readiness gates.",
+    details: "Added imessage-adapter-architecture-v1.md with canonical event model, rollout phases, and acceptance checks.",
+    manual: [
+      "Review architecture phases A to D.",
+      "Implement each phase with exit-gate evidence.",
+      "Validate lifecycle parity against contract."
+    ]
+  },
+  {
+    issue: 703,
+    title: "Email adapter architecture",
+    summary: "Defined Email adapter provider strategy, canonical event mapping, policy controls, and reliability constraints to prepare safe implementation rollout.",
+    details: "Added email-adapter-architecture-v1.md and linked it from adapter contract and README index.",
+    manual: [
+      "Choose provider using listed criteria.",
+      "Implement normalize/send/status abstraction.",
+      "Validate policy and delivery-state behavior."
+    ]
+  },
+  {
+    issue: 704,
+    title: "Discord adapter architecture",
+    summary: "Specified Discord transport architecture for gateway events, interactions, and outbound delivery with deterministic policy and reliability behavior.",
+    details: "Added discord-adapter-architecture-v1.md and mapped rollout phases with testable exit gates.",
+    manual: [
+      "Build ingest/send/ack transport interface.",
+      "Normalize message and interaction events.",
+      "Validate retries, rate-limit handling, and idempotency."
+    ]
+  },
+  {
+    issue: 705,
+    title: "Sovereign role taxonomy",
+    summary: "Codified sovereign agent team roles and authority matrix to separate planning, implementation, review, testing, and release decision rights.",
+    details: "Added sovereign-agent-role-taxonomy-v1.md including propose/decide/veto boundaries and handoff requirements.",
+    manual: [
+      "Assign work by defined role boundaries.",
+      "Use mandatory handoff contract fields.",
+      "Escalate veto conflicts to OC."
+    ]
+  },
+  {
+    issue: 706,
+    title: "Handoff schema + stage-gate enforcement",
+    summary: "Implemented structured handoff schema and validation rules so inter-role transitions are auditable, deterministic, and machine-checkable.",
+    details: "Added handoff-artifact-schema-v1.md, sample handoff JSON, and scripts/validate-handoff-artifact.mjs.",
+    manual: [
+      "Create handoff JSON from schema.",
+      "Run npm run handoff:validate -- <artifact>.",
+      "Only progress when gate.decision is valid."
+    ]
+  },
+  {
+    issue: 707,
+    title: "Automated release gates",
+    summary: "Mapped Definition of Done and testing requirements to automated release gates that fail fast when readiness evidence is incomplete or inconsistent.",
+    details: "Added release-gates-dod-v1.md, sample release artifact, and scripts/validate-release-gates.mjs.",
+    manual: [
+      "Prepare release gate artifact JSON.",
+      "Run npm run release:gates -- <artifact>.",
+      "Proceed only when all hard rules pass."
+    ]
+  },
+  {
+    issue: 708,
+    title: "External-channel policy engine",
+    summary: "Implemented risk-tier policy engine for external channels with approval gating on high-risk actions and explicit operator-readable block reasons.",
+    details: "Added external-channel-policy-engine module, validator script, and integrated policy checks into API adapter flow.",
+    manual: [
+      "Run npm run policy:validate.",
+      "Test high-risk action without approval.",
+      "Confirm blocked decision and reason."
+    ]
+  },
+  {
+    issue: 709,
+    title: "Decision/action audit trail",
+    summary: "Shipped append-only hash-chained audit pipeline recording policy, routing, and delivery events so tampering becomes detectable by validation.",
+    details: "Added dashboard/lib/audit-trail.mjs, scripts/validate-audit-trail.mjs, and audit event integration in adapter flow.",
+    manual: [
+      "Generate runtime events through adapter calls.",
+      "Run npm run audit:validate.",
+      "Investigate chain mismatch errors immediately."
+    ]
+  },
+  {
+    issue: 710,
+    title: "Reliability telemetry baseline",
+    summary: "Added telemetry event schema and SLO summary metrics with API endpoint visibility for success rate, latency, blocked rate, and failure trends.",
+    details: "Added reliability-telemetry module, summary endpoint /api/telemetry/summary, and seed/validate scripts.",
+    manual: [
+      "Run npm run telemetry:seed.",
+      "Run npm run telemetry:validate.",
+      "Open /api/telemetry/summary to inspect SLOs."
+    ]
+  },
+  {
+    issue: 722,
+    title: "iMessage live bridge",
+    summary: "Implemented live iMessage bridge endpoint for inbound event handling and outbound reply path, including policy, audit, telemetry, and idempotency.",
+    details: "Added POST /api/channels/imessage/inbound backed by imessage adapter and lifecycle validation command.",
+    manual: [
+      "Run npm run imessage:validate.",
+      "POST sample payload to /api/channels/imessage/inbound.",
+      "Confirm lifecycle response and delivery attempt."
+    ]
+  }
+];
+
+function toSummary160(text) {
+  const value = String(text || "").trim();
+  if (value.length <= 160) return value;
+  return `${value.slice(0, 157).trim()}...`;
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -681,6 +900,7 @@ function renderPage(state, lastResult) {
         <h2>Functions</h2>
         <p class="sub">Launch MeiMei product functions from the root dashboard.</p>
         <div class="actions">
+          <a class="button secondary" href="${knowmoreRoute}">knowmore</a>
           <a class="button good" href="./Any-URL_summarization_in_seconds">Any-URL summarization in seconds</a>
           <a class="button" href="./Daily_briefing">Daily briefing</a>
           <a class="button secondary" href="./Per-channel_model_routing_by_task_type_and_cost">Per-channel model routing</a>
@@ -782,6 +1002,168 @@ function renderPage(state, lastResult) {
         }).then((response) => response.json());
         output.textContent = JSON.stringify(data, null, 2);
       });
+    });
+  </script>
+</body>
+</html>`;
+}
+
+function renderKnowmorePage() {
+  const releases = knowmoreReleases.map((item) => ({
+    ...item,
+    summary: toSummary160(item.summary),
+    issueUrl: `https://github.com/moldovancsaba/mvp-factory-control/issues/${item.issue}`
+  }));
+  const releaseJson = JSON.stringify(releases).replace(/</g, "\\u003c");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>knowmore - release cards</title>
+  <style>${dashboardShellStyles()}
+    .cards {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      margin-top: 14px;
+    }
+    .flash {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 16px;
+      min-height: 150px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.15s ease;
+    }
+    .flash:hover { transform: translateY(-1px); }
+    .flash .k {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .flash .s {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 8, 14, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 20;
+    }
+    .modal {
+      max-width: 760px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      background: #0b1729;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .modal h2 { margin: 0 0 8px; }
+    .modal p { color: var(--muted); }
+    .modal ul { margin: 8px 0 0 18px; }
+    .modal .head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topnav">
+      <h1 class="title">knowmore</h1>
+      <div class="nav-actions">
+        <a class="button secondary" href="/">Dashboard</a>
+        <a class="button secondary" href="/admin">Admin / Settings</a>
+      </div>
+    </div>
+    <section class="card summary">
+      <p>Release notes as flashcards. Each card shows a 160-character summary; click to open issue link, details, and simple user manual.</p>
+    </section>
+    <section class="card section">
+      <h2>Release flashcards</h2>
+      <p class="sub">Click any card for linked issue details and how-to steps.</p>
+      <div class="cards" id="cards"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="head">
+        <h2 id="mTitle">Release</h2>
+        <button class="button secondary" id="mClose" type="button">Close</button>
+      </div>
+      <p id="mSummary"></p>
+      <p><a id="mIssue" class="button secondary" href="#" target="_blank" rel="noreferrer">Open related issue</a></p>
+      <h3>Details</h3>
+      <p id="mDetails"></p>
+      <h3>User manual</h3>
+      <ul id="mManual"></ul>
+    </div>
+  </div>
+
+  <script>
+    const releases = ${releaseJson};
+    const cards = document.getElementById('cards');
+    const backdrop = document.getElementById('modalBackdrop');
+    const closeBtn = document.getElementById('mClose');
+    const mTitle = document.getElementById('mTitle');
+    const mSummary = document.getElementById('mSummary');
+    const mIssue = document.getElementById('mIssue');
+    const mDetails = document.getElementById('mDetails');
+    const mManual = document.getElementById('mManual');
+
+    function openModal(item) {
+      mTitle.textContent = '#' + item.issue + ' - ' + item.title;
+      mSummary.textContent = item.summary;
+      mIssue.href = item.issueUrl;
+      mIssue.textContent = 'Related issue #' + item.issue;
+      mDetails.textContent = item.details;
+      mManual.innerHTML = '';
+      (item.manual || []).forEach((step) => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        mManual.appendChild(li);
+      });
+      backdrop.style.display = 'flex';
+    }
+
+    function closeModal() {
+      backdrop.style.display = 'none';
+    }
+
+    releases.forEach((item) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'flash';
+      button.innerHTML = '<span class="k">release #' + item.issue + '</span><div class="s">' + item.summary + '</div>';
+      button.addEventListener('click', () => openModal(item));
+      cards.appendChild(button);
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (event) => {
+      if (event.target === backdrop) closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeModal();
     });
   </script>
 </body>
@@ -2300,6 +2682,16 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && normalizedPath === routingRoute) {
       const html = renderRoutingPage();
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, max-age=0"
+      });
+      res.end(html);
+      return;
+    }
+
+    if (req.method === "GET" && normalizedPath === knowmoreRoute) {
+      const html = renderKnowmorePage();
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
