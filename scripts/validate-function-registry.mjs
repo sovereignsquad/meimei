@@ -32,6 +32,14 @@ function validateFunctionContract(fn, index, seenIds) {
   seenIds.add(fn.id);
 
   if (fn.version !== "v1") fail(`${prefix}.version must be "v1"`);
+  if (!fn.description || typeof fn.description !== "string" || fn.description.length < 1 || fn.description.length > 480) {
+    fail(`${prefix}.description must be a non-empty string (max 480) for dashboard catalog copy`);
+  }
+  if ("catalogOrder" in fn) {
+    if (!Number.isInteger(fn.catalogOrder)) {
+      fail(`${prefix}.catalogOrder must be an integer when present`);
+    }
+  }
   const routeStr = String(fn.route || "");
   if (!/^\/dashboard\/\d+\//.test(routeStr)) {
     fail(`${prefix}.route must be /dashboard/<githubIssueId>/<slug> (issue id is canonical; slug is human-readable only)`);

@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PDFParse } from "pdf-parse";
 import { createRuntimeHelpers } from "./lib/runtime.mjs";
+import { loadRegistrySync, miniappRuntimeConfig } from "./lib/miniapp-registry.mjs";
 import { routeViaApiAdapter } from "./lib/api-channel-adapter.mjs";
 import { createReliabilityTelemetry } from "./lib/reliability-telemetry.mjs";
 import { createImessageAdapter } from "./lib/imessage-adapter.mjs";
@@ -27,19 +28,26 @@ const dailyBriefingScript = path.join(repoRoot, "scripts", "daily-briefing.mjs")
 
 const port = Number(process.env.PORT || 3030);
 const localOpenCommand = process.env.MEIMEI_SETUP_COMMAND || "./scripts/meimei-setup";
-const urlSummaryRoute = "/Any-URL_summarization_in_seconds";
-const urlSummaryApiRoute = "/api/functions/url-summary";
-const urlSummaryLabel = "Any-URL summarization in seconds";
-const dailyBriefingRoute = "/Daily_briefing";
-const dailyBriefingApiRoute = "/api/functions/daily-briefing";
-const dailyBriefingOpenApiRoute = "/api/functions/daily-briefing/open";
-const dailyBriefingLabel = "Daily briefing";
-const routingRoute = "/Per-channel_model_routing_by_task_type_and_cost";
-const routingApiRoute = "/api/functions/model-routing";
-const routingLabel = "Per-channel model routing by task type and cost";
-const apiAdapterRoute = "/API_channel_adapter";
-const apiAdapterApiRoute = "/api/functions/api-channel-adapter";
-const apiAdapterLabel = "API channel adapter (reference)";
+
+const miniappCfg = miniappRuntimeConfig(loadRegistrySync());
+const miniappIssueRoute = miniappCfg.miniappIssueRoute;
+const dashboardCatalog = miniappCfg.catalog;
+const R = miniappCfg.routes;
+const urlSummaryRoute = R["url-summary"].internalPath;
+const urlSummaryApiRoute = R["url-summary"].apiPath;
+const urlSummaryLabel = R["url-summary"].displayName;
+const dailyBriefingRoute = R["daily-briefing"].internalPath;
+const dailyBriefingApiRoute = R["daily-briefing"].apiPath;
+const dailyBriefingOpenApiRoute = `${dailyBriefingApiRoute}/open`;
+const dailyBriefingLabel = R["daily-briefing"].displayName;
+const routingRoute = R["model-routing"].internalPath;
+const routingApiRoute = R["model-routing"].apiPath;
+const routingLabel = R["model-routing"].displayName;
+const apiAdapterRoute = R["api-channel-adapter"].internalPath;
+const apiAdapterApiRoute = R["api-channel-adapter"].apiPath;
+const apiAdapterLabel = R["api-channel-adapter"].displayName;
+const apiAdapterIssueId = R["api-channel-adapter"].issueId;
+
 const imessageInboundApiRoute = "/api/channels/imessage/inbound";
 const knowmoreRoute = "/knowmore";
 const openclawChatUrl = process.env.MEIMEI_OPENCLAW_CHAT_URL || "http://127.0.0.1:18789/chat?session=main";
@@ -47,39 +55,6 @@ const dashboardLogoPath = "/images/logo_sovereign.png";
 const knowmoreLogoPath = "/images/logo_knowmore.png";
 const adminLogoPath = "/images/logo_admin.png";
 const openclawLogoPath = "/images/logo_openclaw.png";
-const appCards = [
-  {
-    issueId: 700,
-    name: "API channel adapter (reference)",
-    route: "/700/API_channel_adapter",
-    description: "Run the API reference adapter: policy, audit, telemetry, and lifecycle—the spine that future WhatsApp, iMessage, and Discord adapters attach to."
-  },
-  {
-    issueId: 516,
-    name: "Any-URL summarization in seconds",
-    route: "/516/Any-URL_summarization_in_seconds",
-    description: "Paste a URL and get a fast structured summary so you can understand key points without reading the entire source content."
-  },
-  {
-    issueId: 518,
-    name: "Daily briefing",
-    route: "/518/Daily_briefing",
-    description: "Generate your daily briefing from configured sources to start the day with an actionable overview of priorities and context."
-  },
-  {
-    issueId: 517,
-    name: "Per-channel model routing",
-    route: "/517/Per-channel_model_routing_by_task_type_and_cost",
-    description: "Preview and test model routing behavior by channel, task type, and cost target to keep output quality and spend aligned."
-  }
-];
-
-const miniappIssueRoute = new Map([
-  [700, apiAdapterRoute],
-  [516, urlSummaryRoute],
-  [517, routingRoute],
-  [518, dailyBriefingRoute]
-]);
 
 const knowmoreReleases = [
   {
@@ -807,7 +782,7 @@ function renderPage(state, lastResult) {
   const config = state.config;
   const statusText = lastResult?.stdout || "";
   const statusError = lastResult?.stderr || "";
-  const cardsHtml = appCards.map((app) => renderFlashcard({
+  const cardsHtml = dashboardCatalog.map((app) => renderFlashcard({
     kind: `APP #${app.issueId}`,
     title: app.name,
     content: toSummary160(app.description),
@@ -1850,7 +1825,7 @@ function renderApiChannelAdapterPage() {
     <main class="hero">
       <section class="route-card">
         <h1>${escapeHtml(apiAdapterLabel)}</h1>
-        <p class="lede u-mb12">Issue <strong>#700</strong> — reference path for <code>dashboard/lib/api-channel-adapter.mjs</code>. Same policy, audit trail, and telemetry hooks that WhatsApp, iMessage, and Discord will reuse. Optional message and approval simulate higher-risk intents.</p>
+        <p class="lede u-mb12">Issue <strong>#${apiAdapterIssueId}</strong> — reference path for <code>dashboard/lib/api-channel-adapter.mjs</code>. Same policy, audit trail, and telemetry hooks that WhatsApp, iMessage, and Discord will reuse. Optional message and approval simulate higher-risk intents.</p>
         <div class="route-form">
           <div class="route-grid">
             <div class="field">

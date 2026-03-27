@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes.
+- Dashboard miniapp cards and route constants are derived from `functions/registry.v1.json` (`dashboard/lib/miniapp-registry.mjs`); registry entries require `description` and may set `catalogOrder`.
 
 ## 2026-03-27 - API channel adapter miniapp (`0.7.4`)
 

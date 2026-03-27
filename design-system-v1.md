@@ -93,6 +93,7 @@ Every new miniapp page must:
 2. Set `data-theme` on `<body>`
 3. Reuse design-system components/classes rather than introducing page-local style systems
 4. Call dashboard APIs with root-absolute paths (for example `fetch("/api/functions/...")`, not `./api/...`), because function URLs are nested (`/dashboard/<issueId>/<slug>`) and relative `./api` resolves incorrectly
+5. **Dashboard function catalog** (home-page flashcards) must come from `functions/registry.v1.json` via `dashboard/lib/miniapp-registry.mjs` — do not duplicate titles, descriptions, or routes in `dashboard/server.mjs`
 
 ## Safety + state rules
 

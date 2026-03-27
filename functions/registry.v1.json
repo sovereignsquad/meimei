@@ -6,6 +6,8 @@
       "id": "daily-briefing",
       "version": "v1",
       "displayName": "Daily briefing",
+      "description": "Generate your daily briefing from configured sources to start the day with an actionable overview of priorities and context.",
+      "catalogOrder": 2,
       "route": "/dashboard/518/Daily_briefing",
       "api": {
         "method": "POST",
@@ -54,6 +56,8 @@
       "id": "url-summary",
       "version": "v1",
       "displayName": "Any-URL summarization in seconds",
+      "description": "Paste a URL and get a fast structured summary so you can understand key points without reading the entire source content.",
+      "catalogOrder": 1,
       "route": "/dashboard/516/Any-URL_summarization_in_seconds",
       "api": {
         "method": "POST",
@@ -108,6 +112,8 @@
       "id": "model-routing",
       "version": "v1",
       "displayName": "Per-channel model routing by task type and cost",
+      "description": "Preview and test model routing behavior by channel, task type, and cost target to keep output quality and spend aligned.",
+      "catalogOrder": 3,
       "route": "/dashboard/517/Per-channel_model_routing_by_task_type_and_cost",
       "api": {
         "method": "POST",
@@ -162,6 +168,8 @@
       "id": "api-channel-adapter",
       "version": "v1",
       "displayName": "API channel adapter (reference)",
+      "description": "Run the API reference adapter: policy, audit, telemetry, and lifecycle—the spine that future WhatsApp, iMessage, and Discord adapters attach to.",
+      "catalogOrder": 0,
       "route": "/dashboard/700/API_channel_adapter",
       "api": {
         "method": "POST",

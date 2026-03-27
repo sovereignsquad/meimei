@@ -27,6 +27,8 @@ Every miniapp must define a contract object with this schema:
   "id": "daily-briefing",
   "version": "v1",
   "displayName": "Daily briefing",
+  "description": "One-line catalog copy for dashboard flashcards (max 480 characters).",
+  "catalogOrder": 2,
   "route": "/dashboard/518/Daily_briefing",
   "api": {
     "method": "POST",
@@ -64,6 +66,8 @@ Every miniapp must define a contract object with this schema:
 - `id`: stable snake-case or kebab-case identifier
 - `version`: must be `v1`
 - `displayName`: user-facing name
+- `description`: required catalog blurb for dashboard flashcards (machine-enforced max 480 characters in `registry:validate`)
+- `catalogOrder`: optional integer; lower values appear first on the dashboard (omit for alphabetical fallback by issue id)
 - `route`: canonical browser URL path for the function page (must include GitHub issue id; see Route Rules)
 - `api.method` and `api.path`: canonical HTTP entry point
 - `input`: required/optional contract and at least one example
@@ -126,7 +130,7 @@ Every miniapp must define a contract object with this schema:
 
 ## Review Checklist
 
-- [ ] all required fields present
+- [ ] all required fields present (including `description` for registry-driven dashboard cards)
 - [ ] `route` is `/dashboard/<githubIssueId>/<slug>` and API path is under `/dashboard/api/functions/`
 - [ ] input/output and failure behavior are explicit
 - [ ] safety and side effects are declared
