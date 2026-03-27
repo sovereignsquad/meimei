@@ -3,9 +3,9 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.7.2`
+- Version: `0.7.3`
 - Date: `2026-03-27`
-- Codename: `design-system-v1-hardened`
+- Codename: `design-system-v1-mobile-nav-hardened`
 
 ## Included issue deliveries
 
@@ -26,6 +26,7 @@
 - `mvp-factory-control#707` - Automated release gates mapped to DoD/testing
 - `mvp-factory-control#723` - Centralized design system v1 + shared flashcard module
 - `mvp-factory-control#724` - Design system hardening audit fixes (safe rendering + state classes + token cleanup)
+- `mvp-factory-control#725` - Design system mobile navigation standardization
 
 ## Versioning policy
 

@@ -61,9 +61,16 @@ UI wording style:
 ### Navigation
 
 - Nav container: `.nav-actions`
+- Mobile toggle: `.nav-toggle`
 - Nav item: `.nav-chip`
 - Active nav item: `.nav-chip.active`
 - OpenClaw nav item: `.nav-chip.openclaw`
+
+Mobile behavior is standardized:
+
+- at `<=900px`, nav uses a toggle + collapsed vertical list
+- open state uses `.nav-actions.is-open`
+- desktop (`>=901px`) keeps nav open horizontally
 
 OpenClaw branding is component-scoped by default (`.nav-chip.openclaw`) and can also be represented as a full page theme via `data-theme="red"` when needed.
 

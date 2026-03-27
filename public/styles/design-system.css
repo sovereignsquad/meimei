@@ -76,6 +76,15 @@ body[data-theme="red"] {
 .topbar .title { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
 
 .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.nav-toggle {
+  display: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
 .nav-chip {
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -241,6 +250,15 @@ ul { margin: 0; padding-left: 18px; line-height: 1.65; }
   .grid, .row { grid-template-columns: 1fr; }
   .shell { padding: 18px 14px 34px; }
   .topnav { align-items: flex-start; flex-direction: column; }
+  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .nav-actions {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nav-actions.is-open { display: flex; }
+  .nav-chip { width: 100%; justify-content: flex-start; }
 }
 
 @media (max-width: 760px) {

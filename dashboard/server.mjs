@@ -706,8 +706,19 @@ function renderFlashcard({ kind, title, content, href = "", button = false, attr
 }
 
 function renderGlobalNav(activePage) {
+  const navId = "global-nav-actions";
+  const toggleId = "global-nav-toggle";
   return `
-      <div class="nav-actions">
+      <button
+        id="${toggleId}"
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="${navId}"
+      >
+        Menu
+      </button>
+      <div id="${navId}" class="nav-actions" data-nav-actions>
         <a class="nav-chip openclaw" href="${escapeHtml(openclawChatUrl)}">
           <img src="${escapeHtml(openclawLogoPath)}" alt="OpenClaw logo" />
           <span>OpenClaw</span>
@@ -725,6 +736,45 @@ function renderGlobalNav(activePage) {
           <span>Admin</span>
         </a>
       </div>`;
+}
+
+function renderGlobalNavScript() {
+  return `
+    (function initGlobalNav() {
+      const nav = document.querySelector('[data-nav-actions]');
+      const toggle = document.getElementById('global-nav-toggle');
+      if (!nav || !toggle) return;
+
+      function closeNav() {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+
+      function openNav() {
+        nav.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+
+      function syncForViewport() {
+        if (window.matchMedia('(min-width: 901px)').matches) {
+          openNav();
+        } else {
+          closeNav();
+        }
+      }
+
+      toggle.addEventListener('click', () => {
+        if (nav.classList.contains('is-open')) {
+          closeNav();
+          return;
+        }
+        openNav();
+      });
+
+      window.addEventListener('resize', syncForViewport);
+      syncForViewport();
+    })();
+  `;
 }
 
 function renderPage(state, lastResult) {
@@ -786,6 +836,7 @@ function renderPage(state, lastResult) {
     </div>
   </div>
   <script>
+    ${renderGlobalNavScript()}
     const output = document.querySelector('pre');
     async function postForm(form) {
       const response = await fetch(form.action, {
@@ -866,6 +917,7 @@ function renderKnowmorePage() {
   </div>
 
   <script>
+    ${renderGlobalNavScript()}
     const releases = ${releaseJson};
     const cards = document.getElementById('cards');
     const backdrop = document.getElementById('modalBackdrop');
@@ -1112,6 +1164,7 @@ function renderAdminPage(state, lastResult) {
     </div>
   </div>
   <script>
+    ${renderGlobalNavScript()}
     const output = document.querySelector('pre');
     async function postForm(form) {
       const response = await fetch(form.action, {

@@ -8,6 +8,7 @@
 - Standardized flashcard content structure to `kind`, `title`, `content` rendering (`APP` / `ISSUE #...`) without variable-name prefixes.
 - Hardened design-system implementation: removed obsolete styles/tokens, replaced dynamic knowmore `innerHTML` card rendering with safe DOM creation, and moved modal visibility to class-based state (`.is-open`).
 - Expanded design tokens for modal/terminal/code surfaces and OpenClaw brand colors; added explicit `data-theme="red"` token mapping for consistent documentation/runtime alignment.
+- Added a standardized mobile navigation component (`.nav-toggle` + `.nav-actions.is-open`) with responsive behavior across dashboard, knowmore, and admin pages.
 
 ## 2026-03-26 - Foundation hardening wave
 
