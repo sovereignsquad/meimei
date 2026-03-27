@@ -68,4 +68,5 @@ The board lists many **agent.meimei** ideas (email triage, health checks, Discor
 
 - **Audience:** OC, product owner, operators.  
 - **Not for:** low-level API field lists (use `miniapp-contract-v1.md` and `functions/registry.v1.json`).  
-- **Companion:** Technical phase outlook remains in [roadmap.md](./roadmap.md) (foundation vs. channels vs. reliability phases).
+- **Companion:** Technical phase outlook remains in [roadmap.md](./roadmap.md) (foundation vs. channels vs. reliability phases).  
+- **Board hygiene (2026-03-27):** GitHub issue bodies for `#521`, `#561`, `#573`–`#584` now include the **Product traceability (agent.meimei)** block (FR/CR + target miniapp or platform). `#535` was traced earlier in the same pass as `#516`.
