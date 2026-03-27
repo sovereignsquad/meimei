@@ -25,6 +25,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `foundation-contradiction-audit.md` - contradiction matrix and remediation order for foundation hardening.
 - `VERSION.md` - current foundation version and issue-delivery mapping.
 - `CHANGELOG.md` - chronological release notes and foundation delivery history.
+- `documentation-audit.md` - markdown corpus audit, staleness notes, and proposed doc structure (`docs/README.md` is the short map).
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
 - `issue-quality-standard.md` - required quality rules for implementation issues.
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.

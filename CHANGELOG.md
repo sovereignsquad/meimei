@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `documentation-audit.md` (markdown corpus audit, overlap/staleness, phased structure plan) and `docs/README.md` (navigation map). Linked from `README.md` and `AGENTS.md`.
 - Dashboard miniapp cards and route constants are derived from `functions/registry.v1.json` (`dashboard/lib/miniapp-registry.mjs`); registry entries require `description` and may set `catalogOrder`.
 - **Design system docs:** `design-system-v1.md` now documents the **global layout system** (`.layout-flow`, `.layout-box`, `.layout-break`, responsive 1/2/N columns, span classes), distinction from inner `.grid`, `config/page-layout.v1.json`, Admin **Page layout** editor, and `/api/page-layout`. Navigation section documents inactive nav-chip border contrast.
 - **Architecture / README:** cross-links for `config/dashboard-surface.v1.json`, `config/page-layout.v1.json`, layout behavior under Control UI, and the optional `macos/MeiMeiMenuBar` menu bar app.

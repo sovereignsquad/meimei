@@ -20,4 +20,5 @@
 - `architecture.md`
 - `skills/catalog.md`
 - `runbook.md`
+- `docs/README.md` (documentation map) and `documentation-audit.md` when changing or adding many `.md` files
 
