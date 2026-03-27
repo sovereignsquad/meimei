@@ -17,6 +17,18 @@ import {
   resolveOperatorScripts,
   pathStartsWithStaticPrefix
 } from "./lib/dashboard-surface.mjs";
+import {
+  loadPageLayoutMerged,
+  buildLayoutFlowHtml,
+  pageBoxMeta,
+  allPageKeys,
+  clampDesktopCols,
+  sanitizeItemsForPage,
+  pageLayoutFile,
+  miniappPageKey,
+  LAYOUT_VERSION
+} from "./lib/page-layout.mjs";
+import { buildAdminLayoutEditorScript } from "./lib/admin-layout-editor.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +77,7 @@ const knowmoreRoute = surface.routes.knowmore;
 const apiConfigRoute = surface.api.config;
 const apiRunRoute = surface.api.run;
 const telemetrySummaryApiRoute = surface.api.telemetrySummary;
+const pageLayoutApiRoute = surface.api.pageLayout || "/api/page-layout";
 const designSystemCssPath = surface.designSystemCssPath;
 const staticPrefixes = surface.staticPrefixes;
 const listenHost = surface.server.bindHost;
@@ -75,6 +88,14 @@ const adminLogoPath = surface.logos.admin;
 const openclawLogoPath = surface.logos.openclaw;
 
 const knowmoreReleases = loadKnowmoreReleasesSync();
+
+function getLayoutDoc() {
+  return loadPageLayoutMerged(repoRoot, miniappCfg.registry);
+}
+
+function escapeAttr(value) {
+  return escapeHtml(String(value));
+}
 
 function toSummary160(text) {
   const value = String(text || "").trim();
@@ -99,6 +120,29 @@ async function readConfig() {
 async function writeConfig(config) {
   const body = `${JSON.stringify(config, null, 2)}\n`;
   await writeFile(configPath, body, "utf8");
+}
+
+async function savePageLayout(body) {
+  const pageKey = String(body.pageKey || "");
+  if (!pageKey) {
+    throw new Error("pageKey is required");
+  }
+  if (!allPageKeys(miniappCfg.registry).includes(pageKey)) {
+    throw new Error("Invalid pageKey");
+  }
+  const desktopColumnCount = clampDesktopCols(body.desktopColumnCount ?? 3);
+  const items = Array.isArray(body.items) ? body.items : [];
+  let stored = {};
+  try {
+    stored = JSON.parse(await readFile(pageLayoutFile(repoRoot), "utf8"));
+  } catch {
+    stored = {};
+  }
+  stored.version = LAYOUT_VERSION;
+  stored.desktopColumnCount = desktopColumnCount;
+  stored.pages = stored.pages || {};
+  stored.pages[pageKey] = { items: sanitizeItemsForPage(pageKey, items, miniappCfg.registry) };
+  await writeFile(pageLayoutFile(repoRoot), `${JSON.stringify(stored, null, 2)}\n`, "utf8");
 }
 
 function configValue(config, pathParts) {
@@ -586,16 +630,21 @@ function renderGlobalNavScript() {
   `;
 }
 
-function renderPage(state, lastResult) {
-  const config = state.config;
-  const statusText = lastResult?.stdout || "";
-  const statusError = lastResult?.stderr || "";
+function renderPage(state, lastResult, layoutDoc) {
   const cardsHtml = dashboardCatalog.map((app) => renderFlashcard({
     kind: `APP #${app.issueId}`,
     title: app.name,
     content: toSummary160(app.description),
     href: app.route
   })).join("");
+  const fragments = {
+    functions: `<section class="card section">
+        <h2>Functions</h2>
+        <p class="sub">Select an app card to launch the corresponding MeiMei function.</p>
+        <div class="ds-flashcard-grid">${cardsHtml}</div>
+      </section>`
+  };
+  const mainFlow = buildLayoutFlowHtml(layoutDoc, "home", fragments, escapeAttr);
 
   return `<!doctype html>
 <html lang="en">
@@ -611,13 +660,7 @@ function renderPage(state, lastResult) {
       <h1 class="title">MeiMei Operator Dashboard</h1>
       ${renderGlobalNav("dashboard")}
     </div>
-    <div class="grid grid-single">
-      <section class="card section">
-        <h2>Functions</h2>
-        <p class="sub">Select an app card to launch the corresponding MeiMei function.</p>
-        <div class="ds-flashcard-grid">${cardsHtml}</div>
-      </section>
-    </div>
+    ${mainFlow}
   </div>
   <script>
     ${renderGlobalNavScript()}
@@ -626,13 +669,21 @@ function renderPage(state, lastResult) {
 </html>`;
 }
 
-function renderKnowmorePage() {
+function renderKnowmorePage(layoutDoc) {
   const releases = knowmoreReleases.map((item) => ({
     ...item,
     summary: toSummary160(item.summary),
     issueUrl: resolveIssueUrl(surface, item.issue)
   }));
   const releaseJson = JSON.stringify(releases).replace(/</g, "\\u003c");
+
+  const knowFlow = buildLayoutFlowHtml(layoutDoc, "knowmore", {
+    flashcards: `<section class="card section">
+      <h2>Issue flashcards</h2>
+      <p class="sub">Click any card for linked issue details and how-to steps.</p>
+      <div class="ds-flashcard-grid" id="cards"></div>
+    </section>`
+  }, escapeAttr);
 
   return `<!doctype html>
 <html lang="en">
@@ -648,11 +699,7 @@ function renderKnowmorePage() {
       <h1 class="title">knowmore</h1>
       ${renderGlobalNav("knowmore")}
     </div>
-    <section class="card section">
-      <h2>Issue flashcards</h2>
-      <p class="sub">Click any card for linked issue details and how-to steps.</p>
-      <div class="ds-flashcard-grid" id="cards"></div>
-    </section>
+    ${knowFlow}
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
@@ -746,7 +793,38 @@ function renderKnowmorePage() {
 </html>`;
 }
 
-function renderAdminPage(state, lastResult) {
+function renderAdminLayoutEditorSection(layoutDoc) {
+  const keys = allPageKeys(miniappCfg.registry);
+  const meta = pageBoxMeta(miniappCfg.registry);
+  const pageOpts = keys
+    .map((k) => `<option value="${escapeAttr(k)}">${escapeHtml(meta[k]?.label || k)}</option>`)
+    .join("");
+  const colOpts = [3, 4, 5, 6, 7, 8, 9, 10]
+    .map((n) => `<option value="${n}"${n === layoutDoc.desktopColumnCount ? " selected" : ""}>${n}</option>`)
+    .join("");
+  return `<section class="card section">
+    <h2>Page layout</h2>
+    <p class="sub">Small screens use 1 column, tablet 2, desktop uses N columns (below). Drag ⋮⋮ to reorder, pick max width in units, add <strong>New line</strong> to force the next block onto a new row. Persists to <code>config/page-layout.v1.json</code>.</p>
+    <div class="row layout-editor-tools">
+      <div class="field">
+        <label for="meimei-layout-desktop-cols">Desktop columns</label>
+        <select id="meimei-layout-desktop-cols">${colOpts}</select>
+      </div>
+      <div class="field">
+        <label for="meimei-layout-page">Page</label>
+        <select id="meimei-layout-page">${pageOpts}</select>
+      </div>
+    </div>
+    <ul class="layout-editor-list" id="meimei-layout-rows" aria-label="Layout block order"></ul>
+    <div class="actions">
+      <button type="button" class="button secondary" id="meimei-layout-add-break">New line</button>
+      <button type="button" class="good" id="meimei-layout-save">Save layout</button>
+    </div>
+    <p class="muted u-mt8" id="meimei-layout-status"></p>
+  </section>`;
+}
+
+function renderAdminPage(state, lastResult, layoutDoc) {
   const config = state.config;
   const workspace = configValue(config, ["agents", "defaults", "workspace"]);
   const gatewayMode = configValue(config, ["gateway", "mode"]);
@@ -781,8 +859,8 @@ function renderAdminPage(state, lastResult) {
       ${renderGlobalNav("admin")}
     </div>
 
-    <div class="grid">
-      <section class="card section">
+    ${buildLayoutFlowHtml(layoutDoc, "admin", {
+      metadata: `<section class="card section">
         <h2>Runtime metadata</h2>
         <p class="sub">Moved from operator page for cleaner daily operation.</p>
         <div class="meta-grid">
@@ -807,9 +885,8 @@ function renderAdminPage(state, lastResult) {
             <div class="value">${escapeHtml(memoryProvider || "(unset)")}</div>
           </div>
         </div>
-      </section>
-
-      <section class="card section">
+      </section>`,
+      settings: `<section class="card section">
         <h2>Settings</h2>
         <p class="sub">Update the values that control how OpenClaw uses this workspace.</p>
         <form class="form" method="post" action="${escapeHtml(apiConfigRoute)}" data-config-form>
@@ -875,9 +952,8 @@ function renderAdminPage(state, lastResult) {
             <a class="button secondary" href="${escapeHtml(apiConfigRoute)}">View raw config</a>
           </div>
         </form>
-      </section>
-
-      <section class="card section">
+      </section>`,
+      operations: `<section class="card section">
         <h2>Operations</h2>
         <p class="sub">Use the built-in CLI wrappers without leaving the browser.</p>
         <div class="actions">
@@ -899,15 +975,13 @@ function renderAdminPage(state, lastResult) {
           </form>
         </div>
         <div class="footer">OpenClaw gateway is already present locally if you want to use it immediately.</div>
-      </section>
-
-      <section class="card section">
+      </section>`,
+      output: `<section class="card section">
         <h2>Latest output</h2>
         <p class="sub">Last operation result returned by the dashboard server.</p>
         <pre>${escapeHtml(statusText || statusError || "No command has been run yet.")}</pre>
-      </section>
-
-      <section class="card section">
+      </section>`,
+      agent: `<section class="card section">
         <h2>Quick agent turn</h2>
         <p class="sub">Send a message through the repo-local wrapper.</p>
         <form class="form" method="post" action="${escapeHtml(apiRunRoute)}" data-agent-form>
@@ -920,9 +994,8 @@ function renderAdminPage(state, lastResult) {
             <button type="submit" class="good">Send to agent</button>
           </div>
         </form>
-      </section>
-
-      <section class="card section">
+      </section>`,
+      search: `<section class="card section">
         <h2>Web search</h2>
         <p class="sub">Use the local DuckDuckGo fallback with no external API keys.</p>
         <form class="form" method="post" action="${escapeHtml(apiRunRoute)}" data-search-form>
@@ -941,11 +1014,13 @@ function renderAdminPage(state, lastResult) {
             <button type="submit">Search</button>
           </div>
         </form>
-      </section>
-    </div>
+      </section>`,
+      layoutEditor: renderAdminLayoutEditorSection(layoutDoc)
+    }, escapeAttr)}
   </div>
   <script>
     ${renderGlobalNavScript()}
+    ${buildAdminLayoutEditorScript(layoutDoc, pageLayoutApiRoute, miniappCfg.registry)}
     const output = document.querySelector('pre');
     async function postForm(form) {
       const response = await fetch(form.action, {
@@ -971,22 +1046,12 @@ function renderAdminPage(state, lastResult) {
 </html>`;
 }
 
-function renderUrlSummaryPage() {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(urlSummaryLabel)} - agent.meimei</title>
-  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
-</head>
-<body data-theme="green">
-  <div class="shell">
-    <div class="topbar">
+function renderUrlSummaryPage(layoutDoc) {
+  const topbar = `<div class="topbar">
       <a class="button secondary" href="${escapeHtml(homeRoute)}">&larr; Back to dashboard</a>
       <span class="title">${escapeHtml(urlSummaryLabel)}</span>
-    </div>
-    <main class="hero">
+    </div>`;
+  const main = `<main class="hero">
       <section class="search-card">
         <h1>${escapeHtml(urlSummaryLabel)}</h1>
         <p class="lede">Paste one URL or PDF link, then get a short summary with key facts and next steps.</p>
@@ -1027,7 +1092,19 @@ function renderUrlSummaryPage() {
         </div>
       </section>
       <div class="footer">The page is intentionally minimal now so we can extend it into more MeiMei functions later.</div>
-    </main>
+    </main>`;
+  const urlFlow = buildLayoutFlowHtml(layoutDoc, miniappPageKey("url-summary"), { topbar, main }, escapeAttr);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(urlSummaryLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+    ${urlFlow}
   </div>
   <script>
     const input = document.querySelector("[data-url-input]");
@@ -1219,22 +1296,12 @@ function renderUrlSummaryPage() {
 </html>`;
 }
 
-function renderDailyBriefingPage() {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(dailyBriefingLabel)} - agent.meimei</title>
-  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
-</head>
-<body data-theme="green">
-  <div class="shell">
-    <div class="topbar">
+function renderDailyBriefingPage(layoutDoc) {
+  const topbar = `<div class="topbar">
       <a class="button secondary" href="${escapeHtml(homeRoute)}">&larr; Back to dashboard</a>
       <span class="title">${escapeHtml(dailyBriefingLabel)}</span>
-    </div>
-    <main class="hero">
+    </div>`;
+  const main = `<main class="hero">
       <section class="briefing-card">
         <h1>${escapeHtml(dailyBriefingLabel)}</h1>
         <p class="lede">Create a short daily briefing for MeiMei. Apple Notes is the default sink on macOS, and markdown is the fallback if Notes automation is unavailable.</p>
@@ -1260,7 +1327,19 @@ function renderDailyBriefingPage() {
         </div>
       </section>
       <div class="footer">The function writes to Apple Notes first and falls back to markdown for portability.</div>
-    </main>
+    </main>`;
+  const briefingFlow = buildLayoutFlowHtml(layoutDoc, miniappPageKey("daily-briefing"), { topbar, main }, escapeAttr);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(dailyBriefingLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+    ${briefingFlow}
   </div>
   <script>
     const runButton = document.querySelector("[data-briefing-run]");
@@ -1416,22 +1495,12 @@ function renderDailyBriefingPage() {
 </html>`;
 }
 
-function renderRoutingPage() {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(routingLabel)} - agent.meimei</title>
-  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
-</head>
-<body data-theme="green">
-  <div class="shell">
-    <div class="topbar">
+function renderRoutingPage(layoutDoc) {
+  const topbar = `<div class="topbar">
       <a class="button secondary" href="${escapeHtml(homeRoute)}">&larr; Back to dashboard</a>
       <span class="title">${escapeHtml(routingLabel)}</span>
-    </div>
-    <main class="hero">
+    </div>`;
+  const main = `<main class="hero">
       <section class="route-card">
         <h1>${escapeHtml(routingLabel)}</h1>
         <p class="lede">Pick a channel, task type, and cost target. MeiMei will show the recommended route, fallback, and reason. This previews routing only.</p>
@@ -1485,7 +1554,19 @@ function renderRoutingPage() {
         </div>
       </section>
       <div class="footer">This page previews the routing policy only. It does not send a message or execute a turn.</div>
-    </main>
+    </main>`;
+  const routingFlow = buildLayoutFlowHtml(layoutDoc, miniappPageKey("model-routing"), { topbar, main }, escapeAttr);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(routingLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+    ${routingFlow}
   </div>
   <script>
     const channelInput = document.querySelector("[data-channel]");
@@ -1614,22 +1695,12 @@ function renderRoutingPage() {
 </html>`;
 }
 
-function renderApiChannelAdapterPage() {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(apiAdapterLabel)} - agent.meimei</title>
-  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
-</head>
-<body data-theme="green">
-  <div class="shell">
-    <div class="topbar">
+function renderApiChannelAdapterPage(layoutDoc) {
+  const topbar = `<div class="topbar">
       <a class="button secondary" href="${escapeHtml(homeRoute)}">&larr; Back to dashboard</a>
       <span class="title">${escapeHtml(apiAdapterLabel)}</span>
-    </div>
-    <main class="hero">
+    </div>`;
+  const main = `<main class="hero">
       <section class="route-card">
         <h1>${escapeHtml(apiAdapterLabel)}</h1>
         <p class="lede u-mb12">Issue <strong>#${apiAdapterIssueId}</strong> — reference path for <code>dashboard/lib/api-channel-adapter.mjs</code>. Same policy, audit trail, and telemetry hooks that WhatsApp, iMessage, and Discord will reuse. Optional message and approval simulate higher-risk intents.</p>
@@ -1694,7 +1765,19 @@ function renderApiChannelAdapterPage() {
         </div>
       </section>
       <div class="footer">Preview only: does not send a chat message on WhatsApp, iMessage, or Discord.</div>
-    </main>
+    </main>`;
+  const adapterFlow = buildLayoutFlowHtml(layoutDoc, miniappPageKey("api-channel-adapter"), { topbar, main }, escapeAttr);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(apiAdapterLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+    ${adapterFlow}
   </div>
   <script>
     const channelInput = document.querySelector("[data-channel]");
@@ -1878,10 +1961,15 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && url.pathname === homeRoute) {
       const config = await readConfig();
-      const html = renderPage({
-        config,
-        configPath
-      });
+      const layoutDoc = getLayoutDoc();
+      const html = renderPage(
+        {
+          config,
+          configPath
+        },
+        null,
+        layoutDoc
+      );
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1892,10 +1980,15 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && normalizedPath === adminRoute) {
       const config = await readConfig();
-      const html = renderAdminPage({
-        config,
-        configPath
-      });
+      const layoutDoc = getLayoutDoc();
+      const html = renderAdminPage(
+        {
+          config,
+          configPath
+        },
+        null,
+        layoutDoc
+      );
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1907,7 +2000,7 @@ const server = http.createServer(async (req, res) => {
     const resolvedMiniappRoute = resolveMiniappRoute(normalizedPath);
 
     if (req.method === "GET" && resolvedMiniappRoute === urlSummaryRoute) {
-      const html = renderUrlSummaryPage();
+      const html = renderUrlSummaryPage(getLayoutDoc());
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1917,7 +2010,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && resolvedMiniappRoute === dailyBriefingRoute) {
-      const html = renderDailyBriefingPage();
+      const html = renderDailyBriefingPage(getLayoutDoc());
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1927,7 +2020,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && resolvedMiniappRoute === routingRoute) {
-      const html = renderRoutingPage();
+      const html = renderRoutingPage(getLayoutDoc());
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1937,7 +2030,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && resolvedMiniappRoute === apiAdapterRoute) {
-      const html = renderApiChannelAdapterPage();
+      const html = renderApiChannelAdapterPage(getLayoutDoc());
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
@@ -1947,12 +2040,31 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && normalizedPath === knowmoreRoute) {
-      const html = renderKnowmorePage();
+      const html = renderKnowmorePage(getLayoutDoc());
       res.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store, max-age=0"
       });
       res.end(html);
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === pageLayoutApiRoute) {
+      sendJson(res, 200, { ok: true, layout: getLayoutDoc() });
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === pageLayoutApiRoute) {
+      try {
+        const body = await readJson(req);
+        await savePageLayout(body);
+        sendJson(res, 200, { ok: true, layout: getLayoutDoc() });
+      } catch (error) {
+        sendJson(res, 400, {
+          ok: false,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
       return;
     }
 

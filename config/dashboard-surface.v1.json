@@ -9,7 +9,8 @@
     "config": "/api/config",
     "run": "/api/run",
     "telemetrySummary": "/api/telemetry/summary",
-    "imessageInbound": "/api/channels/imessage/inbound"
+    "imessageInbound": "/api/channels/imessage/inbound",
+    "pageLayout": "/api/page-layout"
   },
   "staticPrefixes": ["/images/", "/styles/"],
   "designSystemCssPath": "/styles/design-system.css",
