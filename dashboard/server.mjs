@@ -965,7 +965,6 @@ function renderPage(state, lastResult) {
         <h2>Functions</h2>
         <p class="sub">Select an app card to launch the corresponding MeiMei function.</p>
         <div class="cards">${cardsHtml}</div>
-        <div class="footer">This area will grow into the MeiMei function catalog.</div>
       </section>
 
       <section class="card section">
