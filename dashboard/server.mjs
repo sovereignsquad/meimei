@@ -611,13 +611,12 @@ function renderPage(state, lastResult) {
       <h1 class="title">MeiMei Operator Dashboard</h1>
       ${renderGlobalNav("dashboard")}
     </div>
-    <div class="grid">
+    <div class="grid grid-single">
       <section class="card section">
         <h2>Functions</h2>
         <p class="sub">Select an app card to launch the corresponding MeiMei function.</p>
         <div class="ds-flashcard-grid">${cardsHtml}</div>
       </section>
-
     </div>
   </div>
   <script>
