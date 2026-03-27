@@ -39,6 +39,23 @@ const routingLabel = "Per-channel model routing by task type and cost";
 const imessageInboundApiRoute = "/api/channels/imessage/inbound";
 const knowmoreRoute = "/knowmore";
 const openclawChatUrl = process.env.MEIMEI_OPENCLAW_CHAT_URL || "http://127.0.0.1:18789/chat?session=main";
+const appCards = [
+  {
+    name: "Any-URL summarization in seconds",
+    route: "./Any-URL_summarization_in_seconds",
+    description: "Paste a URL and get a fast structured summary so you can understand key points without reading the entire source content."
+  },
+  {
+    name: "Daily briefing",
+    route: "./Daily_briefing",
+    description: "Generate your daily briefing from configured sources to start the day with an actionable overview of priorities and context."
+  },
+  {
+    name: "Per-channel model routing",
+    route: "./Per-channel_model_routing_by_task_type_and_cost",
+    description: "Preview and test model routing behavior by channel, task type, and cost target to keep output quality and spend aligned."
+  }
+];
 
 const knowmoreReleases = [
   {
@@ -862,6 +879,45 @@ function dashboardShellStyles() {
       word-break: break-word;
       white-space: pre-wrap;
     }
+    .cards {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      margin-top: 6px;
+    }
+    .flash {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 16px;
+      min-height: 160px;
+      text-align: left;
+      transition: transform 0.15s ease;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+      width: 100%;
+    }
+    .flash:hover { transform: translateY(-1px); }
+    .flash .k {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .flash .title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .flash .s {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
     @media (max-width: 900px) {
       .grid, .row { grid-template-columns: 1fr; }
       .shell { padding: 18px 14px 34px; }
@@ -874,6 +930,13 @@ function renderPage(state, lastResult) {
   const config = state.config;
   const statusText = lastResult?.stdout || "";
   const statusError = lastResult?.stderr || "";
+  const cardsHtml = appCards.map((app) => `
+    <a class="flash" href="${escapeHtml(app.route)}">
+      <span class="k">app</span>
+      <h3 class="title">${escapeHtml(app.name)}</h3>
+      <div class="s">${escapeHtml(toSummary160(app.description))}</div>
+    </a>
+  `).join("");
 
   return `<!doctype html>
 <html lang="en">
@@ -900,12 +963,8 @@ function renderPage(state, lastResult) {
     <div class="grid">
       <section class="card section">
         <h2>Functions</h2>
-        <p class="sub">Launch MeiMei product functions from the root dashboard.</p>
-        <div class="actions">
-          <a class="button good" href="./Any-URL_summarization_in_seconds">Any-URL summarization in seconds</a>
-          <a class="button" href="./Daily_briefing">Daily briefing</a>
-          <a class="button secondary" href="./Per-channel_model_routing_by_task_type_and_cost">Per-channel model routing</a>
-        </div>
+        <p class="sub">Select an app card to launch the corresponding MeiMei function.</p>
+        <div class="cards">${cardsHtml}</div>
         <div class="footer">This area will grow into the MeiMei function catalog.</div>
       </section>
 
