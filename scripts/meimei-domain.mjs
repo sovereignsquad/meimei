@@ -65,7 +65,7 @@ function isGatewayPath(pathname) {
   if (pathname.startsWith("/api/functions/")) return false;
   if (pathname.startsWith("/api/command")) return false;
   if (pathname.startsWith("/api/page-layout")) return false;
-  if (pathname.startsWith("/api/llm/cache")) return false;
+  if (pathname.startsWith("/api/llm")) return false;
   if (pathname.startsWith("/api/brain")) return false;
   
   return pathname === "/chat"

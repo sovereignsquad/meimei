@@ -1,5 +1,13 @@
 const OLLAMA_URL = "http://localhost:11434";
 
+// ─── Model definitions ──────────────────────────────────────
+
+const MODELS = {
+  "llama3:latest": { quality: "reasoning", speed: "slow", costTier: "high", supportsJson: true },
+  "gemma3:1b":     { quality: "general",   speed: "medium", costTier: "medium", supportsJson: true },
+  "qwen3.5:0.8b":  { quality: "fast",      speed: "fast", costTier: "low", supportsJson: true }
+};
+
 const DEFAULT_MODELS = {
   fast: "qwen3.5:0.8b",
   medium: "gemma3:1b",
@@ -19,6 +27,85 @@ const TASK_MODELS = {
   default: "default"
 };
 
+// ─── Routing config ─────────────────────────────────────────
+
+const defaultRoutingConfig = {
+  // Brain = reasoning tasks (identity, context, planning)
+  // Muscle = fast tasks (classify, extract, summarize)
+  brainModel: "llama3:latest",
+  muscleModel: "qwen3.5:0.8b",
+  
+  // Per-channel overrides
+  channels: {
+    dashboard: { defaultModel: "gemma3:1b", maxCostTier: "medium" },
+    api:       { defaultModel: "gemma3:1b", maxCostTier: "medium" },
+    chat:      { defaultModel: "llama3:latest", maxCostTier: "high" },
+    heartbeat: { defaultModel: "qwen3.5:0.8b", maxCostTier: "low" }
+  },
+  
+  // Per-task overrides
+  tasks: {
+    summarize: { model: "qwen3.5:0.8b", maxTokens: 256 },
+    classify:  { model: "qwen3.5:0.8b", maxTokens: 64 },
+    extract:   { model: "qwen3.5:0.8b", maxTokens: 256 },
+    enrich:    { model: "gemma3:1b", maxTokens: 512 },
+    generate:  { model: "gemma3:1b", maxTokens: 1024 },
+    reason:    { model: "llama3:latest", maxTokens: 2048 },
+    analyze:   { model: "llama3:latest", maxTokens: 1024 },
+    think:     { model: "llama3:latest", maxTokens: 1024 }
+  },
+  
+  // Cost optimization
+  optimize: true,
+  preferLocal: true,
+  maxDailyTokens: 100000
+};
+
+let routingConfig = { ...defaultRoutingConfig };
+
+function updateRoutingConfig(updates) {
+  routingConfig = { ...routingConfig, ...updates };
+  return routingConfig;
+}
+
+function getRoutingConfig() {
+  return { ...routingConfig };
+}
+
+function resolveModel(options = {}) {
+  const { taskType, channel, model, quality } = options;
+  
+  // Explicit model wins
+  if (model) return model;
+  
+  // Channel-specific default
+  if (channel && routingConfig.channels[channel]) {
+    return routingConfig.channels[channel].defaultModel;
+  }
+  
+  // Task-specific default
+  if (taskType && routingConfig.tasks[taskType]) {
+    return routingConfig.tasks[taskType].model;
+  }
+  
+  // Quality-based default
+  if (quality && DEFAULT_MODELS[quality]) {
+    return DEFAULT_MODELS[quality];
+  }
+  
+  // Brain-muscle split: context queries use brain, data extraction use muscle
+  if (options.isBrainTask) {
+    return routingConfig.brainModel;
+  }
+  if (options.isMuscleTask) {
+    return routingConfig.muscleModel;
+  }
+  
+  return routingConfig.channels.dashboard.defaultModel;
+}
+
+// ─── LLM Error ──────────────────────────────────────────────
+
 class LLMError extends Error {
   constructor(message, statusCode, rawResponse) {
     super(message);
@@ -27,6 +114,8 @@ class LLMError extends Error {
     this.rawResponse = rawResponse;
   }
 }
+
+// ─── Ollama health ──────────────────────────────────────────
 
 async function checkOllamaHealth() {
   try {
@@ -52,7 +141,58 @@ async function listModels() {
   }
 }
 
-/** First balanced `{...}` object in text (handles nested braces; respects strings). */
+// ─── Token tracking (#617) ──────────────────────────────────
+
+const tokenStats = {
+  totalInputTokens: 0,
+  totalOutputTokens: 0,
+  totalCalls: 0,
+  byModel: {},
+  byTask: {},
+  resetAt: Date.now()
+};
+
+function recordTokenUsage(model, taskType, inputTokens, outputTokens) {
+  tokenStats.totalInputTokens += inputTokens;
+  tokenStats.totalOutputTokens += outputTokens;
+  tokenStats.totalCalls++;
+  
+  if (!tokenStats.byModel[model]) {
+    tokenStats.byModel[model] = { input: 0, output: 0, calls: 0 };
+  }
+  tokenStats.byModel[model].input += inputTokens;
+  tokenStats.byModel[model].output += outputTokens;
+  tokenStats.byModel[model].calls++;
+  
+  if (taskType) {
+    if (!tokenStats.byTask[taskType]) {
+      tokenStats.byTask[taskType] = { input: 0, output: 0, calls: 0 };
+    }
+    tokenStats.byTask[taskType].input += inputTokens;
+    tokenStats.byTask[taskType].output += outputTokens;
+    tokenStats.byTask[taskType].calls++;
+  }
+}
+
+function getTokenStats() {
+  return {
+    ...tokenStats,
+    uptime: Date.now() - tokenStats.resetAt,
+    totalTokens: tokenStats.totalInputTokens + tokenStats.totalOutputTokens
+  };
+}
+
+function resetTokenStats() {
+  tokenStats.totalInputTokens = 0;
+  tokenStats.totalOutputTokens = 0;
+  tokenStats.totalCalls = 0;
+  tokenStats.byModel = {};
+  tokenStats.byTask = {};
+  tokenStats.resetAt = Date.now();
+}
+
+// ─── JSON parsing ───────────────────────────────────────────
+
 function extractFirstJsonObject(text) {
   const start = text.indexOf("{");
   if (start < 0) return null;
@@ -139,19 +279,30 @@ function extractCleanText(text) {
   return cleaned.trim();
 }
 
+// ─── Core LLM call with routing ─────────────────────────────
+
 async function callOllama(prompt, options = {}) {
   const {
-    model = DEFAULT_MODELS.default,
+    taskType = null,
+    channel = null,
+    model: explicitModel = null,
     system = null,
     stream = false,
     temperature = 0.7,
-    maxTokens = 2048,
+    maxTokens: explicitMaxTokens = null,
     retries = 2,
     retryDelay = 1000,
     timeout = 120000,
-    /** When `"json"`, Ollama constrains output to valid JSON (see Ollama generate API). */
     responseFormat = null
   } = options;
+
+  // Resolve model via routing
+  const model = explicitModel || resolveModel({ taskType, channel });
+  
+  // Resolve maxTokens via task config
+  const maxTokens = explicitMaxTokens || 
+    (taskType && routingConfig.tasks[taskType]?.maxTokens) || 
+    2048;
 
   const fullPrompt = system ? `${system}\n\n${prompt}` : prompt;
 
@@ -161,9 +312,9 @@ async function callOllama(prompt, options = {}) {
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       const payload = {
-        model: model,
+        model,
         prompt: fullPrompt,
-        stream: stream,
+        stream,
         options: {
           temperature,
           num_predict: maxTokens
@@ -186,8 +337,13 @@ async function callOllama(prompt, options = {}) {
       }
 
       const data = await response.json();
-      // Some models (qwen3.5) put JSON in `thinking` when using format: "json"
       const responseText = data.response || data.thinking || "";
+      
+      // Track token usage
+      const inputTokens = data.prompt_eval_count || estimateTokens(fullPrompt);
+      const outputTokens = data.eval_count || estimateTokens(responseText);
+      recordTokenUsage(model, taskType, inputTokens, outputTokens);
+      
       return {
         response: responseText,
         done: data.done,
@@ -195,7 +351,8 @@ async function callOllama(prompt, options = {}) {
         totalDuration: data.total_duration,
         evalCount: data.eval_count,
         promptEvalCount: data.prompt_eval_count,
-        context: data.context
+        context: data.context,
+        _meta: { modelUsed: model, taskType, channel, inputTokens, outputTokens }
       };
     } catch (error) {
       if (error.name === "AbortError") {
@@ -216,19 +373,18 @@ async function callOllama(prompt, options = {}) {
 }
 
 async function callOllamaJson(prompt, options = {}) {
-  const { schema = null, model = DEFAULT_MODELS.medium, temperature = 0.2, ...rest } = options;
-
-  let systemPrompt = "You are a precise AI assistant. Respond ONLY with valid JSON. No markdown, no commentary.";
+  const { schema = null, ...rest } = options;
+  
+  let systemPrompt = "You are a precise AI assistant. Respond ONLY with valid JSON.";
   if (schema) {
     systemPrompt += ` The JSON must match this schema: ${JSON.stringify(schema, null, 2)}`;
   }
-
+  
   const result = await callOllama(prompt, {
-    model,
     system: systemPrompt,
-    temperature,
-    ...rest,
-    responseFormat: "json"
+    responseFormat: "json",
+    temperature: 0.2,
+    ...rest
   });
 
   const parsed = parseJsonResponse(result.response);
@@ -241,7 +397,7 @@ async function callOllamaJson(prompt, options = {}) {
     );
   }
 
-  return { data: parsed, raw: result.response, meta: result };
+  return { data: parsed, raw: result.response, meta: result._meta };
 }
 
 async function callOllamaStream(prompt, options = {}) {
@@ -259,9 +415,9 @@ async function callOllamaStream(prompt, options = {}) {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      model: model,
+      model,
       prompt: fullPrompt,
-      system: system,
+      system,
       stream: true,
       options: {
         temperature,
@@ -299,14 +455,30 @@ async function callOllamaStream(prompt, options = {}) {
   return { response: fullResponse, done: true };
 }
 
+// ─── Task-specific helpers ──────────────────────────────────
+
 function selectModelForTask(taskType) {
-  const modelKey = TASK_MODELS[taskType] || TASK_MODELS.default;
-  return DEFAULT_MODELS[modelKey];
+  return routingConfig.tasks[taskType]?.model || resolveModel({ taskType });
+}
+
+function estimateTokens(text) {
+  return Math.ceil(text.length / 4);
+}
+
+function formatCost(tokens, model) {
+  const costPerToken = MODELS[model]?.costTier === "high" ? 0.001 :
+    MODELS[model]?.costTier === "medium" ? 0.0005 : 0;
+  return {
+    inputTokens: tokens,
+    outputTokens: 0,
+    costUSD: (tokens * costPerToken).toFixed(6),
+    isLocal: true
+  };
 }
 
 async function summarize(text, options = {}) {
   return callOllama(text, {
-    model: selectModelForTask("summarize"),
+    taskType: "summarize",
     system: "You are a concise summarizer. Provide a clear, brief summary.",
     maxTokens: 256,
     ...options
@@ -321,7 +493,7 @@ async function extractStructured(text, schema, options = {}) {
   const prompt = `Extract the following fields from the text:\n${schemaDesc}\n\nText:\n${text}`;
   
   return callOllamaJson(prompt, {
-    model: selectModelForTask("extract"),
+    taskType: "extract",
     schema,
     ...options
   });
@@ -331,7 +503,7 @@ async function classify(text, categories, options = {}) {
   const prompt = `Classify this text into ONE of these categories: ${categories.join(", ")}.\n\nText: ${text}`;
   
   const result = await callOllama(prompt, {
-    model: selectModelForTask("classify"),
+    taskType: "classify",
     system: "Respond with ONLY the category name, nothing else.",
     maxTokens: 50,
     temperature: 0.1,
@@ -343,14 +515,14 @@ async function classify(text, categories, options = {}) {
 
 async function generate(prompt, options = {}) {
   return callOllama(prompt, {
-    model: selectModelForTask("generate"),
+    taskType: "generate",
     ...options
   });
 }
 
 async function reason(prompt, options = {}) {
   return callOllama(prompt, {
-    model: selectModelForTask("reasoning"),
+    taskType: "reason",
     system: "You are a logical reasoning assistant. Think step by step.",
     temperature: 0.3,
     ...options
@@ -359,46 +531,25 @@ async function reason(prompt, options = {}) {
 
 async function analyze(text, options = {}) {
   return callOllama(text, {
-    model: selectModelForTask("analyze"),
+    taskType: "analyze",
     system: "You are an analytical assistant. Provide insights and analysis.",
     ...options
   });
 }
 
-function estimateTokens(text) {
-  return Math.ceil(text.length / 4);
-}
-
-function formatCost(tokens, model) {
-  const costs = {
-    "llama3:latest": 0,
-    "qwen3.5:0.8b": 0,
-    "gemma3:1b": 0
-  };
-  
-  const costPerToken = costs[model] || 0;
-  return {
-    inputTokens: tokens,
-    outputTokens: 0,
-    costUSD: (tokens * costPerToken).toFixed(6),
-    isLocal: true
-  };
-}
-
 // ─── Prompt Cache (#613) ────────────────────────────────────
 
 const promptCache = new Map();
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_TTL_MS = 30 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 100;
 
 function getCacheKey(systemPrompt, contextPrefix) {
-  // Use hash of stable content parts
   const stablePart = `${systemPrompt || ""}|${contextPrefix || ""}`;
   let hash = 0;
   for (let i = 0; i < stablePart.length; i++) {
     const char = stablePart.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return `prompt_${hash}`;
 }
@@ -406,26 +557,20 @@ function getCacheKey(systemPrompt, contextPrefix) {
 function getCachedPrompt(key) {
   const entry = promptCache.get(key);
   if (!entry) return null;
-  
-  // Check TTL
   if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
     promptCache.delete(key);
     return null;
   }
-  
-  // Update hit count
   entry.hits++;
   return entry.value;
 }
 
 function setCachedPrompt(key, value) {
-  // Evict oldest if at capacity
   if (promptCache.size >= MAX_CACHE_ENTRIES) {
     const oldest = [...promptCache.entries()]
       .sort((a, b) => a[1].timestamp - b[1].timestamp)[0];
     if (oldest) promptCache.delete(oldest[0]);
   }
-  
   promptCache.set(key, {
     value,
     timestamp: Date.now(),
@@ -453,8 +598,13 @@ function clearCache() {
   return { ok: true, cleared: true };
 }
 
+// ─── Exports ────────────────────────────────────────────────
+
 export {
   LLMError,
+  MODELS,
+  DEFAULT_MODELS,
+  TASK_MODELS,
   checkOllamaHealth,
   listModels,
   callOllama,
@@ -471,12 +621,15 @@ export {
   analyze,
   estimateTokens,
   formatCost,
+  resolveModel,
+  updateRoutingConfig,
+  getRoutingConfig,
+  getTokenStats,
+  resetTokenStats,
   getCacheKey,
   getCachedPrompt,
   setCachedPrompt,
   getCacheStats,
   clearCache,
-  DEFAULT_MODELS,
-  TASK_MODELS,
   OLLAMA_URL
 };

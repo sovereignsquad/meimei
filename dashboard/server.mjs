@@ -36,13 +36,19 @@ import {
   listModels,
   summarize,
   parseJsonResponse,
+  resolveModel,
+  updateRoutingConfig,
+  getRoutingConfig,
+  getTokenStats,
+  resetTokenStats,
   getCacheKey,
   getCachedPrompt,
   setCachedPrompt,
   getCacheStats,
   clearCache,
   LLMError,
-  DEFAULT_MODELS
+  DEFAULT_MODELS,
+  MODELS
 } from "./lib/llm.mjs";
 import brain from "./lib/brain/index.mjs";
 import {
@@ -75,6 +81,7 @@ import {
   loadSyncAndApplyMeimeiEnv,
   handleMeimeiEnvApiRequest
 } from "./lib/meimei-env-store.mjs";
+import { loadChecklistActions, saveChecklistActions } from "./lib/checklist-next-actions.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -456,6 +463,38 @@ async function processSupabaseConnector(body = {}) {
   return { ok: false, error: "Unknown action. Use overview, health, or preview_fetch." };
 }
 
+/** Default full-app URL for Agent.Chappie (https://github.com/moldovancsaba/checklist); override with MEIMEI_CHECKLIST_APP_URL. */
+const DEFAULT_MEIMEI_CHECKLIST_APP_URL = "https://agent-chappie.doneisbetter.com/checklist";
+
+/** Checklist — three next actions (Agent.Chappie / checklist repo companion). */
+async function processChecklist(body = {}, repoRoot) {
+  const action = String(body.action || "load");
+  const fullAppUrl =
+    String(process.env.MEIMEI_CHECKLIST_APP_URL || "").trim() || DEFAULT_MEIMEI_CHECKLIST_APP_URL;
+  if (action === "overview") {
+    return {
+      ok: true,
+      title: "Checklist",
+      summary:
+        "Keep exactly three next deliveries visible. Pairs with Agent.Chappie from github.com/moldovancsaba/checklist (auto-deployed web app).",
+      fullAppUrl,
+      storeFile: "data/checklist-next-actions.v1.json",
+      repo: "https://github.com/moldovancsaba/checklist"
+    };
+  }
+  if (action === "load") {
+    const actions = await loadChecklistActions(repoRoot);
+    return { ok: true, actions, fullAppUrl };
+  }
+  if (action === "save") {
+    const raw = body.actions;
+    const arr = Array.isArray(raw) ? raw : [];
+    await saveChecklistActions(repoRoot, arr);
+    return { ok: true };
+  }
+  return { ok: false, error: "Unknown action. Use overview, load, or save." };
+}
+
 async function processLeadOutreach(body = {}, repoRoot) {
   const action = String(body.action || "overview");
   if (action === "overview") {
@@ -616,6 +655,10 @@ const toolsCatalog = miniappCfg.catalog.filter((c) => c.category === "tools");
 const explainItRoute = R["explain-it"]?.internalPath || "/516/Explain_it";
 const explainItApiRoute = R["explain-it"]?.apiPath || "/api/functions/explain-it";
 const explainItLabel = R["explain-it"]?.displayName || "Explain it";
+const checklistRoute = R["checklist"]?.internalPath || "/Checklist";
+const checklistApiRoute = R["checklist"]?.apiPath || "/api/functions/checklist";
+const checklistLabel = R["checklist"]?.displayName || "Checklist";
+const checklistIssueId = R["checklist"]?.issueId;
 const whatNextRoute = R["what-next"]?.internalPath || "/724/What_next";
 const whatNextApiRoute = R["what-next"]?.apiPath || "/api/functions/what-next";
 const whatNextLabel = R["what-next"]?.displayName || "What next?";
@@ -1185,6 +1228,19 @@ function renderFlashcard({ kind, title, content, href = "", button = false, attr
     ? `<a class="ds-flashcard-settings" href="${escapeHtml(settingsHref)}" title="Settings" onclick="event.stopPropagation();">⚙️</a>` 
     : "";
   return `<a class="ds-flashcard" href="${escapeHtml(href)}">${cardHtml}${settingsLink}</a>`;
+}
+
+/** Align with `scripts/meimei-domain.mjs` default so miniapp paths work when the request still has a public mount prefix. */
+function stripDashboardMountPrefix(pathname) {
+  const raw = String(process.env.MEIMEI_PUBLIC_PREFIX ?? "/dashboard").replace(/\/+$/, "");
+  const prefix = raw === "/" ? "" : raw;
+  if (!prefix) return pathname;
+  if (pathname === prefix) return "/";
+  if (pathname.startsWith(`${prefix}/`)) {
+    const rest = pathname.slice(prefix.length);
+    return rest.startsWith("/") ? rest : `/${rest}`;
+  }
+  return pathname;
 }
 
 function resolveMiniappRoute(pathname) {
@@ -2632,6 +2688,109 @@ function renderRoutingPage(layoutDoc) {
     if (params.get("channel")) channelInput.value = params.get("channel");
     if (params.get("taskType")) taskTypeInput.value = params.get("taskType");
     if (params.get("costTarget")) costTargetInput.value = params.get("costTarget");
+  </script>
+</body>
+</html>`;
+}
+
+function renderChecklistPage(layoutDoc) {
+  const issueId = checklistIssueId ?? "727";
+  const fullAppUrl =
+    String(process.env.MEIMEI_CHECKLIST_APP_URL || "").trim() || DEFAULT_MEIMEI_CHECKLIST_APP_URL;
+  const topbar = `<div class="topbar">
+      <a class="button secondary" href="${escapeHtml(appsRoute)}">&larr; Back to Apps</a>
+      <span class="title">${escapeHtml(checklistLabel)}</span>
+    </div>`;
+  const main = `<main class="hero">
+      <section class="route-card">
+        <h1>${escapeHtml(checklistLabel)}</h1>
+        <p class="lede u-mb12">Issue <strong>#${escapeHtml(String(issueId))}</strong> — Your three next best actions, always in front so you can ship. Edit here on the dashboard; open the <a href="${escapeHtml(fullAppUrl)}" target="_blank" rel="noopener noreferrer">Agent.Chappie Checklist</a> (from <a href="https://github.com/moldovancsaba/checklist" target="_blank" rel="noopener noreferrer">moldovancsaba/checklist</a>, auto-deployed) for the full competitive workspace.</p>
+        <p class="muted u-mb12"><strong>What next?</strong> is AI-ranked suggestions from sources. <strong>Checklist</strong> is what <em>you</em> commit to delivering next.</p>
+        <div class="route-form">
+          <div class="field u-mb12">
+            <label for="checklistA1">1 — Next best action</label>
+            <textarea id="checklistA1" data-checklist-row rows="4" placeholder="The single most important thing to finish next…" style="width:100%;max-width:40rem;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);background:rgba(4,10,20,0.72);color:var(--text);padding:12px 14px;font-size:15px;line-height:1.45;"></textarea>
+          </div>
+          <div class="field u-mb12">
+            <label for="checklistA2">2 — Then</label>
+            <textarea id="checklistA2" data-checklist-row rows="3" placeholder="Right after #1…" style="width:100%;max-width:40rem;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);background:rgba(4,10,20,0.72);color:var(--text);padding:12px 14px;font-size:15px;line-height:1.45;"></textarea>
+          </div>
+          <div class="field u-mb12">
+            <label for="checklistA3">3 — Then</label>
+            <textarea id="checklistA3" data-checklist-row rows="3" placeholder="Third in line…" style="width:100%;max-width:40rem;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);background:rgba(4,10,20,0.72);color:var(--text);padding:12px 14px;font-size:15px;line-height:1.45;"></textarea>
+          </div>
+          <div class="route-actions u-mb12">
+            <button type="button" class="good" id="checklistSave">Save three actions</button>
+          </div>
+          <p class="muted u-m0" id="checklistStatus" aria-live="polite"></p>
+        </div>
+      </section>
+      <div class="footer">Stored locally in <code>data/checklist-next-actions.v1.json</code> (gitignored). Repo: <a href="https://github.com/moldovancsaba/checklist" target="_blank" rel="noopener noreferrer">moldovancsaba/checklist</a>.</div>
+    </main>`;
+  const layout = buildLayoutFlowHtml(layoutDoc, miniappPageKey("checklist"), { topbar, main }, escapeAttr);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(checklistLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+</head>
+<body data-theme="green">
+  <div class="shell">
+  ${layout}
+  </div>
+  <script>
+    const checklistApi = "${escapeHtml(checklistApiRoute)}";
+    const rows = [
+      document.getElementById("checklistA1"),
+      document.getElementById("checklistA2"),
+      document.getElementById("checklistA3")
+    ];
+    const statusEl = document.getElementById("checklistStatus");
+    const saveBtn = document.getElementById("checklistSave");
+
+    function setStatus(msg) {
+      if (statusEl) statusEl.textContent = msg || "";
+    }
+
+    async function loadActions() {
+      setStatus("Loading…");
+      try {
+        const response = await fetch(checklistApi, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "load" })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || "Load failed");
+        const a = Array.isArray(data.actions) ? data.actions : ["", "", ""];
+        rows.forEach((el, i) => { if (el) el.value = String(a[i] != null ? a[i] : ""); });
+        setStatus("Loaded.");
+      } catch (e) {
+        setStatus(e instanceof Error ? e.message : String(e));
+      }
+    }
+
+    async function saveActions() {
+      setStatus("Saving…");
+      try {
+        const actions = rows.map((el) => (el ? el.value : ""));
+        const response = await fetch(checklistApi, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "save", actions })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || "Save failed");
+        setStatus("Saved.");
+      } catch (e) {
+        setStatus(e instanceof Error ? e.message : String(e));
+      }
+    }
+
+    if (saveBtn) saveBtn.addEventListener("click", saveActions);
+    loadActions();
   </script>
 </body>
 </html>`;
@@ -5790,11 +5949,13 @@ function guessContentType(filePath) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host || "127.0.0.1"}`);
-    const normalizedPath = url.pathname === "/" ? "/" : url.pathname.replace(/\/+$/, "");
+    const normalizedPath = stripDashboardMountPrefix(
+      url.pathname === "/" ? "/" : url.pathname.replace(/\/+$/, "")
+    );
 
     if ((req.method === "GET" || req.method === "HEAD")
-      && pathStartsWithStaticPrefix(url.pathname, staticPrefixes)) {
-      const relative = decodeURIComponent(url.pathname.slice(1));
+      && pathStartsWithStaticPrefix(normalizedPath, staticPrefixes)) {
+      const relative = decodeURIComponent(normalizedPath.slice(1));
       const requestedPath = path.join(publicDir, relative);
       const safePrefix = `${publicDir}${path.sep}`;
       if (!requestedPath.startsWith(safePrefix)) {
@@ -5826,7 +5987,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "GET" && url.pathname === homeRoute) {
+    if (req.method === "GET" && normalizedPath === homeRoute) {
       const config = await readConfig();
       const layoutDoc = getLayoutDoc();
       const html = renderPage(
@@ -6066,6 +6227,16 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && resolvedMiniappRoute === checklistRoute) {
+      const html = renderChecklistPage(getLayoutDoc());
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, max-age=0"
+      });
+      res.end(html);
+      return;
+    }
+
     if (req.method === "GET" && resolvedMiniappRoute === whatNextRoute) {
       const html = renderWhatNextPage(getLayoutDoc());
       res.writeHead(200, {
@@ -6106,12 +6277,12 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "GET" && url.pathname === pageLayoutApiRoute) {
+    if (req.method === "GET" && normalizedPath === pageLayoutApiRoute) {
       sendJson(res, 200, { ok: true, layout: getLayoutDoc() });
       return;
     }
 
-    if (req.method === "POST" && url.pathname === pageLayoutApiRoute) {
+    if (req.method === "POST" && normalizedPath === pageLayoutApiRoute) {
       try {
         const body = await readJson(req);
         await savePageLayout(body);
@@ -6125,34 +6296,34 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "GET" && url.pathname === apiConfigRoute) {
+    if (req.method === "GET" && normalizedPath === apiConfigRoute) {
       const config = await readConfig();
       sendJson(res, 200, { configPath, config });
       return;
     }
 
-    if (req.method === "GET" && url.pathname === apiRunRoute) {
+    if (req.method === "GET" && normalizedPath === apiRunRoute) {
       const cmd = url.searchParams.get("cmd") || "status";
       const result = await executeCommand(cmd, {});
       sendJson(res, 200, result);
       return;
     }
 
-    if (req.method === "GET" && url.pathname === telemetrySummaryApiRoute) {
+    if (req.method === "GET" && normalizedPath === telemetrySummaryApiRoute) {
       const summary = await getTelemetrySummary();
       sendJson(res, 200, { ok: true, summary });
       return;
     }
 
-    if (req.method === "GET" && url.pathname === explainItApiRoute) {
+    if (req.method === "GET" && normalizedPath === explainItApiRoute) {
       const urlValue = url.searchParams.get("url") || "";
       const result = await summarizeUrlSource(urlValue);
       sendJson(res, 200, result);
       return;
     }
 
-    if (req.method === "GET" && (url.pathname === routingApiRoute || url.pathname === apiAdapterApiRoute)) {
-      const isAdapter = url.pathname === apiAdapterApiRoute;
+    if (req.method === "GET" && (normalizedPath === routingApiRoute || normalizedPath === apiAdapterApiRoute)) {
+      const isAdapter = normalizedPath === apiAdapterApiRoute;
       const result = await routeViaApiAdapter({
         channel: url.searchParams.get("channel") || "dashboard",
         taskType: url.searchParams.get("taskType") || "chat",
@@ -6180,7 +6351,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && (url.pathname === routingApiRoute || url.pathname === apiAdapterApiRoute)) {
+    if (req.method === "POST" && (normalizedPath === routingApiRoute || normalizedPath === apiAdapterApiRoute)) {
       const body = await readJson(req);
       const result = await routeViaApiAdapter({
         channel: body.channel || "dashboard",
@@ -6209,14 +6380,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && url.pathname === imessageInboundApiRoute) {
+    if (req.method === "POST" && normalizedPath === imessageInboundApiRoute) {
       const body = await readJson(req);
       const result = await handleImessageInbound(body);
       sendJson(res, result.code || (result.ok ? 200 : 400), result);
       return;
     }
 
-    if (req.method === "POST" && url.pathname === apiConfigRoute) {
+    if (req.method === "POST" && normalizedPath === apiConfigRoute) {
       const body = await readJson(req);
       const config = await readConfig();
       const nextWorkspace = String(body.workspace || "").trim();
@@ -6268,7 +6439,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && url.pathname === apiRunRoute) {
+    if (req.method === "POST" && normalizedPath === apiRunRoute) {
       const body = await readJson(req);
       const cmd = String(body.cmd || "status");
       const result = await executeCommand(cmd, body);
@@ -6276,14 +6447,28 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && url.pathname === explainItApiRoute) {
+    if (req.method === "POST" && normalizedPath === explainItApiRoute) {
       const body = await readJson(req);
       const result = await summarizeUrlSource(body.url);
       sendJson(res, 200, result);
       return;
     }
 
-    if (req.method === "POST" && url.pathname === whatNextApiRoute) {
+    if (req.method === "POST" && normalizedPath === checklistApiRoute) {
+      const body = (await readJson(req)) || {};
+      try {
+        const out = await processChecklist(body, repoRoot);
+        sendJson(res, out.ok ? 200 : 400, out);
+      } catch (error) {
+        sendJson(res, 500, {
+          ok: false,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+      return;
+    }
+
+    if (req.method === "POST" && normalizedPath === whatNextApiRoute) {
       const body = await readJson(req) || {};
       const sources = Array.isArray(body.sources) ? body.sources : ["tasks", "calendar", "mail"];
       
@@ -6347,7 +6532,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === leadEnrichmentApiRoute) {
+    if (req.method === "POST" && normalizedPath === leadEnrichmentApiRoute) {
       const body = (await readJson(req)) || {};
       const action = String(body.action || "");
       if (action.startsWith("workflow_")) {
@@ -6381,7 +6566,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === leadOutreachApiRoute) {
+    if (req.method === "POST" && normalizedPath === leadOutreachApiRoute) {
       const body = (await readJson(req)) || {};
       try {
         const out = await processLeadOutreach(body, repoRoot);
@@ -6395,7 +6580,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === aiSdrAnalyticsApiRoute) {
+    if (req.method === "POST" && normalizedPath === aiSdrAnalyticsApiRoute) {
       const body = (await readJson(req)) || {};
       try {
         const out = await processAiSdrAnalytics(body, repoRoot);
@@ -6409,7 +6594,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === supabaseConnectorApiRoute) {
+    if (req.method === "POST" && normalizedPath === supabaseConnectorApiRoute) {
       const body = (await readJson(req)) || {};
       try {
         const out = await processSupabaseConnector(body);
@@ -6423,7 +6608,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === environmentVariablesApiRoute) {
+    if (req.method === "POST" && normalizedPath === environmentVariablesApiRoute) {
       const body = (await readJson(req)) || {};
       try {
         const out = await handleMeimeiEnvApiRequest(body, repoRoot);
@@ -6437,7 +6622,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === inboxApiRoute) {
+    if (req.method === "POST" && normalizedPath === inboxApiRoute) {
       const body = await readJson(req) || {};
       const action = String(body.action || "list");
       const filter = String(body.filter || "all");
@@ -6598,7 +6783,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === memoryApiRoute) {
+    if (req.method === "POST" && normalizedPath === memoryApiRoute) {
       const body = await readJson(req) || {};
       let layer = String(body.layer || "all");
       const action = String(body.action || "get");
@@ -6745,7 +6930,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === missionControlApiRoute) {
+    if (req.method === "POST" && normalizedPath === missionControlApiRoute) {
       const body = await readJson(req) || {};
       const filter = String(body.filter || "all");
       const action = String(body.action || "overview");
@@ -6786,7 +6971,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       return;
     }
 
-    if (req.method === "POST" && url.pathname === dailyBriefingApiRoute) {
+    if (req.method === "POST" && normalizedPath === dailyBriefingApiRoute) {
       const body = await readJson(req);
       const sink = String(body.sink || "apple-notes").trim() === "markdown" ? "markdown" : "apple-notes";
 
@@ -6898,7 +7083,7 @@ Generate a concise daily briefing. Return ONLY JSON:
       return;
     }
 
-    if (req.method === "POST" && url.pathname === dailyBriefingOpenApiRoute) {
+    if (req.method === "POST" && normalizedPath === dailyBriefingOpenApiRoute) {
       const body = await readJson(req);
       const target = String(body.target || "").trim();
       if (target === "notes") {
@@ -6928,7 +7113,7 @@ Generate a concise daily briefing. Return ONLY JSON:
       return;
     }
 
-    if (req.method === "GET" && url.pathname === "/api/command/suggestions") {
+    if (req.method === "GET" && normalizedPath === "/api/command/suggestions") {
       try {
         const payload = await generateHomeSuggestions(repoRoot);
         sendJson(res, 200, payload);
@@ -6942,7 +7127,7 @@ Generate a concise daily briefing. Return ONLY JSON:
       return;
     }
 
-    if (req.method === "POST" && url.pathname === "/api/command") {
+    if (req.method === "POST" && normalizedPath === "/api/command") {
       const body = await readJson(req) || {};
       const query = String(body.query || "").trim();
       
@@ -6961,26 +7146,60 @@ Generate a concise daily briefing. Return ONLY JSON:
     }
 
     // Prompt cache management (#613)
-    if (req.method === "GET" && url.pathname === "/api/llm/cache/stats") {
+    if (req.method === "GET" && normalizedPath === "/api/llm/cache/stats") {
       const stats = getCacheStats();
       sendJson(res, 200, { ok: true, ...stats });
       return;
     }
     
-    if (req.method === "POST" && url.pathname === "/api/llm/cache/clear") {
+    if (req.method === "POST" && normalizedPath === "/api/llm/cache/clear") {
       const result = clearCache();
       sendJson(res, 200, result);
       return;
     }
 
     // Brain health endpoint
-    if (req.method === "GET" && url.pathname === "/api/brain/health") {
+    if (req.method === "GET" && normalizedPath === "/api/brain/health") {
       try {
         const stats = await brain.getStats(repoRoot);
         sendJson(res, 200, { ok: true, brain: stats, llmCache: getCacheStats() });
       } catch (error) {
         sendJson(res, 200, { ok: false, error: error.message });
       }
+      return;
+    }
+
+    // Model routing (#517, #561, #612)
+    if (req.method === "GET" && normalizedPath === "/api/llm/routing") {
+      const config = getRoutingConfig();
+      const health = await checkOllamaHealth();
+      sendJson(res, 200, { 
+        ok: true, 
+        config,
+        models: MODELS,
+        availableModels: health.models || [],
+        ollamaHealthy: health.healthy
+      });
+      return;
+    }
+    
+    if (req.method === "POST" && normalizedPath === "/api/llm/routing") {
+      const body = await readJson(req);
+      const updated = updateRoutingConfig(body);
+      sendJson(res, 200, { ok: true, config: updated });
+      return;
+    }
+    
+    // Token stats (#617)
+    if (req.method === "GET" && normalizedPath === "/api/llm/stats") {
+      const stats = getTokenStats();
+      sendJson(res, 200, { ok: true, ...stats });
+      return;
+    }
+    
+    if (req.method === "POST" && normalizedPath === "/api/llm/stats/reset") {
+      resetTokenStats();
+      sendJson(res, 200, { ok: true, message: "Token stats reset" });
       return;
     }
 
