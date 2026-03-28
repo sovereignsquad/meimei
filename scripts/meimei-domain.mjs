@@ -61,6 +61,11 @@ function stripPrefix(urlPath) {
 }
 
 function isGatewayPath(pathname) {
+  // Dashboard APIs — not gateway
+  if (pathname.startsWith("/api/functions/")) return false;
+  if (pathname.startsWith("/api/command")) return false;
+  if (pathname.startsWith("/api/page-layout")) return false;
+  
   return pathname === "/chat"
     || pathname.startsWith("/chat/")
     || pathname === "/api"

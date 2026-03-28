@@ -3,74 +3,299 @@
   "generatedAt": "2026-03-28",
   "functions": [
     {
-      "id": "daily-briefing",
+      "id": "lead-enrichment",
       "version": "v1",
-      "displayName": "Daily briefing",
-      "description": "Generate your daily briefing from configured sources to start the day with an actionable overview of priorities and context.",
-      "catalogOrder": 2,
-      "route": "/dashboard/518/Daily_briefing",
+      "category": "apps",
+      "displayName": "Lead Enrichment",
+      "description": "Enrich contacts and companies with structured sales data for personalized outreach campaigns.",
+      "catalogOrder": 3,
+      "route": "/dashboard/649/Lead_enrichment",
       "api": {
         "method": "POST",
-        "path": "/dashboard/api/functions/daily-briefing"
+        "path": "/dashboard/api/functions/lead-enrichment"
       },
       "input": {
         "required": [],
-        "optional": [],
+        "optional": [
+          "action",
+          "source",
+          "sourceData",
+          "enrichmentLevel",
+          "priority",
+          "async",
+          "label",
+          "workflowId",
+          "id"
+        ],
         "examples": [
-          {}
+          { "source": "linkedin", "sourceData": { "profileUrl": "https://linkedin.com/in/example" } },
+          { "source": "email", "sourceData": { "email": "john@example.com" }, "enrichmentLevel": "full" },
+          {
+            "source": "crm",
+            "sourceData": {
+              "crmProvider": "hubspot",
+              "externalId": "deal-1024",
+              "email": "jane@acme.com",
+              "notes": "MQL from webinar",
+              "customFields": { "lifecycle": "MQL", "region": "EU" }
+            }
+          },
+          { "action": "workflow_list" },
+          {
+            "action": "workflow_enqueue",
+            "source": "email",
+            "sourceData": { "email": "ops@example.com" },
+            "label": "Q1 queue"
+          },
+          { "action": "workflow_run", "workflowId": "le_wf_xxxxxxxx" },
+          {
+            "source": "supabase",
+            "sourceData": {
+              "table": "leads",
+              "id": "00000000-0000-0000-0000-000000000000",
+              "idColumn": "id"
+            }
+          }
         ]
       },
       "output": {
         "statusField": "ok",
         "payloadShape": "object",
-        "requiredFields": [
-          "ok",
-          "title",
-          "sink"
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": true,
+        "allowedProtocols": ["https"],
+        "notes": [
+          "External enrichment sources; data cached for 30 days.",
+          "CRM source (mvp-factory-control#632): seed enrichment from exported CRM / connector fields.",
+          "Supabase source (mvp-factory-control#631): PostgREST row fetch; env MEIMEI_SUPABASE_URL + key.",
+          "Workflow (mvp-factory-control#650): actions workflow_* use data/lead-enrichment-workflow.v1.json (PII, gitignored). Single-shot enrich still requires source + sourceData when action is omitted."
         ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["network-fetch", "local-file-write", "audit-append"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return partial results from available sources"
+      }
+    },
+    {
+      "id": "lead-outreach",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "Lead outreach",
+      "description": "Hyper-personalized cold email campaigns — build sequences and messaging from enriched leads (mvp-factory-control#653).",
+      "catalogOrder": 4,
+      "route": "/dashboard/653/Lead_outreach",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/lead-outreach"
+      },
+      "input": {
+        "required": [],
+        "optional": [
+          "action",
+          "campaignName",
+          "leadSummary",
+          "tone",
+          "toEmail",
+          "subjectLine",
+          "body",
+          "trackType",
+          "note",
+          "relatedEventId"
+        ],
+        "examples": [
+          {},
+          { "action": "overview" },
+          { "action": "draft_touch", "campaignName": "Q1 outbound", "leadSummary": "VP Eng at Acme, EU, MQL" },
+          {
+            "action": "sdr_send",
+            "toEmail": "lead@example.com",
+            "subjectLine": "Quick idea for Acme",
+            "body": "Hi…",
+            "campaignName": "Q1 outbound"
+          },
+          { "action": "sdr_analytics" },
+          { "action": "sdr_track", "trackType": "replied", "note": "Booked call Tuesday" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": true,
+        "allowedProtocols": [],
+        "notes": [
+          "Addon #654 delivered: sdr_send (Mail draft + JSONL log), sdr_analytics, sdr_track; log file data/sdr-outbound.jsonl (PII, gitignored)."
+        ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["network-fetch", "local-file-write"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return structured error with suggested next step"
+      }
+    },
+    {
+      "id": "ai-sdr-analytics",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "AI SDR analytics",
+      "description": "Operator dashboard for outbound metrics — SDR events (#654) plus lead workflow funnel (#650), local logs only.",
+      "catalogOrder": 5,
+      "route": "/dashboard/651/AI_SDR_analytics",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/ai-sdr-analytics"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action"],
+        "examples": [{}, { "action": "overview" }, { "action": "metrics" }]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
       },
       "safety": {
         "untrustedInput": false,
         "allowedProtocols": [],
         "notes": [
-          "Writes to Apple Notes first and markdown fallback."
+          "Reads gitignored local files data/sdr-outbound.jsonl and data/lead-enrichment-workflow.v1.json; no external analytics vendor."
         ]
       },
       "capabilities": {
-        "channels": [
-          "dashboard",
-          "api"
-        ],
-        "sideEffects": [
-          "apple-notes-write",
-          "local-file-write"
-        ],
+        "channels": ["dashboard", "api"],
+        "sideEffects": [],
         "requiresApproval": false
       },
       "failureModel": {
         "clearErrorMessages": true,
-        "fallbackBehavior": "markdown fallback when Apple Notes is unavailable"
+        "fallbackBehavior": "Return error payload with empty series"
       }
     },
     {
-      "id": "url-summary",
+      "id": "inbox",
       "version": "v1",
-      "displayName": "Any-URL summarization in seconds",
-      "description": "Paste a URL and get a fast structured summary so you can understand key points without reading the entire source content.",
-      "catalogOrder": 1,
-      "route": "/dashboard/516/Any-URL_summarization_in_seconds",
+      "category": "apps",
+      "displayName": "Inbox",
+      "description": "MeiMei's email inbox — receive, review, and act on messages like a real assistant.",
+      "catalogOrder": 6,
+      "route": "/dashboard/563/Inbox",
       "api": {
         "method": "POST",
-        "path": "/dashboard/api/functions/url-summary"
+        "path": "/dashboard/api/functions/inbox"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action", "messageId", "filter", "limit"],
+        "examples": [
+          {},
+          { "action": "list", "limit": 20 },
+          { "action": "read", "messageId": "msg_abc123" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok", "messages", "total", "unread"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": ["AppleScript integration for macOS Mail; requires permission."]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["apple-script", "local-file-write"],
+        "requiresApproval": true
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return error with permission instructions"
+      }
+    },
+    {
+      "id": "what-next",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "What next?",
+      "description": "Your daily guide — get prioritized recommendations based on your sources and AI analysis.",
+      "catalogOrder": 1,
+      "route": "/dashboard/724/What_next",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/what-next"
+      },
+      "input": {
+        "required": [],
+        "optional": ["sources", "scheduleTime", "priority"],
+        "examples": [
+          {},
+          { "scheduleTime": "06:00" },
+          { "sources": ["tasks", "calendar"], "priority": "high" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok", "recommendations", "sources"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": ["Reads from configured sources, generates recommendations."]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["network-fetch", "apple-notes-write"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return partial results with available sources"
+      }
+    },
+    {
+      "id": "explain-it",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "Explain it",
+      "description": "Paste a URL or add a source, get a fast structured explanation. Use 'Set alarm' to schedule daily briefings.",
+      "catalogOrder": 2,
+      "route": "/dashboard/516/Explain_it",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/explain-it"
       },
       "input": {
         "required": [
           "url"
         ],
-        "optional": [],
+        "optional": [
+          "schedule",
+          "scheduleTime",
+          "sources"
+        ],
         "examples": [
           {
             "url": "https://example.com"
+          },
+          {
+            "url": "https://example.com",
+            "schedule": true,
+            "scheduleTime": "06:00"
           }
         ]
       },
@@ -99,7 +324,9 @@
           "api"
         ],
         "sideEffects": [
-          "network-fetch"
+          "network-fetch",
+          "apple-notes-write",
+          "local-file-write"
         ],
         "requiresApproval": false
       },
@@ -109,15 +336,16 @@
       }
     },
     {
-      "id": "model-routing",
+      "id": "ai-routing",
       "version": "v1",
-      "displayName": "Per-channel model routing by task type and cost",
-      "description": "Preview and test model routing behavior by channel, task type, and cost target to keep output quality and spend aligned.",
-      "catalogOrder": 3,
-      "route": "/dashboard/517/Per-channel_model_routing_by_task_type_and_cost",
+      "category": "tools",
+      "displayName": "AI routing",
+      "description": "Configure how requests route to different AI models based on channel, task type, and cost target.",
+      "catalogOrder": 1,
+      "route": "/dashboard/517/AI_routing",
       "api": {
         "method": "POST",
-        "path": "/dashboard/api/functions/model-routing"
+        "path": "/dashboard/api/functions/ai-routing"
       },
       "input": {
         "required": [
@@ -165,15 +393,16 @@
       }
     },
     {
-      "id": "api-channel-adapter",
+      "id": "api-access",
       "version": "v1",
-      "displayName": "API channel adapter (reference)",
-      "description": "Run the API reference adapter: policy, audit, telemetry, and lifecycle—the spine that future WhatsApp, iMessage, and Discord adapters attach to.",
-      "catalogOrder": 4,
-      "route": "/dashboard/700/API_channel_adapter",
+      "category": "tools",
+      "displayName": "API access",
+      "description": "Manage API integration: policy, audit trail, and telemetry—the spine that connects external systems.",
+      "catalogOrder": 2,
+      "route": "/dashboard/700/API_access",
       "api": {
         "method": "POST",
-        "path": "/dashboard/api/functions/api-channel-adapter"
+        "path": "/dashboard/api/functions/api-access"
       },
       "input": {
         "required": [
@@ -208,7 +437,7 @@
         "untrustedInput": false,
         "allowedProtocols": [],
         "notes": [
-          "Reference adapter: policy, audit trail, telemetry. Same engine as model-routing; dedicated route for issue #700.",
+          "Reference adapter: policy, audit trail, telemetry.",
           "On success includes route; on policy block may omit route but includes adapter."
         ]
       },
@@ -226,6 +455,134 @@
       "failureModel": {
         "clearErrorMessages": true,
         "fallbackBehavior": "return structured error with adapter lifecycle"
+      }
+    },
+    {
+      "id": "memory",
+      "version": "v1",
+      "category": "tools",
+      "displayName": "Memory",
+      "description": "Business Brain — MeiMei's identity, mission, values, and operating principles as a durable context layer.",
+      "catalogOrder": 3,
+      "route": "/dashboard/601/Memory",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/memory"
+      },
+      "input": {
+        "required": [],
+        "optional": ["layer", "action", "key", "value"],
+        "examples": [
+          {},
+          { "layer": "identity" },
+          { "layer": "context", "action": "get" },
+          { "layer": "context", "action": "set", "key": "currentProject", "value": "Lead Enrichment" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok", "layer", "content"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": ["Durable memory layer for MeiMei's identity and context."]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["local-file-write"],
+        "requiresApproval": true
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return default memory layer"
+      }
+    },
+    {
+      "id": "mission-control",
+      "version": "v1",
+      "category": "tools",
+      "displayName": "Mission Control",
+      "description": "Live board of MeiMei activity and state — agent status, runs, failures, and action traces.",
+      "catalogOrder": 4,
+      "route": "/dashboard/635/Mission_control",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/mission-control"
+      },
+      "input": {
+        "required": [],
+        "optional": ["filter", "timeRange", "scope"],
+        "examples": [
+          {},
+          { "filter": "errors" },
+          { "filter": "runs", "timeRange": "1h" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok", "overview", "recentRuns"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": ["Read-only surface; no execution from this tool."]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": [],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return partial data with available telemetry"
+      }
+    },
+    {
+      "id": "supabase-connector",
+      "version": "v1",
+      "category": "tools",
+      "displayName": "Supabase connector",
+      "description": "PostgREST health and previews; powers Lead Enrichment source supabase for durable lead rows (mvp-factory-control#631).",
+      "catalogOrder": 5,
+      "route": "/dashboard/631/Supabase_connector",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/supabase-connector"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action", "testTable", "table", "id", "idColumn", "match", "limit"],
+        "examples": [
+          {},
+          { "action": "overview" },
+          { "action": "health", "testTable": "leads" },
+          { "action": "preview_fetch", "table": "leads", "idColumn": "id", "id": "00000000-0000-0000-0000-000000000000", "limit": 3 }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": ["https"],
+        "notes": [
+          "Requires MEIMEI_SUPABASE_URL and MEIMEI_SUPABASE_SERVICE_ROLE or MEIMEI_SUPABASE_ANON_KEY in environment.",
+          "Table and column names validated to alphanumeric/underscore only."
+        ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["network-fetch"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return structured REST error message"
       }
     }
   ]
