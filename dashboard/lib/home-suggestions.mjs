@@ -40,7 +40,7 @@ async function buildDashboardSignals() {
     lines.push("- Apple Mail: status unknown. Do not invent unread counts.");
   }
   lines.push(
-    "- Lead enrichment, AI SDR analytics (#651), Memory, Mission control, Explain URL, and What next miniapps are available from Apps; Supabase connector is under Tools; mention when Brain context implies they help."
+    "- Lead enrichment, AI SDR analytics (#651), Memory, Mission control, Explain URL, and What next miniapps are available from Apps; Tools include Supabase connector and Environment variables (Vercel-style secrets); mention when Brain context implies they help."
   );
   return lines.join("\n");
 }

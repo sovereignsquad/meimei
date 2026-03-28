@@ -33,7 +33,14 @@ export function miniappPageKey(fnId) {
 
 export function pageBoxMeta(registry) {
   const meta = {
-    home: { label: "Operator dashboard", boxes: { functions: "Functions" } },
+    home: {
+      label: "Operator dashboard",
+      boxes: {
+        commandChat: "AI command",
+        homeSuggestions: "Suggestions",
+        functions: "Welcome"
+      }
+    },
     admin: {
       label: "Admin",
       boxes: {
@@ -62,7 +69,13 @@ export function pageBoxMeta(registry) {
 }
 
 export function defaultItemsForPage(pageKey) {
-  if (pageKey === "home") return [{ id: "functions", spanMax: 3 }];
+  if (pageKey === "home") {
+    return [
+      { id: "commandChat", spanMax: 3 },
+      { id: "homeSuggestions", spanMax: 3 },
+      { id: "functions", spanMax: 3 }
+    ];
+  }
   if (pageKey === "admin") {
     return [
       { id: "metadata", spanMax: 2 },
@@ -122,6 +135,21 @@ function mergeMissingBoxes(pageKey, items, registry) {
   return items.concat(extra);
 }
 
+const HOME_LAYOUT_ORDER = ["commandChat", "homeSuggestions", "functions"];
+
+function sortHomeLayoutItems(items) {
+  const rank = (id) => {
+    const i = HOME_LAYOUT_ORDER.indexOf(String(id || ""));
+    return i === -1 ? 100 : i;
+  };
+  return [...items].sort((a, b) => {
+    if (a.type === "break" && b.type === "break") return 0;
+    if (a.type === "break") return 1;
+    if (b.type === "break") return -1;
+    return rank(a.id) - rank(b.id);
+  });
+}
+
 /**
  * @param {string} repoRoot
  * @param {object} registry parsed registry.v1.json
@@ -140,6 +168,9 @@ export function loadPageLayoutMerged(repoRoot, registry) {
     const stored = raw.pages?.[key];
     let items = sanitizeItemsForPage(key, stored?.items, registry);
     items = mergeMissingBoxes(key, items, registry);
+    if (key === "home") {
+      items = sortHomeLayoutItems(items);
+    }
     pages[key] = { items };
   }
   return {

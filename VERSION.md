@@ -3,12 +3,17 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.7.4`
-- Date: `2026-03-27`
-- Codename: `api-channel-adapter-miniapp-700`
+- Version: `0.8.0`
+- Date: `2026-03-28`
+- Codename: `gtm-env-operator-726`
 
 ## Included issue deliveries
 
+- `mvp-factory-control#631` - Supabase connector miniapp + Lead Enrichment `source: supabase` (PostgREST)
+- `mvp-factory-control#650` - Lead enrichment workflow queue and `workflow_*` API
+- `mvp-factory-control#651` - AI SDR analytics dashboard miniapp (SDR JSONL + workflow funnel)
+- `mvp-factory-control#653` / `#654` - Lead outreach miniapp + SDR Mail draft, JSONL log, analytics, tracking
+- Workspace **#726** - Environment variables miniapp (Vercel-style local secret store; not a board issue id)
 - `mvp-factory-control#692` - Foundation contradiction audit baseline
 - `mvp-factory-control#693` - Unified readiness gate
 - `mvp-factory-control#694` - Miniapp contract v1

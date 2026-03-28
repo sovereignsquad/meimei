@@ -6,6 +6,7 @@ const COMMAND_INTENTS = [
   "lead_outreach",
   "sdr_analytics",
   "supabase_connector",
+  "environment_variables",
   "check_inbox", 
   "view_memory",
   "check_status",
@@ -23,6 +24,7 @@ const KEYWORD_PATTERNS = [
   { intent: "get_recommendations", keywords: ["what next", "what should", "recommend", "prioritize", "priorities", "next step", "todo"] },
   { intent: "sdr_analytics", keywords: ["sdr analytics", "outreach metrics", "outreach dashboard", "campaign metrics"] },
   { intent: "supabase_connector", keywords: ["supabase connector", "supabase tool"] },
+  { intent: "environment_variables", keywords: ["environment variables", "env variables", "api keys", "secrets manager", "vercel env"] },
   { intent: "lead_outreach", keywords: ["outreach", "cold email", "campaign", "sdr", "sequence"] },
   { intent: "check_inbox", keywords: ["inbox", "email", "emails", "mail", "unread", "messages"] },
   { intent: "enrich_lead", keywords: ["enrich", "enrichment", "lead", "linkedin", "contact", "crm"] },
@@ -83,6 +85,7 @@ check_status = check MeiMei system health or OpenClaw agents
 get_recommendations = ask what to do next or get priorities
 sdr_analytics = outbound / SDR metrics and funnel dashboard
 supabase_connector = Supabase database connector tool
+environment_variables = manage API keys and env vars like Vercel
 summarize_url = summarize a webpage
 learn_fact = teach the system a new fact
 query_context = general question or chitchat
@@ -149,6 +152,14 @@ async function executeCommand(intentData, repoRoot) {
 
     case "supabase_connector": {
       return { action: "navigate", target: "/631/Supabase_connector", message: "Opening Supabase connector" };
+    }
+
+    case "environment_variables": {
+      return {
+        action: "navigate",
+        target: "/726/Environment_variables",
+        message: "Opening Environment variables"
+      };
     }
     
     case "check_inbox": {

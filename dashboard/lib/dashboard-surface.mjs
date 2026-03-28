@@ -23,7 +23,13 @@ export function loadKnowmoreReleasesSync() {
   if (!Array.isArray(data.releases)) {
     throw new Error("knowmore-releases.v1.json: missing releases array");
   }
-  return data.releases;
+  return {
+    releases: data.releases,
+    boardUrl: typeof data.boardUrl === "string" ? data.boardUrl : "https://github.com/users/moldovancsaba/projects/1",
+    repo: typeof data.repo === "string" ? data.repo : "https://github.com/moldovancsaba/mvp-factory-control",
+    note: typeof data.note === "string" ? data.note : "",
+    syncedFromGithub: typeof data.syncedFromGithub === "string" ? data.syncedFromGithub : ""
+  };
 }
 
 export function resolveIssueUrl(surface, issue) {

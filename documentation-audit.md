@@ -122,6 +122,10 @@ Product function specs and skills: **correct location**; avoid duplicating regis
 
 Local app; keep next to code.
 
+### Tier K — `ai-runtime-audit.md`
+
+Runtime truth table for **OpenClaw vs Ollama vs rules vs sample data**; keep at repo root next to `architecture.md`; update when adding miniapps or changing `dashboard/server.mjs` AI paths.
+
 ---
 
 ## Staleness patterns to watch

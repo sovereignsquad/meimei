@@ -34,12 +34,19 @@ These should stay machine-specific and should not be stored in Vercel:
 - `MEIMEI_BRIEFING_DIR`
 - `MEIMEI_BRIEFING_FOLDER`
 - `MEIMEI_BRIEFING_SINK`
+- `MEIMEI_SUPABASE_URL` - Supabase project URL (Lead Enrichment source `supabase`, #631).
+- `MEIMEI_SUPABASE_SERVICE_ROLE` - service role key for server-side REST (preferred for local dashboard).
+- `MEIMEI_SUPABASE_ANON_KEY` - optional if using anon key with RLS instead of service role.
 - `OPENCLAW_CHANNEL`
 - `OPENCLAW_TASK_TYPE`
 - `OPENCLAW_COST_TARGET`
 - `OPENCLAW_ROUTE_REPORT`
 - `OPENCLAW_ROUTE_ONLY`
 - `OPENCLAW_AGENT`
+
+## Dashboard editor
+
+You can also create and edit the same logical variables in the repo dashboard: **Tools → Environment variables** (`/726/Environment_variables`). That UI writes `data/meimei-environment.v1.json` (gitignored) and applies values to `process.env` for the running dashboard (scoped by `MEIMEI_ENV_PROFILE`, default `development`). Mirror Vercel pull into that store or into `~/.openclaw/.env` as you prefer.
 
 ## Local Pull Rule
 

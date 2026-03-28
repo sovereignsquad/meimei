@@ -58,7 +58,8 @@ export function buildDashboardCatalog(registry) {
       description: fn.description,
       catalogOrder: typeof fn.catalogOrder === "number" ? fn.catalogOrder : 999,
       internalPath,
-      id: fn.id
+      id: fn.id,
+      category: fn.category || "apps"
     };
   });
   cards.sort((a, b) => {
@@ -66,6 +67,14 @@ export function buildDashboardCatalog(registry) {
     return a.issueId - b.issueId;
   });
   return cards;
+}
+
+/** @param {object} registry parsed registry.v1.json */
+/** @param {string} category filter by 'apps' or 'tools', or undefined for all */
+export function buildCatalogByCategory(registry, category) {
+  const all = buildDashboardCatalog(registry);
+  if (!category) return all;
+  return all.filter((card) => card.category === category);
 }
 
 /** @param {object} registry parsed registry.v1.json */

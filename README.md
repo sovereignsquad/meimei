@@ -28,6 +28,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `VERSION.md` - current foundation version and issue-delivery mapping.
 - `CHANGELOG.md` - chronological release notes and foundation delivery history.
 - `documentation-audit.md` - markdown corpus audit, staleness notes, and proposed doc structure (`docs/README.md` is the short map).
+- `ai-runtime-audit.md` - where OpenClaw, Ollama, rules, and sample/stub data are used (LLM integration truth table).
 - `miniapp-contract-v1.md` - frozen contract standard for all MeiMei miniapps.
 - `issue-quality-standard.md` - required quality rules for implementation issues.
 - `issue-ready-gate-checklist.md` - checklist used before moving issues to `Ready (NEXT)`.
@@ -100,7 +101,7 @@ Current baseline includes:
 
 Current version line:
 
-- `foundation 0.7.4` (`api-channel-adapter-miniapp-700`, `2026-03-27`)
+- `foundation 0.8.0` (`gtm-env-operator-726`, `2026-03-28`)
 
 Release metadata source of truth:
 

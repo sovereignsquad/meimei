@@ -97,3 +97,13 @@
 - Task queue with explicit ownership
 - OC feedback loop for testing
 - [2026-03-28] remember that OC likes dark mode *(source: user_command)*
+
+## MVP Factory Structure
+
+- [2026-03-28] MVP Factory is a multi-product organization managed from one unified board
+- **Project repo**: `moldovancsaba/mvp-factory-control`
+- **Project board**: https://github.com/users/moldovancsaba/projects/1
+- **Products on board**: {reply} (13 items), {sovereign} (10), {hatori} (5), mvp-factory-control (2)
+- **agent.meimei is NOT on the board yet** — issues tracked in agent.meimei repo only
+- Product issues are not the same as project board items — each product has its own repo, but development is coordinated on the unified board
+- Board statuses: IDEA BANK (20), Backlog SOONER (4), Roadmap LATER (3), Done (2), Review (1)

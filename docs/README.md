@@ -8,6 +8,7 @@ Use this page to navigate markdown without relying on repo search alone.
 | Agent rules (Cursor / OC) | [`AGENTS.md`](../AGENTS.md) |
 | MeiMei identity & contract | [`agent.md`](../agent.md) |
 | System shape | [`architecture.md`](../architecture.md) |
+| AI / LLM vs rules vs sample data (runtime truth) | [`ai-runtime-audit.md`](../ai-runtime-audit.md) |
 | UI + layout system | [`design-system-v1.md`](../design-system-v1.md) |
 | Miniapp contracts | [`miniapp-contract-v1.md`](../miniapp-contract-v1.md), [`functions/registry.v1.json`](../functions/registry.v1.json) |
 | Day-to-day ops | [`runbook.md`](../runbook.md) (includes **CI** / `npm run ci`) |

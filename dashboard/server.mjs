@@ -66,10 +66,15 @@ import {
 } from "./lib/telemetry.mjs";
 import { processNaturalLanguage } from "./lib/command-interface.mjs";
 import { generateHomeSuggestions } from "./lib/home-suggestions.mjs";
+import {
+  loadSyncAndApplyMeimeiEnv,
+  handleMeimeiEnvApiRequest
+} from "./lib/meimei-env-store.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
+loadSyncAndApplyMeimeiEnv(repoRoot);
 const publicDir = path.join(repoRoot, "public");
 const surface = loadDashboardSurfaceSync();
 const operatorScriptPaths = resolveOperatorScripts(surface, repoRoot);
@@ -636,6 +641,13 @@ const supabaseConnectorRoute = R["supabase-connector"]?.internalPath || "/631/Su
 const supabaseConnectorApiRoute = R["supabase-connector"]?.apiPath || "/dashboard/api/functions/supabase-connector";
 const supabaseConnectorLabel = R["supabase-connector"]?.displayName || "Supabase connector";
 const supabaseConnectorIssueId = R["supabase-connector"]?.issueId;
+const environmentVariablesRoute =
+  R["environment-variables"]?.internalPath || "/726/Environment_variables";
+const environmentVariablesApiRoute =
+  R["environment-variables"]?.apiPath || "/dashboard/api/functions/environment-variables";
+const environmentVariablesLabel =
+  R["environment-variables"]?.displayName || "Environment variables";
+const environmentVariablesIssueId = R["environment-variables"]?.issueId;
 const memoryRoute = R["memory"]?.internalPath || "/601/Memory";
 const memoryApiRoute = R["memory"]?.apiPath || "/dashboard/api/functions/memory";
 const memoryLabel = R["memory"]?.displayName || "Memory";
@@ -3905,6 +3917,246 @@ function renderSupabaseConnectorPage(layoutDoc) {
 </html>`;
 }
 
+function renderEnvironmentVariablesPage(layoutDoc) {
+  const issue726 = environmentVariablesIssueId ?? 726;
+  const topbar = `<div class="topbar">
+      <a class="button secondary" href="${escapeHtml(toolsRoute)}">&larr; Back to Tools</a>
+      <span class="title">${escapeHtml(environmentVariablesLabel)}</span>
+    </div>`;
+  const main = `<main class="hero">
+      <section class="route-card">
+        <h1>${escapeHtml(environmentVariablesLabel)}</h1>
+        <p class="lede u-mb12">Issue <strong>#${issue726}</strong> — Vercel-style CRUD for API keys, tokens, URLs, and local OpenClaw / MeiMei settings.</p>
+        <p class="muted u-mb12">Storage: <code>data/meimei-environment.v1.json</code> (600 perms, gitignored). Entries with environment checkboxes are applied to <code>process.env</code> when <code>MEIMEI_ENV_PROFILE</code> matches (default <code>development</code>). Empty checkboxes = all three.</p>
+        <p class="muted u-mb12">Active profile: <strong id="activeProf726">—</strong> · Suggestions: <code>config/meimei-env-catalog.v1.json</code></p>
+        <div id="formCard726" class="result-card u-mb12" style="display:none;">
+          <h2 id="formTitle726" style="font-size:1.1rem;">Add</h2>
+          <div class="field">
+            <label for="envKey726">Name</label>
+            <input type="text" id="envKey726" placeholder="OPENAI_API_KEY" autocomplete="off" style="max-width:28rem;width:100%;box-sizing:border-box;" />
+          </div>
+          <div class="field">
+            <label for="envVal726">Value</label>
+            <textarea id="envVal726" rows="4" placeholder="Secret or URL" style="width:100%;max-width:40rem;box-sizing:border-box;font-family:ui-monospace,monospace;font-size:12px;"></textarea>
+          </div>
+          <p class="muted u-mb8" style="font-size:12px;">Environments</p>
+          <div class="u-mb12" style="display:flex;flex-wrap:wrap;gap:12px;">
+            <label class="muted"><input type="checkbox" id="envTprod726" checked /> Production</label>
+            <label class="muted"><input type="checkbox" id="envTprev726" checked /> Preview</label>
+            <label class="muted"><input type="checkbox" id="envTdev726" checked /> Development</label>
+          </div>
+          <input type="hidden" id="envId726" value="" />
+          <div class="route-actions">
+            <button type="button" class="good" id="btnSave726">Save</button>
+            <button type="button" class="button secondary" id="btnCancel726">Cancel</button>
+          </div>
+        </div>
+        <div class="route-actions u-mb12" style="flex-wrap:wrap;align-items:center;">
+          <button type="button" class="good" id="btnAdd726">Add variable</button>
+          <span class="muted" style="font-size:13px;">Export</span>
+          <select id="exportTarget726" class="button secondary" style="padding:8px 12px;">
+            <option value="">All environments</option>
+            <option value="production">Production only</option>
+            <option value="preview">Preview only</option>
+            <option value="development">Development only</option>
+          </select>
+          <button type="button" class="button secondary" id="btnExport726">Copy .env</button>
+        </div>
+        <div id="catalog726" class="result-card u-mb12" style="font-size:12px;"></div>
+        <div id="table726" class="result-card"><p class="muted u-m0">Loading…</p></div>
+        <textarea id="exportOut726" readonly class="u-mt12" style="display:none;width:100%;min-height:100px;box-sizing:border-box;font-family:ui-monospace,monospace;font-size:11px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,20,0.72);color:var(--text);padding:12px;"></textarea>
+      </section>
+    </main>`;
+  const layout = buildLayoutFlowHtml(
+    layoutDoc,
+    miniappPageKey("environment-variables"),
+    { topbar, main },
+    escapeAttr
+  );
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(environmentVariablesLabel)} - agent.meimei</title>
+  <link rel="stylesheet" href="${escapeHtml(designSystemCssPath)}" />
+  <style>
+    .env726-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .env726-table th, .env726-table td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+    .env726-pill { display:inline-block; font-size:10px; padding:2px 8px; border-radius:999px; margin:2px 4px 2px 0; background:rgba(5,150,105,0.15); color:var(--text); }
+    .env726-pill.off { opacity:0.35; }
+    .env726-actions button { margin-right:6px; margin-bottom:4px; }
+    .env726-chip { font-size:11px; padding:4px 8px; margin:2px; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--text); }
+  </style>
+</head>
+<body data-theme="green">
+  <div class="shell">${layout}</div>
+  <script>
+    var api726 = "${escapeHtml(environmentVariablesApiRoute)}";
+
+    function esc(s) {
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    async function post726(body) {
+      var r = await fetch(api726, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      var d = await r.json().catch(function () { return { ok: false, error: "Bad JSON" }; });
+      return { httpOk: r.ok, d: d };
+    }
+
+    function targetsFromForm() {
+      var t = [];
+      if (document.getElementById("envTprod726").checked) t.push("production");
+      if (document.getElementById("envTprev726").checked) t.push("preview");
+      if (document.getElementById("envTdev726").checked) t.push("development");
+      return t;
+    }
+
+    function setTargetsOnForm(targets) {
+      var set = {};
+      (targets || []).forEach(function (x) { set[x] = true; });
+      document.getElementById("envTprod726").checked = !!set.production;
+      document.getElementById("envTprev726").checked = !!set.preview;
+      document.getElementById("envTdev726").checked = !!set.development;
+      if (!targets || targets.length === 0) {
+        document.getElementById("envTprod726").checked = true;
+        document.getElementById("envTprev726").checked = true;
+        document.getElementById("envTdev726").checked = true;
+      }
+    }
+
+    function showForm(edit) {
+      document.getElementById("formCard726").style.display = "block";
+      document.getElementById("formTitle726").textContent = edit ? "Edit variable" : "Add variable";
+      document.getElementById("envKey726").readOnly = !!edit;
+      if (!edit) {
+        document.getElementById("envId726").value = "";
+        document.getElementById("envKey726").value = "";
+        document.getElementById("envVal726").value = "";
+        setTargetsOnForm(["production","preview","development"]);
+      }
+    }
+
+    function hideForm() {
+      document.getElementById("formCard726").style.display = "none";
+    }
+
+    async function loadCatalog() {
+      var el = document.getElementById("catalog726");
+      var res = await post726({ action: "catalog" });
+      if (!res.httpOk || !res.d.ok || !res.d.catalog || !res.d.catalog.groups) {
+        el.innerHTML = "<p class=\\"muted\\">No catalog.</p>";
+        return;
+      }
+      var parts = ["<p class=\\"muted u-m0\\"><strong>Suggested keys</strong> (click to start add)</p>"];
+      res.d.catalog.groups.forEach(function (g) {
+        parts.push("<p class=\\"muted u-mt8\\"><strong>" + esc(g.label || g.id) + "</strong></p><div>");
+        (g.keys || []).forEach(function (k) {
+          parts.push("<button type=\\"button\\" class=\\"env726-chip\\" data-suggest-key=\\"" + esc(k.key) + "\\">" + esc(k.key) + "</button>");
+        });
+        parts.push("</div>");
+      });
+      el.innerHTML = parts.join("");
+      el.querySelectorAll("[data-suggest-key]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          showForm(false);
+          document.getElementById("envKey726").value = btn.getAttribute("data-suggest-key") || "";
+          document.getElementById("envVal726").focus();
+        });
+      });
+    }
+
+    async function loadTable() {
+      var el = document.getElementById("table726");
+      var res = await post726({ action: "list" });
+      if (!res.httpOk || !res.d.ok) {
+        el.innerHTML = "<p class=\\"muted\\">" + esc(res.d.error || "Failed to load") + "</p>";
+        return;
+      }
+      document.getElementById("activeProf726").textContent = res.d.activeProfile || "development";
+      var rows = (res.d.entries || []).map(function (e) {
+        var pills = ["production","preview","development"].map(function (t) {
+          var on = (e.targets || []).indexOf(t) >= 0;
+          return "<span class=\\"env726-pill" + (on ? "" : " off") + "\\">" + esc(t) + "</span>";
+        }).join("");
+        var apply = e.appliesNow ? "" : " <span class=\\"muted\\">(not applied to runtime)</span>";
+        return "<tr><td><code>" + esc(e.key) + "</code></td><td><code>" + esc(e.maskedValue) + "</code>" + apply + "</td><td>" + pills + "</td><td class=\\"muted\\">" + esc((e.updatedAt || "").slice(0, 19)) + "</td><td class=\\"env726-actions\\"><button type=\\"button\\" class=\\"button secondary\\" data-edit=\\"" + esc(e.id) + "\\">Edit</button><button type=\\"button\\" class=\\"button secondary\\" data-del=\\"" + esc(e.id) + "\\">Delete</button></td></tr>";
+      }).join("");
+      el.innerHTML = "<table class=\\"env726-table\\"><thead><tr><th>Name</th><th>Value</th><th>Environments</th><th>Updated</th><th></th></tr></thead><tbody>" + (rows || "<tr><td colspan=5 class=\\"muted\\">No variables yet.</td></tr>") + "</tbody></table>";
+
+      el.querySelectorAll("[data-edit]").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          var id = btn.getAttribute("data-edit");
+          var r2 = await post726({ action: "reveal", id: id });
+          if (!r2.httpOk || !r2.d.ok) {
+            alert(r2.d.error || "Could not load value");
+            return;
+          }
+          showForm(true);
+          document.getElementById("envId726").value = r2.d.id;
+          document.getElementById("envKey726").value = r2.d.key || "";
+          document.getElementById("envVal726").value = r2.d.value || "";
+          var orig = res.d.entries.find(function (x) { return x.id === id; });
+          setTargetsOnForm(orig ? orig.targets : null);
+        });
+      });
+      el.querySelectorAll("[data-del]").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          if (!confirm("Delete this variable?")) return;
+          var id = btn.getAttribute("data-del");
+          var r2 = await post726({ action: "delete", id: id });
+          if (!r2.httpOk || !r2.d.ok) {
+            alert(r2.d.error || "Delete failed");
+            return;
+          }
+          loadTable();
+        });
+      });
+    }
+
+    document.getElementById("btnAdd726").addEventListener("click", function () { showForm(false); });
+    document.getElementById("btnCancel726").addEventListener("click", hideForm);
+    document.getElementById("btnSave726").addEventListener("click", async function () {
+      var id = document.getElementById("envId726").value.trim();
+      var key = document.getElementById("envKey726").value.trim();
+      var value = document.getElementById("envVal726").value;
+      var targets = targetsFromForm();
+      if (!key) {
+        alert("Name is required.");
+        return;
+      }
+      var body = { action: "upsert", key: key, value: value, targets: targets };
+      if (id) body.id = id;
+      var r = await post726(body);
+      if (!r.httpOk || !r.d.ok) {
+        alert(r.d.error || "Save failed");
+        return;
+      }
+      hideForm();
+      loadTable();
+    });
+
+    document.getElementById("btnExport726").addEventListener("click", async function () {
+      var sel = document.getElementById("exportTarget726").value;
+      var r = await post726({ action: "export_dotenv", target: sel });
+      var ta = document.getElementById("exportOut726");
+      if (!r.httpOk || !r.d.ok) {
+        alert(r.d.error || "Export failed");
+        return;
+      }
+      ta.style.display = "block";
+      ta.value = r.d.text || "";
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+    });
+
+    loadCatalog();
+    loadTable();
+  </script>
+</body>
+</html>`;
+}
+
 function renderInboxPage(layoutDoc) {
   const topbar = `<div class="topbar">
       <a class="button secondary" href="${escapeHtml(appsRoute)}">&larr; Back to Apps</a>
@@ -5709,6 +5961,16 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && resolvedMiniappRoute === environmentVariablesRoute) {
+      const html = renderEnvironmentVariablesPage(getLayoutDoc());
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, max-age=0"
+      });
+      res.end(html);
+      return;
+    }
+
     if (req.method === "GET" && normalizedPath.startsWith(`${inboxRoute}/settings`)) {
       const html = renderInboxSettingsPage(getLayoutDoc());
       res.writeHead(200, {
@@ -6146,6 +6408,20 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       const body = (await readJson(req)) || {};
       try {
         const out = await processSupabaseConnector(body);
+        sendJson(res, out.ok ? 200 : 400, out);
+      } catch (error) {
+        sendJson(res, 500, {
+          ok: false,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === environmentVariablesApiRoute) {
+      const body = (await readJson(req)) || {};
+      try {
+        const out = await handleMeimeiEnvApiRequest(body, repoRoot);
         sendJson(res, out.ok ? 200 : 400, out);
       } catch (error) {
         sendJson(res, 500, {

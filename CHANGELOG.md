@@ -2,11 +2,31 @@
 
 ## Unreleased
 
-- **CI:** GitHub Actions workflow `.github/workflows/ci.yml` runs on **`main`** pushes and all **pull requests**; `npm run ci` chains registry, policy, audit, telemetry, handoff sample, WhatsApp/iMessage validators, and release-gates sample. Documented in `runbook.md`.
-- Added `documentation-audit.md` (markdown corpus audit, overlap/staleness, phased structure plan) and `docs/README.md` (navigation map). Linked from `README.md` and `AGENTS.md`.
-- Dashboard miniapp cards and route constants are derived from `functions/registry.v1.json` (`dashboard/lib/miniapp-registry.mjs`); registry entries require `description` and may set `catalogOrder`.
-- **Design system docs:** `design-system-v1.md` now documents the **global layout system** (`.layout-flow`, `.layout-box`, `.layout-break`, responsive 1/2/N columns, span classes), distinction from inner `.grid`, `config/page-layout.v1.json`, Admin **Page layout** editor, and `/api/page-layout`. Navigation section documents inactive nav-chip border contrast.
-- **Architecture / README:** cross-links for `config/dashboard-surface.v1.json`, `config/page-layout.v1.json`, layout behavior under Control UI, and the optional `macos/MeiMei` menu bar app.
+- Nothing yet.
+
+## 2026-03-28 - Operator GTM funnel and environment governance (`0.8.0`)
+
+### Lead pipeline and SDR (mvp-factory-control)
+
+- **#650** — Lead enrichment workflow: local queue (`data/lead-enrichment-workflow.v1.json`), `workflow_*` API actions, dashboard table with Run / Skip / Remove / Outreach handoff to Lead outreach via `sessionStorage` prefill (`dashboard/lib/lead-enrichment-workflow.mjs`).
+- **#653 / #654** — Lead outreach: `draft_touch`, `sdr_send` (Apple Mail draft + JSONL), `sdr_analytics`, `sdr_track` (`dashboard/lib/sdr-analytics.mjs`, `mail-adapter.mjs`); docs in `functions/lead-outreach.md`.
+- **#651** — AI SDR analytics miniapp `/651/AI_SDR_analytics`: combined metrics from SDR log and workflow store (`dashboard/lib/gtm-analytics.mjs`); contract `functions/ai-sdr-analytics.md`.
+- **#631** — Supabase connector tool `/631/Supabase_connector` and Lead Enrichment source `supabase` (PostgREST via fetch; env `MEIMEI_SUPABASE_*`) (`dashboard/lib/supabase-connector.mjs`, `functions/supabase-connector.md`).
+
+### Secrets and configuration (workspace #726)
+
+- **Environment variables** miniapp `/726/Environment_variables`: Vercel-style name / value / Production·Preview·Development CRUD; `data/meimei-environment.v1.json` (gitignored, chmod 600); applies to `process.env` on load and after save; `MEIMEI_ENV_PROFILE` two-pass apply; suggested keys in `config/meimei-env-catalog.v1.json` (`dashboard/lib/meimei-env-store.mjs`, `functions/environment-variables.md`).
+- `vercel-env-inventory.md` documents the dashboard editor alongside Vercel pull.
+
+### Registry and operator UX
+
+- **12** function contracts in `functions/registry.v1.json`; Inbox catalog order adjusted for new apps.
+- Command interface and home-suggestions navigate to SDR analytics, Supabase connector, and Environment variables.
+
+### Documentation and product map
+
+- `ai-runtime-audit.md`, `product_roadmap.md`, `documentation-audit.md`, `docs/README.md`, `config/knowmore-releases.v1.json`, and related README links updated in this wave.
+- Optional `scripts/what-next.mjs` and `scripts/what-next-schedule` added for local scheduling experiments.
 
 ## 2026-03-27 - API channel adapter miniapp (`0.7.4`)
 

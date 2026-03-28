@@ -2,6 +2,9 @@
 
 audit/decision-action-trail.v1.jsonl
 telemetry/events.v1.jsonl
+data/sdr-outbound.jsonl
+data/lead-enrichment-workflow.v1.json
+data/meimei-environment.v1.json
 
 macos/MeiMei/.build/
 macos/MeiMei/build/

@@ -1,0 +1,59 @@
+{
+  "version": "v1",
+  "note": "Suggested keys for the Environment variables tool; operators can add any NAME=value.",
+  "groups": [
+    {
+      "id": "vercel",
+      "label": "Mirror from Vercel (pull to Mac)",
+      "keys": [
+        { "key": "OPENROUTER_API_KEY", "hint": "Remote / routing models" },
+        { "key": "OLLAMA_API_KEY", "hint": "Optional wrapper" },
+        { "key": "OPENAI_API_KEY", "hint": "OpenAI API" },
+        { "key": "GEMINI_API_KEY", "hint": "Google Gemini" },
+        { "key": "NOTION_API_KEY", "hint": "Notion" },
+        { "key": "TRELLO_API_KEY", "hint": "Trello" },
+        { "key": "TRELLO_TOKEN", "hint": "Trello" },
+        { "key": "ELEVENLABS_API_KEY", "hint": "Voice" },
+        { "key": "GOOGLE_PLACES_API_KEY", "hint": "Places" },
+        { "key": "SHERPA_ONNX_RUNTIME_DIR", "hint": "Local speech" },
+        { "key": "SHERPA_ONNX_MODEL_DIR", "hint": "Local speech" }
+      ]
+    },
+    {
+      "id": "local",
+      "label": "Machine / OpenClaw (usually local-only)",
+      "keys": [
+        { "key": "OPENCLAW_CONFIG_PATH", "hint": "Path to openclaw.json" },
+        { "key": "OPENCLAW_BIN", "hint": "openclaw binary" },
+        { "key": "OPENCLAW_GATEWAY_PORT", "hint": "Gateway port" },
+        { "key": "PORT", "hint": "Dashboard port (surface default 3030)" },
+        { "key": "MEIMEI_DASHBOARD_PORT", "hint": "Alt dashboard port name" },
+        { "key": "MEIMEI_PUBLIC_URL", "hint": "Public base URL" },
+        { "key": "MEIMEI_PUBLIC_HOST", "hint": "Host" },
+        { "key": "MEIMEI_PUBLIC_PREFIX", "hint": "URL prefix" },
+        { "key": "MEIMEI_LAUNCHD_SOCKET", "hint": "launchd" },
+        { "key": "MEIMEI_SETUP_COMMAND", "hint": "Setup script" },
+        { "key": "MEIMEI_BRIEFING_DIR", "hint": "Briefing dir" },
+        { "key": "MEIMEI_BRIEFING_FOLDER", "hint": "Briefing folder" },
+        { "key": "MEIMEI_BRIEFING_SINK", "hint": "Briefing sink" },
+        { "key": "MEIMEI_OPENCLAW_CHAT_URL", "hint": "OpenClaw chat URL" },
+        { "key": "OPENCLAW_CHANNEL", "hint": "Routing" },
+        { "key": "OPENCLAW_TASK_TYPE", "hint": "Routing" },
+        { "key": "OPENCLAW_COST_TARGET", "hint": "Routing" },
+        { "key": "OPENCLAW_ROUTE_REPORT", "hint": "Routing" },
+        { "key": "OPENCLAW_ROUTE_ONLY", "hint": "Routing" },
+        { "key": "OPENCLAW_AGENT", "hint": "Agent name" }
+      ]
+    },
+    {
+      "id": "meimei",
+      "label": "MeiMei apps / connectors",
+      "keys": [
+        { "key": "MEIMEI_SUPABASE_URL", "hint": "Supabase project URL" },
+        { "key": "MEIMEI_SUPABASE_SERVICE_ROLE", "hint": "Service role key" },
+        { "key": "MEIMEI_SUPABASE_ANON_KEY", "hint": "Anon key + RLS" },
+        { "key": "MEIMEI_ENV_PROFILE", "hint": "development | preview | production — which scoped vars apply to process.env" }
+      ]
+    }
+  ]
+}

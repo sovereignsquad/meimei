@@ -1,73 +1,171 @@
 # Product roadmap — agent.meimei (executive view)
 
-This document is the **plain-English** story of what MeiMei delivers as **miniapps**, what is **already shipped**, and what we are **considering next** as feature requests (FR) and change requests (CR). It is meant for OC and leadership: **orientation**, not a technical specification. Technical detail lives in the repo and in individual GitHub issues.
-
-**Board:** [MVP Factory Board](https://github.com/users/moldovancsaba/projects/1) — product filter `agent.meimei`.  
-**How we link issues:** [issue-merge-walkthrough.md](./issue-merge-walkthrough.md).
+**Updated:** 2026-03-27  
+**Board:** [MVP Factory Board](https://github.com/users/moldovancsaba/projects/1) — product filter `agent.meimei`.
 
 ---
 
 ## Where we are
 
-MeiMei is moving from **strong foundations** (contracts, design system, local operator experience) toward **repeatable product delivery**: each idea becomes a **miniapp** with a stable id, a clear UI, and an API path. Three miniapps are **delivered in the product** today; everything else on the board is **future intent** until it ships.
+MeiMei delivers value through two surfaces:
+
+| Surface | Who uses it | What it does |
+|---------|-------------|--------------|
+| **Apps** (`/apps`) | Joe (end user) | Solves problems — "Explain it", "Brief me" |
+| **Tools** (`/tools`) | Operator | Configures the system — AI routing, API access |
+
+Every product is a **miniapp** with a stable contract, a URL, and an API path. Foundation is solid. Now we ship value.
 
 ---
 
-## Shipped miniapps (baseline)
+## Shipped products
 
-These are **Done** on the MVP Factory board and **live** in the dashboard (issue id is the stable anchor in URLs).
+### Apps (Joe's everyday tools)
 
-| Miniapp | Issue | In one sentence |
-|--------|-------|------------------|
-| **Any-URL summarization** | [#516](https://github.com/moldovancsaba/mvp-factory-control/issues/516) | Paste a link (including PDF); get a fast, structured summary. |
-| **Per-channel model routing** | [#517](https://github.com/moldovancsaba/mvp-factory-control/issues/517) | See which model path fits a channel, task type, and cost target before you spend a turn. |
-| **Daily briefing** | [#518](https://github.com/moldovancsaba/mvp-factory-control/issues/518) | Generate a day-start briefing and land it in Apple Notes (with markdown fallback). |
-| **API channel adapter (reference)** | [#700](https://github.com/moldovancsaba/mvp-factory-control/issues/700) | Inspect the adapter spine (policy, audit, telemetry, lifecycle) that WhatsApp, iMessage, and Discord attach to. |
+| App | Issue | Status | In one sentence |
+|-----|-------|--------|-----------------|
+| **Explain it** | [#516](https://github.com/moldovancsaba/mvp-factory-control/issues/516) | Live | Paste a URL or PDF; get a fast structured explanation. Schedule daily briefings. |
+| **Brief me** | [#518](https://github.com/moldovancsaba/mvp-factory-control/issues/518) | Merged into Explain it | "Set alarm" on Explain it handles scheduled briefings. |
 
-Together they prove the **end-to-end pattern**: one place to run the function, one contract, one honest result. **#700** is the **channel basement**, not a consumer chat app by itself.
+### Tools (Operator configuration)
 
----
-
-## Future value tied to those three apps
-
-Below is **not a commitment order**. It is **how backlog ideas cluster** so you can see what “better” looks like per miniapp after the baseline exists.
-
-### Any-URL summarization (#516) — themes
-
-- **Research intake (FR)** — [#535](https://github.com/moldovancsaba/mvp-factory-control/issues/535): richer “read this for me as research” framing on top of the same summarization core (plain-English spec in the issue). *Classified as an FR for #516; see traceability on the issue.*
-- **Operator polish (FR/CR mix)** — ideas such as **copy to clipboard**, **history**, **clearer error states**, **progress/status**, **PDF metadata/citations**, **trust signals**, **long-article layout** (representative issues in the **#573–#584** range on the board) read as **the product maturing** after first delivery: fewer dead ends, more confidence, more reuse.
-
-*Interpretation:* Most of these **assume #516** exists; they are **not** separate products unless we explicitly split them into new miniapps.
-
-### Per-channel model routing (#517) — themes
-
-- **Routing intelligence (FR)** — e.g. [#521](https://github.com/moldovancsaba/mvp-factory-control/issues/521) (context separation / pollution reduction): makes recommendations **more trustworthy** as channels multiply.
-- **Overlap watch (CR/duplicate risk)** — [#561](https://github.com/moldovancsaba/mvp-factory-control/issues/561) sits close to the same job as #517; during walkthrough, decide **merge vs. refine** so the board does not carry two truths.
-
-### Daily briefing (#518) — themes
-
-- **Depth and reliability (FR/CR)** — sink options, source health, section contracts, run history (already discussed as next steps in product work). Treat these as **making the briefing boringly dependable**, not as new surface area unless scope explodes.
+| Tool | Issue | Status | In one sentence |
+|------|-------|--------|-----------------|
+| **AI routing** | [#517](https://github.com/moldovancsaba/mvp-factory-control/issues/517) | Live | Configure how requests route to different AI models by channel, task type, and cost. |
+| **API access** | [#700](https://github.com/moldovancsaba/mvp-factory-control/issues/700) | Live | Manage API integration: policy, audit trail, telemetry. The spine for external systems. |
 
 ---
 
-## Beyond the three miniapps
+## Priority delivery list
 
-The board lists many **agent.meimei** ideas (email triage, health checks, Discord/Telegram, skills publishing, memory, etc.). Those are **candidate future miniapps or platform programs** until they pass intake, get a contract, and earn their own delivery issue. They belong in the board’s **IDEA BANK** until gated; they should not blur the story of **516 / 517 / 518**.
+Ordered by **impact × dependencies**. Ship top to bottom.
+
+### Phase 1: Daily value (highest impact)
+
+| Priority | Name | Type | Issues | Why now | Dependencies |
+|----------|------|------|--------|---------|--------------|
+| **1** | **What next?** | App | NEW | Daily recurring engagement. Answers Joe's #1 question. | Explain it, AI routing |
+| **2** | **AI routing presets** | Tool | #585 | One-click optimization. No manual config every time. | AI routing |
+
+### Phase 2: Polish (habit formation)
+
+| Priority | Name | Type | Issues | Why now | Dependencies |
+|----------|------|------|--------|---------|--------------|
+| **3** | **Explain it history** | App | #575 | Never lose a summary. Enables future research. | Explain it |
+| **4** | **Copy to clipboard** | App | #573 | Instant usability win. | Explain it |
+| **5** | **Progress reporting** | App | #577 | Confidence builder. Shows work happening. | Explain it |
+
+### Phase 3: Observability (operator trust)
+
+| Priority | Name | Type | Issues | Why now | Dependencies |
+|----------|------|------|--------|---------|--------------|
+| **6** | **Mission control** | Tool | #639 | Full task/log/agent visibility. | Telemetry baseline (#710) |
+| **7** | **Health checks** | Tool | #520, #522 | Catch failures before Joe notices. | Telemetry |
+| **8** | **Audit trail** | Tool | #709 | Compliance and debugging. | Decision audit pipeline |
+
+### Phase 4: Intelligence (AI improvement)
+
+| Priority | Name | Type | Issues | Why now | Dependencies |
+|----------|------|------|--------|---------|--------------|
+| **9** | **Business brain** | Platform | #605 | Long-term memory. Reduces repetition. | Memory layer (#564) |
+| **10** | **Autonomous learning** | Platform | #647 | Agent improves every 3 hours. | Business brain |
+
+---
+
+## Backlog by category
+
+Issues not in priority list are organized below by where they belong.
+
+### Apps (Joe's tools)
+
+| Category | Issues | Notes |
+|----------|--------|-------|
+| **Explain it addons** | #573–#584 | History, clipboard, progress, PDF metadata, trust signals |
+| **Research** | #535 | "Read this for research" framing |
+| **Email triage** | #519 | Draft-only triage with urgent alerts |
+| **Calendar** | #529, #533 | Meeting coordination, family calendar |
+| **Voice/Screenshot** | #527, #528 | Capture tools |
+| **Multi-agent** | #526, #542 | Parallel research |
+
+### Tools (Operator configuration)
+
+| Category | Issues | Notes |
+|----------|--------|-------|
+| **AI routing** | #585–#587 | Presets, route history, per-channel defaults |
+| **Daily briefing** | #588–#595 | Sources, sinks, output routing, delivery status |
+| **Channels** | #536, #620, #621, #624 | WhatsApp, Discord, Telegram |
+| **Connectors** | #609, #628–#632 | GitHub, Email, Calendar, CRM |
+| **Webhooks** | #625–#627 | Form pipeline, workflow automation |
+| **Security** | #525, #524, #597 | Audit routines, prompt injection screening |
+| **Memory** | #564, #568, #604 | Durable memory, QMD backend |
+
+### Platform (foundation)
+
+| Category | Issues | Notes |
+|----------|--------|-------|
+| **Business brain** | #601, #602, #603 | Context prompts, identity, soul file |
+| **Multi-agent** | #607, #612, #618 | Builder/orchestrator/executor, brain-muscle split |
+| **Model optimization** | #613, #614, #617 | Caching, context capping, token optimization |
+| **Mission control** | #635, #636, #639 | Command center, real-time control |
+
+---
+
+## New product recommendation: "What next?"
+
+### The product
+
+An app that answers Joe's daily question: **"What should I focus on today?"**
+
+Combines:
+- **Scheduled briefing** (Explain it with alarm)
+- **Source ranking** (configurable priority sources)
+- **Action recommendations** (what to do with the information)
+
+### The UX
+
+```
+6:00 AM — Joe wakes up
+↓
+MeiMei delivers "What next?" briefing:
+- Top 3 priorities from sources
+- Conflicts to resolve
+- Opportunities to chase
+↓
+Joe acts or delegates
+↓
+MeiMei learns from outcomes
+```
+
+### Why this is #1
+
+| Factor | Score | Notes |
+|--------|-------|-------|
+| Recurring value | ★★★★★ | Daily habit = stickiness |
+| Problem clarity | ★★★★★ | "What should I do?" is universal |
+| Differentiation | ★★★★★ | No competitor does this |
+| Dependencies | ★★★☆☆ | Uses existing tools |
+| Time to MVP | ★★★★☆ | 1-2 weeks |
+
+### Roadmap position
+
+This is **Phase 1 #1** — the highest impact deliverable. It combines Explain it + AI routing into a new product that answers Joe's daily question.
 
 ---
 
 ## How to read this with the board
 
-1. **Shipped truth** — three issues **Done**: #516, #517, #518.  
-2. **Next conversation** — pick one cluster (e.g. summarization polish vs. routing depth vs. briefing reliability).  
-3. **Traceability** — FR/CR items should name their **target miniapp issue** in the issue body (see walkthrough template).  
-4. **Refresh** — Update this file when a cluster **ships** or when you **reclassify** a large issue (merge/split).
+1. **Shipped truth** — Apps: Explain it. Tools: AI routing, API access.
+2. **Priority** — Phase 1 list is ordered by impact × effort. Start at #1.
+3. **New products** — Track **What next?** on the board as [#724](https://github.com/moldovancsaba/mvp-factory-control/issues/724); new miniapps still use `miniapp-contract-v1.md`.
+4. **Addons** — Issues #573–#595 are improvements to existing products, not new products.
+5. **Platform** — Issues #601–#723 are foundation/platform work. Deliver after Phase 1-3.
+6. **knowmore** — `/knowmore` cards are driven by `config/knowmore-releases.v1.json` (foundation spine **#692–#724** on [mvp-factory-control](https://github.com/moldovancsaba/mvp-factory-control)), with **open/closed** synced from GitHub periodically. The [Project 1 board](https://github.com/users/moldovancsaba/projects/1) is authoritative for workflow; refresh the JSON when board status diverges.
 
 ---
 
 ## Document control
 
-- **Audience:** OC, product owner, operators.  
-- **Not for:** low-level API field lists (use `miniapp-contract-v1.md` and `functions/registry.v1.json`).  
-- **Companion:** Technical phase outlook remains in [roadmap.md](./roadmap.md) (foundation vs. channels vs. reliability phases).  
-- **Board hygiene (2026-03-27):** GitHub issue bodies now include the **Product traceability (agent.meimei)** block (FR/CR + target miniapp or platform). First batch: `#521`, `#561`, `#573`–`#584` (and `#535` → `#516`). **Continued:** `#519`–`#534`, `#536`–`#550`, `#551`–`#566`, `#567`–`#572`, `#585`–`#590` (includes **#585–#587** → `#517`, **#588–#590** → `#518`).
+- **Audience:** OC, product owner, operators
+- **Not for:** technical API specs (use `miniapp-contract-v1.md` and `functions/registry.v1.json`)
+- **Companion:** [roadmap.md](./roadmap.md) for technical phases
+- **Board hygiene:** All issues tagged `agent.meimei` on the MVP Factory board

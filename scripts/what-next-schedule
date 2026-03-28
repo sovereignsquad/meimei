@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+CRON_TIME="${1:-06:00}"
+
+if [[ ! "$CRON_TIME" =~ ^([01]?[0-9]|2[0-3]):[0-5][0-9]$ ]]; then
+  echo "Error: Invalid time format. Use HH:MM (e.g., 06:00)"
+  exit 1
+fi
+
+CRON_MINUTE=$(echo "$CRON_TIME" | cut -d: -f2)
+CRON_HOUR=$(echo "$CRON_TIME" | cut -d: -f1)
+
+CRON_ENTRY="{$CRON_MINUTE} {$CRON_HOUR} * * * cd {$REPO_ROOT} && /usr/bin/env node scripts/what-next.mjs tasks calendar >> ~/.openclaw/what-next.log 2>&1"
+
+echo "Setting up 'What next?' daily briefing at {$CRON_TIME}"
+echo "Entry: {$CRON_ENTRY}"
+
+(crontab -l 2>/dev/null | grep -v "what-next.mjs"; echo "$CRON_ENTRY") | crontab -
+
+echo "Done. Your daily briefing will run at {$CRON_TIME}."
+echo "Logs: ~/.openclaw/what-next.log"

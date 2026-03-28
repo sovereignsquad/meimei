@@ -2,6 +2,8 @@
   "version": "v1",
   "routes": {
     "home": "/",
+    "apps": "/apps",
+    "tools": "/tools",
     "admin": "/admin",
     "knowmore": "/knowmore"
   },
@@ -44,6 +46,7 @@
     "skills": "scripts/oc-skills",
     "agent": "scripts/oc-agent",
     "webSearch": "scripts/web-search",
-    "dailyBriefing": "scripts/daily-briefing.mjs"
+    "dailyBriefing": "scripts/daily-briefing.mjs",
+    "whatNext": "scripts/what-next.mjs"
   }
 }

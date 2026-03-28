@@ -571,7 +571,7 @@
         "untrustedInput": false,
         "allowedProtocols": ["https"],
         "notes": [
-          "Requires MEIMEI_SUPABASE_URL and MEIMEI_SUPABASE_SERVICE_ROLE or MEIMEI_SUPABASE_ANON_KEY in environment.",
+          "Requires MEIMEI_SUPABASE_URL and MEIMEI_SUPABASE_SERVICE_ROLE or MEIMEI_SUPABASE_ANON_KEY (shell or Environment variables tool).",
           "Table and column names validated to alphanumeric/underscore only."
         ]
       },
@@ -583,6 +583,54 @@
       "failureModel": {
         "clearErrorMessages": true,
         "fallbackBehavior": "Return structured REST error message"
+      }
+    },
+    {
+      "id": "environment-variables",
+      "version": "v1",
+      "category": "tools",
+      "displayName": "Environment variables",
+      "description": "Vercel-style CRUD for API keys, tokens, PATs, and URLs — local gitignored store; applies to process.env by MEIMEI_ENV_PROFILE (production / preview / development).",
+      "catalogOrder": 6,
+      "route": "/dashboard/726/Environment_variables",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/environment-variables"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action", "id", "key", "value", "targets", "target"],
+        "examples": [
+          {},
+          { "action": "list" },
+          { "action": "catalog" },
+          { "action": "upsert", "key": "OPENAI_API_KEY", "value": "sk-…", "targets": ["development", "production"] },
+          { "action": "reveal", "id": "env_abc123" },
+          { "action": "delete", "id": "env_abc123" },
+          { "action": "export_dotenv", "target": "development" }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Secrets in data/meimei-environment.v1.json (chmod 600, gitignored). Same-origin dashboard only.",
+          "reveal returns plaintext — treat like Vercel dashboard; do not expose this route publicly."
+        ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["local-file-write"],
+        "requiresApproval": true
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return structured error without echoing stored values"
       }
     }
   ]

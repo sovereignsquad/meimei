@@ -1,213 +1,327 @@
 {
   "version": "v1",
+  "syncedFromGithub": "2026-03-28",
+  "boardUrl": "https://github.com/users/moldovancsaba/projects/1",
+  "repo": "https://github.com/moldovancsaba/mvp-factory-control",
+  "note": "Cards mirror mvp-factory-control issues #692–#724 (foundation spine). State is last synced from GitHub API; reopen board for live workflow.",
   "releases": [
     {
       "issue": 692,
-      "title": "Foundation contradiction audit baseline",
-      "summary": "Mapped core docs/runtime contradictions into one baseline matrix so implementation starts from verified truth instead of assumptions and silent drift.",
-      "details": "Introduced a contradiction audit artifact to identify and prioritize the biggest truth gaps between docs, config, scripts, and runtime behavior.",
+      "state": "open",
+      "title": "Source-of-truth contradiction audit",
+      "summary": "Maps contradictions between docs, config, scripts, and runtime so work starts from verified truth.",
+      "details": "Foundation audit artifact with severity-ranked contradiction IDs and remediation order.",
       "manual": [
-        "Open foundation-contradiction-audit.md.",
-        "Review contradiction IDs and severity.",
-        "Apply remediation in order from highest impact."
+        "Open foundation-contradiction-audit.md (or current audit doc).",
+        "Triage by severity; fix highest-impact drift first.",
+        "Re-run readiness / CI after doc or config changes."
       ]
     },
     {
       "issue": 693,
+      "state": "open",
       "title": "Unified readiness gate",
-      "summary": "Added a single PASS/FAIL readiness gate that combines config checks, runtime probes, and doctor signals to block unsafe launches and releases.",
-      "details": "Created scripts/oc-readiness and npm run readiness so operators have one deterministic go/no-go command.",
+      "summary": "Single PASS/FAIL command combining config checks, runtime probes, and doctor-style signals.",
+      "details": "scripts/oc-readiness and npm run readiness give operators one go/no-go.",
       "manual": [
         "Run npm run readiness.",
-        "If FAIL, inspect reported critical findings.",
-        "Fix issues and rerun until PASS."
+        "On FAIL, fix listed critical items and rerun until PASS."
       ]
     },
     {
       "issue": 694,
+      "state": "open",
       "title": "Miniapp contract v1",
-      "summary": "Locked a canonical miniapp contract schema with versioning and governance rules so all new functions follow one consistent, reviewable standard.",
-      "details": "Added miniapp-contract-v1.md and linked lifecycle/workflow requirements to enforce one miniapp shape across delivery.",
+      "summary": "Canonical schema and governance for every new function / miniapp.",
+      "details": "miniapp-contract-v1.md defines the one shape for delivery and review.",
       "manual": [
-        "Read miniapp-contract-v1.md.",
-        "Author miniapp metadata using the v1 schema.",
-        "Ensure docs and registry stay aligned."
+        "Read miniapp-contract-v1.md before authoring a miniapp.",
+        "Update functions/registry.v1.json with matching metadata.",
+        "Run npm run registry:validate."
       ]
     },
     {
       "issue": 695,
+      "state": "open",
       "title": "Function registry + validator",
-      "summary": "Implemented machine-readable miniapp registry plus schema validator to keep function contracts consistent, typed, and automatically verifiable over time.",
-      "details": "Added functions/registry.v1.json and scripts/validate-function-registry.mjs with npm run registry:validate.",
+      "summary": "Machine-readable registry with automated schema validation.",
+      "details": "functions/registry.v1.json + scripts/validate-function-registry.mjs.",
       "manual": [
-        "Update functions/registry.v1.json entries.",
+        "Add or edit registry entries.",
         "Run npm run registry:validate.",
-        "Fix validation errors before shipping."
+        "Fix validation errors before merge."
       ]
     },
     {
       "issue": 696,
-      "title": "Dashboard runtime modularization",
-      "summary": "Refactored dashboard runtime helpers out of server monolith into reusable module, reducing coupling and enabling safer incremental feature delivery.",
-      "details": "Extracted runScript, launchDetached, and readJson into dashboard/lib/runtime.mjs and wired server import usage.",
+      "state": "open",
+      "title": "Dashboard runtime modularization (phase 1)",
+      "summary": "Extract runtime helpers from the server monolith for safer iteration.",
+      "details": "dashboard/lib/runtime.mjs hosts runScript, launchDetached, readJson patterns.",
       "manual": [
-        "Use dashboard/lib/runtime.mjs for runtime helpers.",
-        "Keep server route logic separate from helper internals.",
-        "Run dashboard and smoke-test command actions."
+        "Prefer dashboard/lib/runtime.mjs for subprocess helpers.",
+        "Keep route handlers thin; smoke-test dashboard actions after refactors."
       ]
     },
     {
       "issue": 697,
-      "title": "Issue quality standard + ready gate",
-      "summary": "Defined strict issue quality format and ready-gate checklist so board items are implementation-ready, testable, and objectively reviewable before coding.",
-      "details": "Added issue-quality-standard.md and issue-ready-gate-checklist.md with mandatory sections and status transition rules.",
+      "state": "open",
+      "title": "Issue quality standard + Ready gate",
+      "summary": "Templates and checklist so board items are implementation-ready.",
+      "details": "issue-quality-standard.md and issue-ready-gate-checklist.md.",
       "manual": [
-        "Draft issue with all required sections.",
-        "Apply ready-gate checklist before Ready (NEXT).",
-        "Attach evidence when moving to Review."
+        "Draft issues with required sections.",
+        "Apply ready-gate before moving to Ready (NEXT).",
+        "Attach evidence when entering Review."
+      ]
+    },
+    {
+      "issue": 698,
+      "state": "open",
+      "title": "Migrate functions to Miniapp Contract v1",
+      "summary": "Bring URL summary, daily briefing, and model-routing preview under the v1 contract.",
+      "details": "Aligns legacy surfaces with registry + validator + governance.",
+      "manual": [
+        "Inventory non-contract functions.",
+        "Cut over to registry entries and stable API paths.",
+        "Validate with npm run registry:validate and manual smoke tests."
       ]
     },
     {
       "issue": 699,
-      "title": "Channel adapter contract + lifecycle",
-      "summary": "Established one adapter contract and lifecycle for all channels to standardize ingress, policy, dispatch, egress, and delivery-state visibility.",
-      "details": "Added channel-adapter-contract-v1.md and channel-adapter-lifecycle-v1.md as cross-channel foundation documents.",
+      "state": "open",
+      "title": "Channel adapter interface + lifecycle",
+      "summary": "Shared package for ingress, policy, dispatch, egress, and delivery visibility.",
+      "details": "channel-adapter-contract-v1.md and channel-adapter-lifecycle-v1.md.",
       "manual": [
-        "Normalize channel events to canonical shape.",
+        "Normalize events to the canonical adapter shape.",
         "Enforce lifecycle stages without silent skips.",
         "Emit explicit delivery states."
       ]
     },
     {
       "issue": 700,
+      "state": "closed",
       "title": "API reference adapter implementation",
-      "summary": "Built reference API adapter implementing lifecycle stages and policy checks, plus a dedicated miniapp and API route for operator inspection.",
-      "details": "Implemented dashboard/lib/api-channel-adapter.mjs; HTTP POST /api/functions/api-channel-adapter; dashboard page /700/API_channel_adapter; see channel-api-adapter-reference-v1.md.",
+      "summary": "Reference HTTP adapter exercising policy, audit, and telemetry hooks.",
+      "details": "Implements dashboard/lib/api-channel-adapter.mjs and miniapp /700/API_channel_adapter.",
       "manual": [
-        "Open /700/API_channel_adapter and run the adapter.",
-        "Call POST /api/functions/api-channel-adapter with channel, taskType, costTarget; optional message and approved.",
-        "Inspect adapter lifecycle JSON; confirm policy blocks return adapter state."
+        "Open /700/API_channel_adapter and exercise the adapter.",
+        "POST /api/functions/api-channel-adapter with channel, taskType, costTarget.",
+        "Confirm blocked vs allowed paths in JSON responses."
       ]
     },
     {
       "issue": 701,
-      "title": "WhatsApp parity validator",
-      "summary": "Added WhatsApp parity rules and validator to enforce config consistency with adapter contract expectations and reduce channel-specific policy drift.",
-      "details": "Introduced whatsapp-adapter-parity-v1.md and scripts/validate-whatsapp-adapter.mjs with npm run adapter:whatsapp:validate.",
+      "state": "open",
+      "title": "WhatsApp adapter parity",
+      "summary": "Harden WhatsApp against the shared adapter contract.",
+      "details": "whatsapp-adapter-parity-v1.md + npm run adapter:whatsapp:validate.",
       "manual": [
-        "Update WhatsApp config fields.",
-        "Run npm run adapter:whatsapp:validate.",
+        "Run npm run adapter:whatsapp:validate after config edits.",
         "Resolve parity mismatches before release."
       ]
     },
     {
       "issue": 702,
+      "state": "open",
       "title": "iMessage adapter architecture",
-      "summary": "Documented phased iMessage adapter architecture with provider boundaries, policy requirements, lifecycle behavior, and production-readiness gates.",
-      "details": "Added imessage-adapter-architecture-v1.md with canonical event model, rollout phases, and acceptance checks.",
+      "summary": "Phased plan for iMessage provider boundaries and lifecycle.",
+      "details": "imessage-adapter-architecture-v1.md.",
       "manual": [
-        "Review architecture phases A to D.",
-        "Implement each phase with exit-gate evidence.",
-        "Validate lifecycle parity against contract."
+        "Follow phases A–D with exit-gate evidence.",
+        "Validate lifecycle parity against the contract."
       ]
     },
     {
       "issue": 703,
+      "state": "open",
       "title": "Email adapter architecture",
-      "summary": "Defined Email adapter provider strategy, canonical event mapping, policy controls, and reliability constraints to prepare safe implementation rollout.",
-      "details": "Added email-adapter-architecture-v1.md and linked it from adapter contract and README index.",
+      "summary": "Provider strategy and canonical email event mapping.",
+      "details": "email-adapter-architecture-v1.md.",
       "manual": [
-        "Choose provider using listed criteria.",
-        "Implement normalize/send/status abstraction.",
-        "Validate policy and delivery-state behavior."
+        "Pick provider using documented criteria.",
+        "Implement normalize / send / status abstractions."
       ]
     },
     {
       "issue": 704,
+      "state": "open",
       "title": "Discord adapter architecture",
-      "summary": "Specified Discord transport architecture for gateway events, interactions, and outbound delivery with deterministic policy and reliability behavior.",
-      "details": "Added discord-adapter-architecture-v1.md and mapped rollout phases with testable exit gates.",
+      "summary": "Transport model for gateway events, interactions, and outbound delivery.",
+      "details": "discord-adapter-architecture-v1.md.",
       "manual": [
-        "Build ingest/send/ack transport interface.",
-        "Normalize message and interaction events.",
-        "Validate retries, rate-limit handling, and idempotency."
+        "Implement ingest / send / ack with retries and idempotency."
       ]
     },
     {
       "issue": 705,
+      "state": "open",
       "title": "Sovereign role taxonomy",
-      "summary": "Codified sovereign agent team roles and authority matrix to separate planning, implementation, review, testing, and release decision rights.",
-      "details": "Added sovereign-agent-role-taxonomy-v1.md including propose/decide/veto boundaries and handoff requirements.",
+      "summary": "Authority matrix for planning, implementation, review, test, and release.",
+      "details": "sovereign-agent-role-taxonomy-v1.md.",
       "manual": [
-        "Assign work by defined role boundaries.",
-        "Use mandatory handoff contract fields.",
-        "Escalate veto conflicts to OC."
+        "Assign work within role boundaries.",
+        "Use mandatory handoff fields; escalate vetoes to OC."
       ]
     },
     {
       "issue": 706,
-      "title": "Handoff schema + stage-gate enforcement",
-      "summary": "Implemented structured handoff schema and validation rules so inter-role transitions are auditable, deterministic, and machine-checkable.",
-      "details": "Added handoff-artifact-schema-v1.md, sample handoff JSON, and scripts/validate-handoff-artifact.mjs.",
+      "state": "open",
+      "title": "Handoff schema + stage gates",
+      "summary": "Structured, validatable handoffs between roles.",
+      "details": "handoff-artifact-schema-v1.md + npm run handoff:validate.",
       "manual": [
-        "Create handoff JSON from schema.",
-        "Run npm run handoff:validate -- <artifact>.",
-        "Only progress when gate.decision is valid."
+        "Author handoff JSON from schema.",
+        "Run npm run handoff:validate -- <artifact>."
       ]
     },
     {
       "issue": 707,
+      "state": "open",
       "title": "Automated release gates",
-      "summary": "Mapped Definition of Done and testing requirements to automated release gates that fail fast when readiness evidence is incomplete or inconsistent.",
-      "details": "Added release-gates-dod-v1.md, sample release artifact, and scripts/validate-release-gates.mjs.",
+      "summary": "DoD mapped to machine-checkable release artifacts.",
+      "details": "release-gates-dod-v1.md + npm run release:gates.",
       "manual": [
-        "Prepare release gate artifact JSON.",
-        "Run npm run release:gates -- <artifact>.",
-        "Proceed only when all hard rules pass."
+        "Prepare release gate JSON.",
+        "Run npm run release:gates -- <artifact>."
       ]
     },
     {
       "issue": 708,
+      "state": "open",
       "title": "External-channel policy engine",
-      "summary": "Implemented risk-tier policy engine for external channels with approval gating on high-risk actions and explicit operator-readable block reasons.",
-      "details": "Added external-channel-policy-engine module, validator script, and integrated policy checks into API adapter flow.",
+      "summary": "Risk-tier policy with approval gating and readable block reasons.",
+      "details": "Integrated with adapter flows; npm run policy:validate.",
       "manual": [
-        "Run npm run policy:validate.",
-        "Test high-risk action without approval.",
-        "Confirm blocked decision and reason."
+        "Test high-risk paths without approval and confirm block reasons."
       ]
     },
     {
       "issue": 709,
-      "title": "Decision/action audit trail",
-      "summary": "Shipped append-only hash-chained audit pipeline recording policy, routing, and delivery events so tampering becomes detectable by validation.",
-      "details": "Added dashboard/lib/audit-trail.mjs, scripts/validate-audit-trail.mjs, and audit event integration in adapter flow.",
+      "state": "open",
+      "title": "Decision / action audit trail",
+      "summary": "Hash-chained append-only audit for policy, routing, and delivery.",
+      "details": "dashboard/lib/audit-trail.mjs + npm run audit:validate.",
       "manual": [
-        "Generate runtime events through adapter calls.",
-        "Run npm run audit:validate.",
-        "Investigate chain mismatch errors immediately."
+        "Exercise adapter paths that emit audit events.",
+        "Run npm run audit:validate; investigate chain breaks."
       ]
     },
     {
       "issue": 710,
+      "state": "open",
       "title": "Reliability telemetry baseline",
-      "summary": "Added telemetry event schema and SLO summary metrics with API endpoint visibility for success rate, latency, blocked rate, and failure trends.",
-      "details": "Added reliability-telemetry module, summary endpoint /api/telemetry/summary, and seed/validate scripts.",
+      "summary": "SLO-oriented event schema and summary API.",
+      "details": "reliability-telemetry + /api/telemetry/summary.",
       "manual": [
-        "Run npm run telemetry:seed.",
-        "Run npm run telemetry:validate.",
-        "Open /api/telemetry/summary to inspect SLOs."
+        "Run npm run telemetry:seed and telemetry:validate.",
+        "Inspect /api/telemetry/summary after traffic."
+      ]
+    },
+    {
+      "issue": 711,
+      "state": "open",
+      "title": "Incident response + replay",
+      "summary": "Incident taxonomy, ownership, and deterministic replay protocol.",
+      "details": "Operational runbook for production incidents.",
+      "manual": [
+        "Document severities and on-call ownership.",
+        "Define replay steps for gateway and channel failures."
+      ]
+    },
+    {
+      "issue": 712,
+      "state": "open",
+      "title": "Public API (OpenAPI)",
+      "summary": "Versioned external API contract and error taxonomy.",
+      "details": "Prepares third-party and partner integrations.",
+      "manual": [
+        "Publish OpenAPI spec; align dashboard routes with documented errors."
+      ]
+    },
+    {
+      "issue": 713,
+      "state": "open",
+      "title": "External API auth + quotas",
+      "summary": "Scoped auth, rate limits, and tenant isolation for API consumers.",
+      "details": "Extends public API surface with multi-tenant safety.",
+      "manual": [
+        "Define scopes and quota policies.",
+        "Enforce per-tenant isolation in handlers."
+      ]
+    },
+    {
+      "issue": 714,
+      "state": "open",
+      "title": "Cross-channel SLA dashboard",
+      "summary": "Operator views for success rate, latency, and failures by channel.",
+      "details": "Builds on telemetry baseline (#710).",
+      "manual": [
+        "Wire channel dimensions into telemetry aggregates.",
+        "Ship dashboard views for trends and drill-down."
+      ]
+    },
+    {
+      "issue": 715,
+      "state": "open",
+      "title": "Chaos drills",
+      "summary": "Gateway, channel, and provider outage drills with verification.",
+      "details": "Institutionalize reliability game days.",
+      "manual": [
+        "Script failure modes; measure detection and recovery time."
+      ]
+    },
+    {
+      "issue": 716,
+      "state": "open",
+      "title": "Data governance + retention",
+      "summary": "Retention and PII handling with auditable controls.",
+      "details": "Policy enforcement across logs, audit, and adapter payloads.",
+      "manual": [
+        "Define retention classes; implement deletion and export hooks."
+      ]
+    },
+    {
+      "issue": 717,
+      "state": "open",
+      "title": "Multi-tenant white-label foundation",
+      "summary": "Isolated branded operator workspaces.",
+      "details": "Long-horizon platform architecture.",
+      "manual": [
+        "Design tenant boundary (data, auth, UI branding).",
+        "Prototype single-tenant hard isolation first."
       ]
     },
     {
       "issue": 722,
+      "state": "open",
       "title": "iMessage live bridge",
-      "summary": "Implemented live iMessage bridge endpoint for inbound event handling and outbound reply path, including policy, audit, telemetry, and idempotency.",
-      "details": "Added POST /api/channels/imessage/inbound backed by imessage adapter and lifecycle validation command.",
+      "summary": "Inbound-outbound iMessage loop with policy, audit, and telemetry.",
+      "details": "POST /api/channels/imessage/inbound + imessage adapter.",
       "manual": [
         "Run npm run imessage:validate.",
-        "POST sample payload to /api/channels/imessage/inbound.",
-        "Confirm lifecycle response and delivery attempt."
+        "POST sample inbound payload; verify lifecycle and delivery attempt."
+      ]
+    },
+    {
+      "issue": 723,
+      "state": "open",
+      "title": "Five AI employees architecture",
+      "summary": "Named AI workers with handoffs instead of one overloaded assistant.",
+      "details": "Product-grade org model for MeiMei delivery.",
+      "manual": [
+        "Read issue #723; align miniapps and Brain with employee lanes."
+      ]
+    },
+    {
+      "issue": 724,
+      "state": "open",
+      "title": "What next? app",
+      "summary": "Context-aware daily guidance miniapp.",
+      "details": "Delivers prioritized “what to do” from Brain + sources.",
+      "manual": [
+        "Track dashboard route /724 and registry entry for what-next."
       ]
     }
   ]
