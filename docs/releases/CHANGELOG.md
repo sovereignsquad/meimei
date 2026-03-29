@@ -290,7 +290,7 @@
 - **Design system**: `.ds-markdown` component for markdown rendering. No hardcoded styles in miniapps.
 
 ### Documentation
-- **`ARCHITECTURE.md`**: Full system architecture with diagrams, data flows, component specs.
+- **`ARCHITECTURE.md`**: Full system architecture with diagrams, data flows, component specs. *(Superseded path: [`docs/architecture/system-overview.md`](../architecture/system-overview.md).)*
 - **`brain/` directory**: Identity, user, context, skills, durable, log layers.
 - **`cursor-kilo.md`**: Agent coordination (KILO + CURSOR parallel work).
 
