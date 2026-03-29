@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-03-29 — Docs: full markdown ledger regen (`ARCHITECTURE.md` historical footnote)
+
+- **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** — regenerated with **`scripts/generate-full-documents-audit.mjs`** base **`2026-03-29T20:00:00Z`** (per-row UTC audit column); follows **CHANGELOG** §Documentation legacy **`ARCHITECTURE.md`** superseded-path footnote.
+
 ## 2026-03-29 — Kernel program: status rollup doc + façade HTTP capability gate test
 
 - **`kernel-app-separation-and-https-program.v1.md`** — **Current status (rollup)** table (T1–T6), CI hook list, remaining epics.

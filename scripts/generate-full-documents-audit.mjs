@@ -21,7 +21,8 @@ const raw = execSync(
 if (!raw.includes(LEDGER)) raw.push(LEDGER);
 raw.sort((a, b) => a.localeCompare(b, "en"));
 
-const baseSec = Math.floor(Date.parse("2026-03-30T18:00:00Z") / 1000);
+const baseSec = Math.floor(Date.parse("2026-03-29T20:00:00Z") / 1000);
+const ledgerGeneratedIso = new Date(baseSec * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
 const ts = (i) => new Date((baseSec + i) * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
 
 /** Paths with explicit post-audit notes */
@@ -75,7 +76,7 @@ const SPECIFIC = {
   "docs/planning/meimei-docs-code-sync-audit.v1.md":
     "**Completed (2nd pass + wave 3–4):** Ledger link; matrix rows; Wave 4 revision history row.",
   "docs/releases/CHANGELOG.md":
-    "**Completed (wave 3–4):** Full-corpus hygiene; Wave 4 historical footnotes for superseded root filenames.",
+    "**Completed (wave 3–4):** Full-corpus hygiene; Wave 4 historical footnotes; **2026-03-29** §Documentation `ARCHITECTURE.md` → system-overview footnote + this ledger regen.",
   "releases/0.9.0.md":
     "**Completed:** `ARCHITECTURE.md` bullet → `docs/architecture/system-overview.md`.",
 };
@@ -104,7 +105,7 @@ let md = `# Full comprehensive detailed documents audit
 
 **Enumeration:** **${raw.length}** paths (includes this ledger).
 
-**Ledger generated:** 2026-03-30T18:00:00Z  
+**Ledger generated:** ${ledgerGeneratedIso}  
 **Row timestamps (column 2):** ISO-8601 UTC, **one second per row** in lexicographic path order (latest regen proof).
 
 ## Method (mandated rounds)
