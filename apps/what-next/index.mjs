@@ -5,7 +5,7 @@
  * Issue: #724
  */
 
-import { callOllamaJson, parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 import { getInboxMessages, getUnreadCount, isMailAvailable } from "../../dashboard/lib/mail-adapter.mjs";
 
@@ -55,7 +55,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
   ]
 }`;
 
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "qwen3.5:0.8b",
       taskType: "generate",
       temperature: 0.3,

@@ -5,7 +5,7 @@
  * Issue: #516
  */
 
-import { callOllamaJson } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 
 const META = {
@@ -83,7 +83,7 @@ Return ONLY JSON:
   "actionItems": ["What OC might do after reading"]
 }`;
 
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "llama3:latest",
       taskType: "summarize",
       temperature: 0.3,
@@ -96,7 +96,7 @@ Return ONLY JSON:
       ok: true,
       source: { url, type: contentType },
       result: result.data,
-      provider: "ollama"
+      provider: "meimei-inference-route"
     };
   } catch (error) {
     return { ok: false, error: `URL summarization failed: ${error.message}` };

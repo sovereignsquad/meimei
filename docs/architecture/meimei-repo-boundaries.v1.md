@@ -39,7 +39,7 @@ These are **shared platform** unless and until a future version moves a file to 
 
 - **Surface & config:** `dashboard-surface.mjs`, `miniapp-registry.mjs`, `page-layout.mjs`, `runtime.mjs`
 - **Env:** `meimei-env-store.mjs`
-- **Jobs & inference:** `meimei-job-queue.mjs`, `meimei-job-worker.mjs`, `meimei-monitor-feed.mjs`, `inference-route.mjs`
+- **Jobs & inference:** `meimei-job-queue.mjs`, `meimei-job-worker.mjs`, `meimei-monitor-feed.mjs`, `inference-route.mjs`, **`meimei-inference-client.mjs`** (in-process `handleMeimeiInferenceRoute` for miniapps — kernel K3)
 - **HTTP / policy primitives:** `api-channel-adapter.mjs`, `external-channel-policy-engine.mjs`, `imessage-adapter.mjs`, `reliability-telemetry.mjs`, `audit-trail.mjs`
 - **Legacy inference (until retired):** `llm.mjs`
 - **Checklist (integration surface):** `checklist-api-shell.mjs`, `checklist-local-integration.mjs`, **`checklist-bridge-http.mjs`** (HTTP adapter), `checklist-bridge.mjs`, `checklist-node/*` — **integration-adjacent**

@@ -2,7 +2,7 @@
  * Shared dashboard chrome — global nav, flashcards, list helper.
  * @see docs/architecture/meimei-kernel-completion-plan.v1.md Phase K2
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.12
+ * @aligned package agent-meimei 0.8.13
  */
 
 /**

@@ -1,6 +1,7 @@
 import { readFile, writeFile, readdir, stat, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { callOllama, callOllamaJson, summarize, estimateTokens } from "../llm.mjs";
+import { estimateTokens } from "../llm.mjs";
+import { inferenceCallOllama } from "../meimei-inference-client.mjs";
 
 const BRAIN_DIR = "brain";
 const LAYERS = {
@@ -241,7 +242,7 @@ async function logActivity(repoRoot, activity) {
     
     try {
       const summaryPrompt = `Summarize these activity log entries into 5-10 key events. Be concise:\n${oldEntries.join("\n")}`;
-      const summary = await callOllama(summaryPrompt, { model: "qwen3.5:0.8b", maxTokens: 256 });
+      const summary = await inferenceCallOllama(summaryPrompt, { model: "qwen3.5:0.8b", maxTokens: 256 });
       
       // Strip thinking tags
       let summaryText = summary.response || "";
@@ -367,7 +368,7 @@ async function getContext(repoRoot, query) {
   const prompt = `Based on the context, answer: ${query}\n\nContext:\n${context}`;
 
   try {
-    const result = await callOllama(prompt, {
+    const result = await inferenceCallOllama(prompt, {
       model: "qwen3.5:0.8b",
       system: "You are MeiMei's memory assistant. Answer based on the provided context. Be concise.",
       maxTokens: 512
@@ -440,7 +441,7 @@ Think through this step by step, considering:
 5. What skills are available?`;
 
   try {
-    const result = await callOllama(prompt, {
+    const result = await inferenceCallOllama(prompt, {
       model: depth === "deep" ? "llama3:latest" : "gemma3:1b",
       system: "You are MeiMei, a sharp, dependable AI agent. Think deeply and provide actionable insights.",
       temperature: 0.5,
@@ -475,7 +476,7 @@ async function compactLog(repoRoot) {
   const recentEntries = entries.slice(-30);
   
   try {
-    const result = await callOllama(
+    const result = await inferenceCallOllama(
       `Summarize these log entries into 5-10 key events:\n${oldEntries.join("\n")}`,
       { model: "qwen3.5:0.8b", maxTokens: 256 }
     );
@@ -505,7 +506,7 @@ async function curateDurable(repoRoot) {
   
   // Ask LLM to consolidate
   try {
-    const result = await callOllama(
+    const result = await inferenceCallOllama(
       `Consolidate this durable memory file. Remove redundant entries, merge similar facts, keep the most important items. Return the cleaned markdown:\n\n${durableResult.content}`,
       { model: "gemma3:1b", maxTokens: 2048 }
     );

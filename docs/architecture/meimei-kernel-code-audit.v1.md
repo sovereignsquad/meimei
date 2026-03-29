@@ -130,7 +130,7 @@ The following table maps **each allowlisted area** to its primary responsibility
 |-------|-----------|----------------|
 | Surface & config | `dashboard-surface.mjs`, `miniapp-registry.mjs`, `page-layout.mjs`, `runtime.mjs` | Listen/surface config load, registry projection, layout merge, shared path/helpers for server |
 | Env SoT | `meimei-env-store.mjs` | Operator key/value store + catalog integration |
-| Jobs & inference | `meimei-job-queue.mjs`, `meimei-job-worker.mjs`, `meimei-monitor-feed.mjs`, `inference-route.mjs` | Spooler, worker loop, monitor formatting, OpenAI-shaped Ollama router |
+| Jobs & inference | `meimei-job-queue.mjs`, `meimei-job-worker.mjs`, `meimei-monitor-feed.mjs`, `inference-route.mjs`, **`meimei-inference-client.mjs`** | Spooler, worker loop, monitor formatting, OpenAI-shaped router, in-process client for miniapps (K3) |
 | Policy / channels | `api-channel-adapter.mjs`, `external-channel-policy-engine.mjs`, `imessage-adapter.mjs`, `reliability-telemetry.mjs`, `audit-trail.mjs` | API channel routing shell, policy, iMessage bridge hooks, telemetry, audit |
 | Legacy inference | `llm.mjs` | Direct Ollama client, JSON robustness, routing config, prompt cache — migration target for hot paths per K3 |
 | Checklist integration | `checklist-api-shell.mjs`, `checklist-local-integration.mjs`, `checklist-bridge-http.mjs`, `checklist-bridge.mjs`, `checklist-node/*` | Shell POST, local proxy, bridge HTTP, Node engine surface |
@@ -273,8 +273,8 @@ This separation is not a weakness of the kernel; it is **accurate system documen
 |-------|-----------|------------------|
 | **K1** | Extract remaining GET/settings HTML from `server.mjs` | **K1 complete** for planned batches (**K1a–K1e**). |
 | **K2** | Consolidate shared chrome (nav, list/flashcard) | **Delivered** (**`0.8.12`**) — **`platform-pages/chrome.mjs`**; thin wrappers + **`dashboardChromeDeps()`** in `server.mjs`. |
-| **K3** | Prefer inference route / jobs for LLM alignment (R1/R2) | **Ongoing** — `llm.mjs` remains in active use alongside migration. |
-| **K4** | Trace propagation polish, smoke gates | **Per roadmap** — monitor and correlation foundations exist; CI smoke policies evolve per roadmap. |
+| **K3** | Prefer inference route / jobs for LLM alignment (R1/R2) | **Delivered** (**`0.8.13`**) — **`meimei-inference-client.mjs`**; R1 exception documented for lead workflow. |
+| **K4** | Trace propagation polish, smoke gates | **Baseline** (**`0.8.13`**) — strict smoke monitor probe; knowmore + admin split docs; registry **`platformAlignment`**. |
 
 ---
 
@@ -282,7 +282,7 @@ This separation is not a weakness of the kernel; it is **accurate system documen
 
 ### 11.1 Measurement method
 
-- **Population:** all `dashboard/lib/**/*.mjs` files (**53** files on 2026-03-30 post-**K2**).  
+- **Population:** all `dashboard/lib/**/*.mjs` files (**54** files on 2026-03-30 post-**K3**).  
 - **File-top module banner:** first non-whitespace character begins `/**`.  
 - **`@param` prevalence:** file contains at least one `@param`.  
 - **Limitation:** These metrics do not measure prose quality or architectural accuracy—only structural JSDoc presence.
@@ -291,7 +291,7 @@ This separation is not a weakness of the kernel; it is **accurate system documen
 
 | Scope | Files | File-top `/**` | Files with `@param` |
 |-------|------:|---------------:|--------------------:|
-| `dashboard/lib/**/*.mjs` | 53 | 35 (**66.0%**) | 26 (**49.1%**) |
+| `dashboard/lib/**/*.mjs` | 54 | 36 (**66.7%**) | 27 (**50.0%**) |
 | `apps/**/*.mjs` | 12 | 12 (**100%**) | 1 (**8.3%**) |
 | `dashboard/server.mjs` | 1 | 0 | 0 |
 
@@ -333,3 +333,4 @@ This audit is **complete** relative to its **Document control** scope: kernel bo
 | v1.3 | 2026-03-30 | K1d routing settings: `server.mjs` **~2680** lines; HTTP anchor refresh; allowlist + **routing-settings-pages.mjs**; repository baseline **0.8.10**. |
 | v1.4 | 2026-03-30 | K1e home/admin: `server.mjs` **~2244** lines; **34** `render*`; HTTP anchor refresh; allowlist + **home-admin-pages.mjs**; K1 batch table complete; repository baseline **0.8.11**. |
 | v1.5 | 2026-03-30 | K2 chrome: `server.mjs` **~2181** lines; **33** `render*`; **`platform-pages/chrome.mjs`**; HTTP anchor refresh; allowlist + platform table; §10 K2 **delivered**; commentary population **53** `dashboard/lib` `.mjs`; repository baseline **0.8.12**. |
+| v1.6 | 2026-03-30 | K3/K4: **`meimei-inference-client.mjs`**; allowlist + §3.2 jobs/inference row; §10 K3/K4 **delivered** baseline; §11 population **54** `dashboard/lib` `.mjs`; repository **0.8.13**. |

@@ -183,6 +183,15 @@ Connector requirements (still apply for future real APIs):
 
 *Gathered via GitHub search on `mvp-factory-control` for agent.meimei issues touching leads, enrichment, SDR, campaigns, connectors, and adjacent employees. Re-run search periodically; board [Project 1](https://github.com/users/moldovancsaba/projects/1) remains source of truth for status.*
 
+## Platform alignment — queue (R1) — **documented exception**
+
+**Workflow `workflow_run`:** Executes `enrichLead` on the **HTTP handler thread** (see `dashboard/lib/lead-enrichment-workflow.mjs` + `apps/lead-enrichment/index.mjs`). This is **not** modeled as `meimei_jobs` today.
+
+- **Why:** Preserves synchronous operator UX (run one queued item and get an immediate JSON result) without a second polling protocol.
+- **Sunset target:** Revisit by **2027-06-30** — either enqueue enrichment as `inference_v1` / dedicated job kind with async poll, or reaffirm this exception in the audit.
+
+**Single-shot `source` + `sourceData`:** Same thread; LLM call uses **`meimei-inference-client`** (kernel K3).
+
 ## Operator transport & secrets (R8 / R4)
 
 | Topic | Guidance |

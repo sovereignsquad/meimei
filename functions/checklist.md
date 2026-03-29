@@ -32,6 +32,10 @@ Hosted **consultant-followup-web** talks to the Mac via the dashboard HTTP bridg
 | Local SQLite (node) | Default `data/checklist/agent_brain.sqlite3` (override with `MEIMEI_CHECKLIST_DB_PATH`) |
 | Neon queue consumer | `npm run checklist:queue-consumer` — see `integrations/checklist-web/README.md` |
 
+### LLM (kernel K3)
+
+Legacy miniapp JSON paths (`apps/checklist/index.mjs` — insights, recommendations) and **`checklist-node/jobs.mjs`** / **`regenerate.mjs`** use **`dashboard/lib/meimei-inference-client.mjs`** (same inference plane as `POST /api/meimei/route`). **R1** (heavy work on `meimei_jobs`) and **R6** (trace through queue) remain improvement areas for the Checklist product, not the raw Ollama client.
+
 ## R3 / R4 — integration HTTP vs inter-app bus (Phase B)
 
 - **Not R3 violation:** HTTP from the hosted Checklist UI to MeiMei’s **`/api/checklist/bridge`** (or local Next proxy) is an **documented integration edge**, not synchronous **miniapp-to-miniapp** delegation on the `meimei_jobs` bus. Async work inside MeiMei still uses **`checklist-node/*`** and the env SoT.

@@ -2,7 +2,7 @@
  * Platform UI — Home (dashboard) shell + admin page + admin layout editor section.
  * @see docs/architecture/meimei-kernel-completion-plan.v1.md Phase K1e
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.12
+ * @aligned package agent-meimei 0.8.13
  */
 
 export function renderPage(state, lastResult, layoutDoc, d) {

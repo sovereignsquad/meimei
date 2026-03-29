@@ -1,9 +1,9 @@
 /**
- * POST /jobs — Node-native pipeline (Ollama via MeiMei llm.mjs), compatible job_result contract.
+ * POST /jobs — Node-native pipeline (MeiMei inference plane), compatible job_result contract.
  */
 import crypto from "node:crypto";
 import { getChecklistDb } from "./db.mjs";
-import { callOllamaJson } from "../llm.mjs";
+import { inferenceCallOllamaJson } from "../meimei-inference-client.mjs";
 import { normalizeRecommendedTasks, persistChecklistAndCards } from "./checklist-persist.mjs";
 
 const SIGNAL_TYPES = new Set([
@@ -141,7 +141,7 @@ Source ref: ${sourceRef}
 Text (may truncate):
 ${rawText.slice(0, 14000)}`;
 
-  const llm = await callOllamaJson(prompt, {
+  const llm = await inferenceCallOllamaJson(prompt, {
     model: "qwen3.5:0.8b",
     temperature: 0.25,
     maxTokens: 4096

@@ -2,7 +2,7 @@
  * Feedback-driven checklist regeneration (subset of Python regenerate_project_checklist).
  */
 import { getChecklistDb } from "./db.mjs";
-import { callOllamaJson } from "../llm.mjs";
+import { inferenceCallOllamaJson } from "../meimei-inference-client.mjs";
 import {
   normalizeRecommendedTasks,
   persistChecklistAndCards,
@@ -143,7 +143,7 @@ ${retainedJson}
 SOURCE CONTEXT (excerpt):
 ${sourceExcerpt.slice(0, 12000)}`;
 
-  const llm = await callOllamaJson(prompt, {
+  const llm = await inferenceCallOllamaJson(prompt, {
     model: "qwen3.5:0.8b",
     temperature: 0.25,
     maxTokens: 4096

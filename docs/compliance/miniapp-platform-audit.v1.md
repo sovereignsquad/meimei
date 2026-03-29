@@ -34,14 +34,14 @@
 | api-access | tools | Same as ai-routing (`routeViaApiAdapter`); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |
 | supabase-connector | tools | `apps/supabase-connector/index.mjs` | — | — | — | G | G | — | G | G | P2 | **R4:** Operator text in **`functions/supabase-connector.md`** — prefer env store for `MEIMEI_SUPABASE_*`; handler reads `process.env` only (no second SoT). |
 | mission-control | tools | `apps/mission-control/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | — | — | — | G | Y | G | Y | P2 | OpenClaw/telemetry read-only; not on `meimei_jobs` feed. |
-| memory | tools | `apps/memory/index.mjs` → `brain/*`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | `brain/memory.mjs` uses `callOllama` for summarization / queries. |
+| memory | tools | `apps/memory/index.mjs` → `brain/*`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | G | — | — | G | — | G | Y | P2 | **`meimei-inference-client`** in `brain/memory.mjs` (kernel K3). |
 | ai-sdr-analytics | apps | `apps/ai-sdr-analytics/index.mjs` | — | — | — | — | G | — | G | Y | P2 | Reads gitignored JSONL + workflow file; no LLM. |
-| inbox | apps | `apps/inbox/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | Uses `callOllama` for prioritization; Mail/AppleScript side effects. |
-| what-next | apps | `apps/what-next/index.mjs`; GET shell **`platform-pages/reader-pages.mjs`** (main + settings) | — | Y | — | — | G | — | Y | Y | P1 | `callOllamaJson`; no queue. |
-| explain-it | apps | `apps/explain-it/index.mjs`; GET URL summary + settings **`platform-pages/reader-pages.mjs`** | — | Y | — | — | G | — | Y | Y | P1 | Fetches URL + `callOllamaJson`; untrusted content path. |
-| lead-enrichment | apps | `apps/lead-enrichment/index.mjs` (single-shot + `workflow_*`); GET shell **`platform-pages/gtm-pages.mjs`** | Y | Y | — | Y | G | — | G | Y | P1 | `enrichLead` + workflow queue consolidated in app; `runWorkflowItem` still sync on handler thread — not `meimei_jobs`. |
-| lead-outreach | apps | `apps/lead-outreach/index.mjs`; GET shell **`platform-pages/gtm-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | `draft_touch` uses `callOllamaJson` on request thread. |
-| checklist | apps | POST shell → **`checklist-api-shell.mjs`**; GET proxy/page → **`checklist-local-integration.mjs`**; **`/api/checklist/bridge`** → **`checklist-bridge-http.mjs`** + `checklist-bridge.mjs` | Y | Y | G | G | Y | Y | G | Y | P0 | Phase B: **R3/R4** — integration HTTP vs bus documented in **`functions/checklist.md`**; bridge secret pattern explicit. R1/R2/R5/R6 remain **Y** (queue/inference/UI/trace improvements tracked separately). |
+| inbox | apps | `apps/inbox/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | G | — | — | G | — | G | Y | P2 | **`meimei-inference-client`**; Mail/AppleScript side effects unchanged. |
+| what-next | apps | `apps/what-next/index.mjs`; GET shell **`platform-pages/reader-pages.mjs`** (main + settings) | — | G | — | — | G | — | Y | Y | P2 | **`meimei-inference-client`**; no queue (R1 —). |
+| explain-it | apps | `apps/explain-it/index.mjs`; GET URL summary + settings **`platform-pages/reader-pages.mjs`** | — | G | — | — | G | — | Y | Y | P2 | **`meimei-inference-client`**; untrusted URL content path unchanged. |
+| lead-enrichment | apps | `apps/lead-enrichment/index.mjs` (single-shot + `workflow_*`); GET shell **`platform-pages/gtm-pages.mjs`** | Y | G | — | Y | G | — | G | Y | P1 | **R2:** inference client. **R1:** `workflow_run` sync on handler — **documented exception** in **`functions/lead-enrichment.md`** (sunset 2027-06-30). |
+| lead-outreach | apps | `apps/lead-outreach/index.mjs`; GET shell **`platform-pages/gtm-pages.mjs`** | — | G | — | — | G | — | G | Y | P2 | **`meimei-inference-client`** for `draft_touch`. |
+| checklist | apps | POST shell → **`checklist-api-shell.mjs`**; GET proxy/page → **`checklist-local-integration.mjs`**; **`/api/checklist/bridge`** → **`checklist-bridge-http.mjs`** + `checklist-bridge.mjs` | Y | G | G | G | Y | Y | G | Y | P0 | **R2:** Node engine + legacy JSON paths use **`meimei-inference-client`** (K3). **R1/R5/R6** still **Y** (jobs/UI/trace). **R3/R4** documented in **`functions/checklist.md`**. |
 
 ### Registry doc filename gaps (R7)
 
@@ -51,7 +51,7 @@
 | ai-routing | Uses `per-channel-model-routing-by-task-type-and-cost.md` (+ addon) — **name mismatch**; link from registry or rename for discoverability. |
 | api-access | Uses `api-channel-adapter.md` — **name mismatch**. |
 | explain-it | Uses `any-url-summarization-in-seconds.md` (+ addon) — **name mismatch**. |
-| what-next | Uses `daily-briefing.md` — **name mismatch** (different product surface). |
+| what-next | Uses `daily-briefing.md` in older notes — **wrong file** for What next; use registry + issue #724; optional dedicated `functions/what-next.md` TBD. **`functions/daily-briefing.md`** is for the Daily briefing route only. |
 
 ---
 
@@ -59,10 +59,10 @@
 
 | Surface | Route / API | Handler | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | Pri | Notes |
 |---------|-------------|---------|----|----|----|----|----|----|----|----|-----|-------|
-| knowmore | `config/dashboard-surface.v1.json` → `/knowmore` | **`renderKnowmorePage`** in **`dashboard/lib/platform-pages/catalog-pages.mjs`** (thin call from `server.mjs`) | — | — | — | — | G | — | Y | Y | P2 | Static cards from `config/knowmore-releases.v1.json`; no queue. Refresh cadence is operational, not code. |
-| admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | Y | — | — | G | — | Y | Y | P2 | `previewModelRouting` / home command / suggestions may use LLM (`command-interface`, `home-suggestions`). Layout editor persists `page-layout.v1.json`. |
+| knowmore | `config/dashboard-surface.v1.json` → `/knowmore` | **`renderKnowmorePage`** in **`dashboard/lib/platform-pages/catalog-pages.mjs`** (thin call from `server.mjs`) | — | — | — | — | G | — | G | Y | P2 | **`docs/operations/knowmore-content-refresh.md`** — operational refresh; no queue. |
+| admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | G | — | — | G | — | Y | Y | P2 | Home command + **`home-suggestions`** use **`meimei-inference-client`** (K3). Routing **preview** still **`oc-agent`** (see ai-routing row). Split: **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`**. |
 | System monitor | `/api/meimei/monitor/*` (and shell page) | Feed: `meimei-monitor-feed.mjs`; GET shell: **`platform-pages/system-monitor-page.mjs`** | — | — | — | — | — | G | G | Y | P2 | **Platform chrome** — reference for R6 when migrating apps. |
-| Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `apps/daily-briefing/index.mjs` | — | Y | — | — | G | — | Y | Y | P2 | **Not in registry**; companion to Explain it; `callOllamaJson`. |
+| Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `apps/daily-briefing/index.mjs` | — | G | — | — | G | — | G | Y | P2 | **Not in registry**; contract **`functions/daily-briefing.md`**; **`meimei-inference-client`**. |
 
 ---
 
@@ -74,11 +74,11 @@
 
 ## 4. Suggested next actions (from this audit)
 
-1. **P0 — Checklist:** Remaining **R1/R2/R5/R6** (queue, inference, UI, trace) — **R3/R4** documented in **`functions/checklist.md`** and scored **G** in §1; continue hardening async work and observability as needed.
-2. **P1 — LLM migration batch:** explain-it, what-next, inbox (priority), lead-enrichment (dedupe server vs app `enrichLead`), lead-outreach `draft_touch`, memory/brain — move to `inference_v1` enqueue or `handleMeimeiInferenceRoute` per [`docs/api/inference-route.v1.md`](../api/inference-route.v1.md).
-3. **P1 — Lead workflow:** Model long-running workflow steps as `meimei_jobs` (or document explicit exception) so R1 matches adapter contract.
-4. **P2 — Docs:** Rename or symlink `functions/*.md` to match registry `id` for R7; add `functions/daily-briefing.md` if the route stays public.
-5. **P2 — Smoke:** Extend `scripts/meimei-dashboard-miniapps-smoke.mjs` with optional probes for `/api/meimei/monitor/feed` row shapes when strict CI is enabled.
+1. **P0 — Checklist:** Remaining **R1/R5/R6** — **R2** on **`meimei-inference-client`** as of kernel K3 **`0.8.13`**; **R3/R4** **G**.
+2. **P1 — Lead workflow R1:** Enqueue workflow steps to `meimei_jobs` or keep **documented exception** (`functions/lead-enrichment.md`); review by **2027-06-30**.
+3. **P2 — Routing preview:** ai-routing / api-access **R2** still **Y** (`oc-agent` bash) — optional move behind inference or documented forever.
+4. **P2 — R7:** Add `functions/what-next.md` or registry `contractDoc` links for name-aligned discoverability.
+5. **Smoke:** `MEIMEI_SMOKE_STRICT=1` validates **`GET /api/meimei/monitor/feed`** JSON shape (kernel K4).
 
 ---
 

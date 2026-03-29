@@ -7,7 +7,8 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { callOllamaJson, callOllama, parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 
 const META = {
@@ -233,7 +234,7 @@ Return ONLY JSON:
 }`;
 
   try {
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "qwen3.5:0.8b",
       taskType: "analyze",
       temperature: 0.3,
@@ -316,7 +317,7 @@ Generate 1-3 action recommendations. Return ONLY JSON:
 }`;
 
   try {
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "llama3:latest",
       taskType: "generate",
       temperature: 0.4,

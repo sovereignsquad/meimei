@@ -2,7 +2,7 @@
  * Platform UI — AI routing & API access tool **settings** GET shells (main tool pages stay in tool-surface-pages.mjs).
  * @see docs/architecture/meimei-kernel-completion-plan.v1.md Phase K1d
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.12
+ * @aligned package agent-meimei 0.8.13
  */
 
 export function renderAIRoutingSettingsPage(layoutDoc, d) {

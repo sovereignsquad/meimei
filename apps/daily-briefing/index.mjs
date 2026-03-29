@@ -4,7 +4,7 @@
  * AI-powered daily business briefing
  */
 
-import { callOllamaJson, parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 import { getInboxMessages, getUnreadCount, isMailAvailable } from "../../dashboard/lib/mail-adapter.mjs";
 
@@ -55,7 +55,7 @@ Generate a concise daily briefing. Return ONLY JSON:
   "insights": "Brief strategic insight"
 }`;
 
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "gemma3:1b",
       taskType: "generate",
       temperature: 0.4,

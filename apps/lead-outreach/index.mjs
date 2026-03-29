@@ -2,7 +2,7 @@
  * Lead outreach — cold email / SDR (#653, #654)
  */
 
-import { callOllamaJson } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 import { isMailAvailable, createOutgoingDraft } from "../../dashboard/lib/mail-adapter.mjs";
 import { appendSdrEvent, loadSdrEvents, summarizeSdr } from "../../dashboard/lib/sdr-analytics.mjs";
@@ -62,7 +62,7 @@ Lead / account context (from enrichment or CRM):
 ${leadSummary || "(none supplied)"}
 
 Return ONLY valid JSON with keys subjectLine (string) and body (string, plain text email). No markdown fences.`;
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "qwen3.5:0.8b",
       maxTokens: 600,
       temperature: 0.4
@@ -80,7 +80,7 @@ Return ONLY valid JSON with keys subjectLine (string) and body (string, plain te
         issue: 654,
         note: "Use sdr_send to open Mail draft or log; sdr_analytics for metrics."
       },
-      model: result.meta?.model || null
+      model: result.meta?.modelUsed || null
     };
   }
   if (action === "sdr_send") {

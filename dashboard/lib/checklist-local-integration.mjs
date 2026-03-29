@@ -3,7 +3,7 @@
  * Registry POST shell: `checklist-api-shell.mjs`; HTTP bridge: `checklist-bridge.mjs`.
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.12
+ * @aligned package agent-meimei 0.8.13
  */
 import http from "node:http";
 import https from "node:https";

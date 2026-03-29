@@ -1,7 +1,7 @@
 /**
  * Platform UI — System monitor (queue explorer) GET HTML.
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.12
+ * @aligned package agent-meimei 0.8.13
  */
 
 /**

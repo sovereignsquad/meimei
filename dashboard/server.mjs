@@ -31,12 +31,9 @@ import {
   LAYOUT_VERSION
 } from "./lib/page-layout.mjs";
 import { buildAdminLayoutEditorScript } from "./lib/admin-layout-editor.mjs";
-import { 
-  callOllama as llmCall, 
-  callOllamaJson,
+import {
   checkOllamaHealth,
   listModels,
-  summarize,
   parseJsonResponse,
   resolveModel,
   updateRoutingConfig,
@@ -53,6 +50,7 @@ import {
   DEFAULT_MODELS,
   MODELS
 } from "./lib/llm.mjs";
+import { inferenceCallOllamaJson } from "./lib/meimei-inference-client.mjs";
 import brain from "./lib/brain/index.mjs";
 import {
   getInboxMessages,
@@ -175,12 +173,6 @@ const configPath =
 
 const port = normalizeDashboardListenCandidate(surface, process.env[surface.envKeys.port]);
 const localOpenCommand = process.env[surface.envKeys.setupCommand] || surface.defaults.setupCommand;
-
-async function callOllama(prompt, options = {}) {
-  const model = options.model || DEFAULT_MODELS.default;
-  const result = await llmCall(prompt, { model, ...options });
-  return result.response;
-}
 
 const miniappCfg = miniappRuntimeConfig(loadRegistrySync());
 const miniappIssueRoute = miniappCfg.miniappIssueRoute;
@@ -755,11 +747,10 @@ async function summarizeUrlSource(inputUrl) {
     operatorBrainContext
   });
 
-  const ollamaResult = await callOllamaJson(prompt, {
+  const ollamaResult = await inferenceCallOllamaJson(prompt, {
     model: DEFAULT_MODELS.reasoning,
     maxTokens: 4096,
-    temperature: 0.35,
-    timeout: 120000
+    temperature: 0.35
   });
 
   const summary = normalizeSummaryObject(ollamaResult.data, ollamaResult.raw);
@@ -776,8 +767,8 @@ async function summarizeUrlSource(inputUrl) {
     result: {
       ...summary,
       raw: ollamaResult.raw,
-      model: ollamaResult.meta?.model || null,
-      provider: "ollama"
+      model: ollamaResult.meta?.modelUsed || null,
+      provider: "meimei-inference-route"
     }
   };
 }

@@ -1,4 +1,4 @@
-import { callOllamaJson } from "./llm.mjs";
+import { inferenceCallOllamaJson } from "./meimei-inference-client.mjs";
 import brain from "./brain/index.mjs";
 
 const COMMAND_INTENTS = [
@@ -102,7 +102,7 @@ Query: "${query}"
 {"intent":"...","confidence":0.0}`;
 
   try {
-    const result = await callOllamaJson(prompt, {
+    const result = await inferenceCallOllamaJson(prompt, {
       model: "qwen3.5:0.8b",
       temperature: 0.1,
       maxTokens: 64

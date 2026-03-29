@@ -1,6 +1,6 @@
 # MeiMei kernel completion plan — v1
 
-**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.11**).  
+**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.13**).  
 **Goal:** A **clear kernel** (runtime + contracts + shared libraries) with **all product surfaces** owned as **modules** (apps, tools, platform GET shells, integrations) — not a growing monolith in `dashboard/server.mjs`.  
 **Companion docs:** [`meimei-repo-boundaries.v1.md`](meimei-repo-boundaries.v1.md) (layers + allowlist), [`meimei-system-vision-and-platform-audit.v3.md`](meimei-system-vision-and-platform-audit.v3.md) (vision + theory + application layer), [`meimei-kernel-code-audit.v1.md`](meimei-kernel-code-audit.v1.md) (evidence-based kernel baseline + inventory), [`../developers/meimei-kernel-handbook.v1.md`](../developers/meimei-kernel-handbook.v1.md) (integration handbook), [`meimei-platform-alignment-roadmap.v1.md`](meimei-platform-alignment-roadmap.v1.md) (Phases A–E), [`miniapp-platform-audit.v1.md`](../compliance/miniapp-platform-audit.v1.md) (R1–R8 scorecard).
 
@@ -87,25 +87,25 @@ Suggested **file batches** (names indicative):
 
 **Exit K2:** ✅ **`chrome.mjs`** owns global nav + list/flashcard + nav script; **`catalogPageUiDeps()`** / **`homeAdminPageDeps()`** pass the same thin delegates into **`catalog-pages.mjs`** / **`home-admin-pages.mjs`**; boundaries §3 allowlist updated.
 
-### Phase K3 — **Phase C** (LLM + queue alignment) — *modules stay modules*
+### Phase K3 — **Phase C** (LLM + queue alignment) ✅ *delivered batch — **`0.8.13`*
 
-Per **`meimei-platform-alignment-roadmap.v1.md`** §6 Phase C and **`miniapp-platform-audit.v1.md`** Yellow rows:
+Per **`meimei-platform-alignment-roadmap.v1.md`** §6 Phase C and **`miniapp-platform-audit.v1.md`**:
 
-1. **R2:** Migrate **Yellow** miniapps from raw **`llm.mjs`** on the hot path to **`POST /api/meimei/route`** or enqueued **`inference_v1`** (inbox, what-next, explain-it, memory/brain, lead-outreach `draft_touch`, Checklist paths as scoped).
-2. **R1:** Where work is truly async/burst, enqueue **`meimei_jobs`** (or document an explicit exception in the app contract).
-3. After each app: **CHANGELOG**, **`functions/<id>.md`**, optional **`dashboard:smoke:miniapps`** assertion.
+1. **R2:** Miniapp LLM hot paths use **`dashboard/lib/meimei-inference-client.mjs`** (in-process **`handleMeimeiInferenceRoute`** — same contract as **`POST /api/meimei/route`**). Migrated: inbox, what-next, explain-it, memory/brain, lead-enrichment, lead-outreach, checklist (legacy JSON + **`checklist-node`** jobs/regenerate), daily-briefing, home command (**`command-interface`**), home suggestions, operator URL summary in **`server.mjs`**. **Exception:** ai-routing / api-access **preview** still **`oc-agent`** (audit **Y**).
+2. **R1:** Lead enrichment **`workflow_run`** — **documented exception** in **`functions/lead-enrichment.md`** (sunset **2027-06-30**). Checklist R1 remains **Y** per audit.
+3. **Docs:** **`functions/daily-briefing.md`**, **`functions/lead-enrichment.md`** (R1), **`functions/checklist.md`** (inference note); registry **`platformAlignment`** object; audit §1/§2/§4 refreshed.
 
-**Exit K3:** Audit R1/R2 columns **Green** or **documented Yellow with dated sunset** in audit.
+**Exit K3:** R2 **G** for migrated surfaces in **`miniapp-platform-audit.v1.md`**; remaining **Y** rows explicit (routing preview, checklist R1, etc.).
 
-### Phase K4 — **Phase D + E** (polish + gates)
+### Phase K4 — **Phase D + E** (polish + gates) — *baseline delivered — **`0.8.13`*
 
-- **R6:** `trace_id` through migrated flows; monitor rows useful for those apps.
-- **R5:** One-off HTML aligned to layout-flow / tokens where still legacy.
-- **knowmore:** operational refresh process (content + links), no queue.
-- **Admin:** Doc split “platform config” vs “miniapp ops” + env keys (**`meimei-app-development-guide`** + runbook).
-- **Gates:** Optional **`registry.platformAlignment`** sidecar; **`dashboard:smoke:miniapps`** in CI/nightly + **`MEIMEI_SMOKE_STRICT`** policy; architect sign-off bullets in roadmap §6 Phase E.
+- **R6:** Inference responses carry **`meimei_meta.trace_id`**; monitor feed exposes **`trace_id`** per row (**`meimei-monitor-feed.mjs`**). **`MEIMEI_SMOKE_STRICT=1`** asserts feed JSON shape in **`meimei-dashboard-miniapps-smoke.mjs`**.
+- **R5:** No broad HTML rewrite in this batch; legacy one-offs remain tracked in audit.
+- **knowmore:** **`docs/operations/knowmore-content-refresh.md`** (operational cadence).
+- **Admin:** **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`** (platform vs miniapp ops split).
+- **Gates:** Registry **`platformAlignment`**; strict smoke policy documented in smoke script header.
 
-**Exit K4:** Roadmap Phase D/E checkboxes satisfied; release discipline documented.
+**Exit K4:** Baseline docs + strict smoke hook landed; roadmap Phase E sign-off remains with product owner.
 
 ---
 

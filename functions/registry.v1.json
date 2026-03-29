@@ -1,6 +1,12 @@
 {
   "version": "v1",
   "generatedAt": "2026-03-29",
+  "platformAlignment": {
+    "asOf": "2026-03-30",
+    "package": "0.8.13",
+    "inferenceHotPath": "dashboard/lib/meimei-inference-client.mjs → handleMeimeiInferenceRoute",
+    "notes": "Kernel K3: registry apps/tools use the inference plane for blocking LLM calls. dashboard/lib/llm.mjs remains for routing config, health, gateway, and utilities."
+  },
   "functions": [
     {
       "id": "checklist",

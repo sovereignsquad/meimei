@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-03-30 — Ideabank: steal-from-Sovereign research plan
+
+- **`docs/ideabank/steal_from_sovereign_plan.md`** — Research on `/Users/chappie/Projects/sovereign` (orchestrator, bridge, DAG nodes, `providers.py`, Prisma `AgentTask`/`ProjectMemory`, pgvector migrations, `sovereign-dag.ts`, `memory.ts`, `tasks.ts`, `discord_vanguard.py`) plus `sovereign_audit.zip` constitutional specs: 14 adoption items, MeiMei analogues, phased roadmap, non-copy caveats. **`docs/README.md`** ideabank index updated.
+
+## 2026-03-30 — Kernel K3 + K4 baseline: inference client + docs/smoke (`0.8.13`)
+
+- **`dashboard/lib/meimei-inference-client.mjs`** — in-process **`handleMeimeiInferenceRoute`** for miniapps; replaces **`llm.mjs`** `callOllama` / `callOllamaJson` on hot paths (inbox, what-next, explain-it, daily-briefing, lead-enrichment/outreach, checklist + **`checklist-node`**, brain/memory, command bar, home suggestions, operator URL summary in **`server.mjs`**).
+- **Contracts:** **`functions/daily-briefing.md`**; **`functions/lead-enrichment.md`** (R1 sync workflow exception, sunset **2027-06-30**); **`functions/checklist.md`** (inference note); registry root **`platformAlignment`**.
+- **K4:** **`docs/operations/knowmore-content-refresh.md`**, **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`**; **`MEIMEI_SMOKE_STRICT=1`** asserts **`GET /api/meimei/monitor/feed`** JSON shape in **`meimei-dashboard-miniapps-smoke.mjs`**.
+- **Docs:** **`miniapp-platform-audit.v1.md`**, **`meimei-kernel-completion-plan.v1.md`**, **`meimei-kernel-code-audit.v1.md`**, **`meimei-repo-boundaries.v1.md`** allowlist.
+- **Version:** package **0.8.13**; **`@aligned package agent-meimei 0.8.13`** on aligned modules.
+
 ## 2026-03-30 — Kernel K2: Shared dashboard chrome (`0.8.12`)
 
 - **`dashboard/lib/platform-pages/chrome.mjs`** — **`renderList`**, **`renderFlashcard`**, **`renderGlobalNav`**, **`renderGlobalNavScript`** moved out of `server.mjs`; **`dashboardChromeDeps()`** supplies routes/logos/`escapeHtml`; thin wrappers preserve **`catalogPageUiDeps()`** / **`homeAdminPageDeps()`** call sites.

@@ -5,7 +5,8 @@
  * Issue: #563
  */
 
-import { callOllama, summarize, parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { parseJsonResponse } from "../../dashboard/lib/llm.mjs";
+import { inferenceCallOllama, inferenceSummarize } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 import {
   getInboxMessages,
@@ -69,12 +70,12 @@ async function listMessages(limit, filter, useAI, repoRoot) {
         ).join("\n\n");
 
         try {
-          const priorityResult = await callOllama(
+          const priorityResult = await inferenceCallOllama(
             `Analyze these emails and suggest priorities. Return JSON with 'priorityOrder' array of indexes (0-4) from highest to lowest priority.\n\n${messageSummaries}`,
             { model: "qwen3.5:0.8b", maxTokens: 128, taskType: "classify" }
           );
 
-          const parsed = parseJsonResponse(priorityResult);
+          const parsed = parseJsonResponse(priorityResult.response);
           if (parsed && parsed.priorityOrder) {
             prioritizedMessages = [...messages].sort((a, b) => {
               const aIdx = messages.indexOf(a) % 5;
@@ -133,7 +134,7 @@ async function readMessage(messageId, useAI, repoRoot) {
         let summary = null;
         if (useAI && message.body) {
           try {
-            const summaryResult = await summarize(message.body.substring(0, 2000));
+            const summaryResult = await inferenceSummarize(message.body.substring(0, 2000));
             summary = summaryResult.response;
           } catch {
             // Continue without summary

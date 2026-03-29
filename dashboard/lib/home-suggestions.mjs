@@ -1,5 +1,6 @@
 import brain from "./brain/index.mjs";
-import { callOllama, parseJsonResponse, DEFAULT_MODELS } from "./llm.mjs";
+import { parseJsonResponse, DEFAULT_MODELS } from "./llm.mjs";
+import { inferenceCallOllama } from "./meimei-inference-client.mjs";
 import { getUnreadCount, isMailAvailable } from "./mail-adapter.mjs";
 
 function truncate(s, max) {
@@ -86,12 +87,10 @@ ${snippet}
 Return ONLY valid JSON (no markdown):
 {"suggestions":[{"title":"short headline","detail":"one sentence why this helps","exampleQuery":"short command phrase"}]}`;
 
-  const result = await callOllama(prompt, {
+  const result = await inferenceCallOllama(prompt, {
     model: DEFAULT_MODELS.fast,
     temperature: 0.35,
-    maxTokens: 700,
-    timeout: 90000,
-    responseFormat: "json"
+    maxTokens: 700
   });
 
   const parsed = parseJsonResponse(result.response);
