@@ -54,7 +54,7 @@ async function handleApi(req, body, repoRoot) {
       timestamp: telemetry.timestamp || new Date().toISOString()
     };
   } catch (error) {
-    return { ok: false, error: `Failed to get telemetry: ${error.message}` };
+    return { ok: false, httpStatus: 500, error: `Failed to get telemetry: ${error.message}` };
   }
 }
 

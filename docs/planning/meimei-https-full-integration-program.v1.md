@@ -129,7 +129,7 @@ Each item: **ID**, **theme**, **deliverable**, **acceptance**, **deps**.
 
 | ID | Theme | Deliverable | Acceptance | Deps |
 |----|--------|-------------|------------|------|
-| **TLS-060** | CI | **GitHub Actions** (or local): job **`https-smoke`** — install deps, `cert:install` (non-interactive mode if possible), start `dashboard` + `meimei-domain`, run smoke with **`NODE_EXTRA_CA_CERTS`**. | Workflow green on `main`; documented skip for forks without certs. | TLS-030, TLS-033 |
+| **TLS-060** | CI | **`scripts/meimei-https-e2e-ci.mjs`** + **`npm run https:e2e-ci`** (in **`npm run ci`**): temp openssl cert, dashboard subprocess, mini TLS proxy, **`GET …/dashboard/api/health`** over HTTPS with temp CA. | Green on Ubuntu + macOS where `openssl` exists; no `meimei.localhost` keychain. | TLS-030, TLS-033 |
 | **TLS-061** | Lint | Optional **`scripts/lint-no-insecure-ingress-docs.mjs`**: fail on new `http://127.0.0.1:<dashboard port>` in `docs/**` (allowlist exceptions). | Runs in CI or weekly. | TLS-002 |
 | **TLS-062** | Gates | **`releases/*.json`** or **`mac-mini-go-live-checklist`**: add **HTTPS-only** pass/fail step. | Human + machine check listed. | TLS-002 |
 
@@ -184,6 +184,7 @@ TLS-020 blocks TLS-033
 
 | Date | Change |
 |------|--------|
+| 2026-03-30 | **Delivered (TLS-060):** **`meimei-https-e2e-ci.mjs`** — live HTTPS → dashboard health in CI via ephemeral cert + mini proxy (**`npm run https:e2e-ci`**, part of **`npm run ci`**). |
 | 2026-03-30 | **Delivered (phase 1):** **`validate-https-doc-contract.mjs`** + **`npm run https:validate-docs`** in **`npm run ci`** (TLS-061 baseline); topology **TLS-042/043** (forwarded proto + cookies); handbook HTTPS pointer; kernel plan **TLS-052** waiver for **`openclawChatUrl`**; health **`public_https.termination`**. |
 | 2026-03-30 | **Delivered (phase 0):** ADR-003 **Accepted** (proxy default); **`meimei-https-topology.v1.md`**; runbook/README/miniapp-contract/checklist; server boot hint + **`GET /api/health`** `public_https` + bind envs; **`MEIMEI_DOMAIN_HTTP_REDIRECT`**; smoke **`MEIMEI_SMOKE_HTTPS`**, probe **`MEIMEI_PROBE_TLS`**; **`npm run dashboard:smoke:https`**, **`dashboard:probe:tls`**. |
 | 2026-03-30 | Initial program: rationale, target state, micro-deliverables TLS-001–TLS-071. |

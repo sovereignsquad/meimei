@@ -56,7 +56,7 @@ These are **shared platform** unless and until a future version moves a file to 
 1. **Register** routes, **read** body, **call** one exported `handleApi` or `processX` from `apps/*` or `dashboard/lib/*`.  
 2. **Do not** add new multi-hundred-line product logic inline.  
 3. **One** `POST` handler per normalized API path (no duplicate branches).  
-4. **CI guard:** `npm run boundary:check` — asserts a single `POST` branch for `checklistApiRoute` (extend script as more invariants are added).
+4. **CI guard:** `npm run boundary:check` — (1) single `POST` branch for `checklistApiRoute`, (2) no cross-app `from` imports, (3) static `../apps/*` imports in `server.mjs` match an explicit legacy allowlist (**MM-KERNEL-603**).
 
 ---
 
@@ -72,7 +72,7 @@ Each subdirectory documents an **external** boundary (e.g. Next.js Checklist). C
 
 - Registry → owner table and core allowlist are **explicit**; ambiguous “misc lib” files are labeled candidates, not silently core.
 - `dashboard/server.mjs` stays a **thin router**: register routes, read body, delegate to one `apps/*` or `dashboard/lib/*` entrypoint — no new large product blocks (see §4).
-- **Automated guards:** `npm run boundary:check` runs (1) single `POST` branch for `checklistApiRoute` in `server.mjs`, (2) **no cross-app imports** (`apps/foo` must not `from` another `apps/bar` path). Extend the scripts as new invariants are agreed.
+- **Automated guards:** `npm run boundary:check` runs (1) single `POST` branch for `checklistApiRoute` in `server.mjs`, (2) **no cross-app imports** (`apps/foo` must not `from` another `apps/bar` path), (3) **`meimei-dashboard-static-apps-import-check.mjs`** — legacy allowlist for static `server.mjs` → `apps/*` imports. Extend the scripts as new invariants are agreed.
 
 **Deferred (documented, not waived silently):**
 

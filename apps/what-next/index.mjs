@@ -66,7 +66,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
     const recs = parsed.recommendations || parsed.items || [];
 
     if (!Array.isArray(recs) || recs.length === 0) {
-      return { ok: false, error: "Could not parse LLM recommendations" };
+      return { ok: false, httpStatus: 500, error: "Could not parse LLM recommendations" };
     }
 
     await brain.log(repoRoot, `Generated ${recs.length} recommendations`).catch(() => {});
@@ -79,7 +79,7 @@ Generate 3-5 prioritized recommendations for what OC should do next. Return ONLY
       source: "ollama/qwen3.5:0.8b"
     };
   } catch (error) {
-    return { ok: false, error: `AI recommendation failed: ${error.message}` };
+    return { ok: false, httpStatus: 500, error: `AI recommendation failed: ${error.message}` };
   }
 }
 

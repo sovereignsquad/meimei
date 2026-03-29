@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node scripts/meimei-kernel-app-registry.mjs list
- *   node scripts/meimei-kernel-app-registry.mjs register <installDir>
+ *   node scripts/meimei-kernel-app-registry.mjs register <installDir> [--secret <value>]
  *   node scripts/meimei-kernel-app-registry.mjs disable <app_id>
  *   node scripts/meimei-kernel-app-registry.mjs enable <app_id>
  *   node scripts/meimei-kernel-app-registry.mjs remove <app_id> [reason]
@@ -39,7 +39,7 @@ async function main() {
   if (!cmd || cmd === "help" || cmd === "-h") {
     console.log(`Usage:
   node scripts/meimei-kernel-app-registry.mjs list
-  node scripts/meimei-kernel-app-registry.mjs register <installDir>
+  node scripts/meimei-kernel-app-registry.mjs register <installDir> [--secret <value>]
   node scripts/meimei-kernel-app-registry.mjs disable <app_id>
   node scripts/meimei-kernel-app-registry.mjs enable <app_id>
   node scripts/meimei-kernel-app-registry.mjs remove <app_id> [reason]
@@ -62,12 +62,27 @@ Registry file: ${regPath}`);
   }
 
   if (cmd === "register") {
-    const dir = rest[0];
+    let dir = "";
+    let deploymentSecret;
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === "--secret" && rest[i + 1] !== undefined) {
+        deploymentSecret = rest[i + 1];
+        i++;
+        continue;
+      }
+      if (!dir && rest[i] !== "--secret") {
+        dir = rest[i];
+      }
+    }
     if (!dir) {
       console.error("register requires <installDir>");
       process.exit(1);
     }
-    const out = await registerKernelApp(repoRoot, dir, { registryPath: regPath, audit: true });
+    const out = await registerKernelApp(repoRoot, dir, {
+      registryPath: regPath,
+      audit: true,
+      ...(deploymentSecret !== undefined ? { deploymentSecret } : {})
+    });
     console.log(
       JSON.stringify({ ok: true, app_id: out.app_id, created: out.created }, null, 2)
     );

@@ -80,7 +80,7 @@ async function handleApi(req, body, repoRoot) {
       } else {
         const result = await brain.readLayer(repoRoot, layer);
         if (!result.ok) {
-          return { ok: false, error: `Layer not found: ${layer}` };
+          return { ok: false, httpStatus: 404, error: `Layer not found: ${layer}` };
         }
 
         // Parse markdown for frontend

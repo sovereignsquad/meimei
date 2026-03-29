@@ -69,18 +69,8 @@ import {
   getUnreadCount
 } from "./lib/mail-adapter.mjs";
 import { routeToApp } from "./lib/app-router.mjs";
-import { handleApi as leadEnrichmentHandler } from "../apps/lead-enrichment/index.mjs";
-import { handleApi as inboxHandler } from "../apps/inbox/index.mjs";
-import { handleApi as memoryHandler } from "../apps/memory/index.mjs";
-import { handleApi as missionControlHandler } from "../apps/mission-control/index.mjs";
-import { handleApi as whatNextHandler } from "../apps/what-next/index.mjs";
-import { handleApi as explainItHandler } from "../apps/explain-it/index.mjs";
-import { handleApi as dailyBriefingHandler } from "../apps/daily-briefing/index.mjs";
-import { handleApi as aiRoutingHandler } from "../apps/ai-routing/index.mjs";
-import { handleApi as checklistHandler } from "../apps/checklist/index.mjs";
-import { handleApi as leadOutreachHandler } from "../apps/lead-outreach/index.mjs";
-import { handleApi as aiSdrAnalyticsHandler } from "../apps/ai-sdr-analytics/index.mjs";
-import { handleApi as supabaseConnectorHandler } from "../apps/supabase-connector/index.mjs";
+import { loadChecklistHandleApi } from "./lib/checklist-app-handler.mjs";
+import { loadAiRoutingHandleApi } from "./lib/lazy-ai-routing-handler.mjs";
 import {
   getOpenClawHealth,
   getTelemetry,
@@ -221,9 +211,10 @@ const checklistLabel = R["checklist"]?.displayName || "Checklist";
 
 /**
  * Registry checklist POST — delegates shell actions to `dashboard/lib/checklist-api-shell.mjs` (Phase 0).
- * Legacy JSON miniapp: `apps/checklist/index.mjs`. One route: `npm run boundary:check`.
+ * Legacy JSON miniapp: `apps/checklist/index.mjs` loaded dynamically. One route: `npm run boundary:check`.
  */
 async function handleChecklistPost(req, body, repoRootArg) {
+  const checklistHandler = await loadChecklistHandleApi(repoRootArg);
   return handleChecklistPostShell(req, body, repoRootArg, {
     checklistHandler,
     repoRoot: repoRootArg,
@@ -1908,80 +1899,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === "POST" && normalizedPath === explainItApiRoute) {
-      const body = await readJson(req);
-      const result = await explainItHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : 400, result);
-      return;
-    }
-
     if (req.method === "POST" && normalizedPath === checklistApiRoute) {
       const body = (await readJson(req)) || {};
       try {
         const out = await handleChecklistPost(req, body, repoRoot);
-        sendJson(res, out.ok ? 200 : 400, out);
-      } catch (error) {
-        sendJson(res, 500, {
-          ok: false,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === whatNextApiRoute) {
-      const body = await readJson(req) || {};
-      const result = await whatNextHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : 500, result);
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === leadEnrichmentApiRoute) {
-      const body = (await readJson(req)) || {};
-      try {
-        const result = await leadEnrichmentHandler(req, body, repoRoot);
-        sendJson(res, result.ok ? 200 : 400, result);
-      } catch (error) {
-        sendJson(res, 500, {
-          ok: false,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === leadOutreachApiRoute) {
-      const body = (await readJson(req)) || {};
-      try {
-        const out = await leadOutreachHandler(req, body, repoRoot);
-        sendJson(res, out.ok ? 200 : 400, out);
-      } catch (error) {
-        sendJson(res, 500, {
-          ok: false,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === aiSdrAnalyticsApiRoute) {
-      const body = (await readJson(req)) || {};
-      try {
-        const out = await aiSdrAnalyticsHandler(req, body, repoRoot);
-        sendJson(res, out.ok ? 200 : 400, out);
-      } catch (error) {
-        sendJson(res, 500, {
-          ok: false,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === supabaseConnectorApiRoute) {
-      const body = (await readJson(req)) || {};
-      try {
-        const out = await supabaseConnectorHandler(req, body, repoRoot);
         sendJson(res, out.ok ? 200 : 400, out);
       } catch (error) {
         sendJson(res, 500, {
@@ -2031,64 +1952,6 @@ const server = http.createServer(async (req, res) => {
           error: error instanceof Error ? error.message : String(error)
         });
       }
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === inboxApiRoute) {
-      const body = await readJson(req) || {};
-      const result = await inboxHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : 400, result);
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === memoryApiRoute) {
-      const body = await readJson(req) || {};
-      const result = await memoryHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : (result.error?.includes("not found") ? 404 : 400), result);
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === missionControlApiRoute) {
-      const body = await readJson(req) || {};
-      const result = await missionControlHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : 500, result);
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === dailyBriefingApiRoute) {
-      const body = await readJson(req);
-      const result = await dailyBriefingHandler(req, body, repoRoot);
-      sendJson(res, result.ok ? 200 : 500, result);
-      return;
-    }
-
-    if (req.method === "POST" && normalizedPath === dailyBriefingOpenApiRoute) {
-      const body = await readJson(req);
-      const target = String(body.target || "").trim();
-      if (target === "notes") {
-        const opened = await runScript("open", ["-a", "Notes"], { timeoutMs: 8000 });
-        if (opened.code !== 0) {
-          sendJson(res, 500, { ok: false, error: opened.stderr || "Could not open Notes." });
-          return;
-        }
-        sendJson(res, 200, { ok: true, target: "notes" });
-        return;
-      }
-      if (target === "markdown") {
-        const markdownPath = String(body.markdownPath || "").trim();
-        if (!markdownPath || !path.isAbsolute(markdownPath)) {
-          sendJson(res, 400, { ok: false, error: "Missing or invalid markdownPath." });
-          return;
-        }
-        const opened = await runScript("open", [markdownPath], { timeoutMs: 8000 });
-        if (opened.code !== 0) {
-          sendJson(res, 500, { ok: false, error: opened.stderr || "Could not open markdown file." });
-          return;
-        }
-        sendJson(res, 200, { ok: true, target: "markdown", markdownPath });
-        return;
-      }
-      sendJson(res, 400, { ok: false, error: "Unknown open target." });
       return;
     }
 
@@ -2185,16 +2048,18 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Model routing (#517, #561, #612)
+    // Model routing (#517, #561, #612) — same handler as registry ai-routing miniapp; path legacy for LLM UI.
     if (req.method === "GET" && normalizedPath === "/api/llm/routing") {
-      const result = await aiRoutingHandler(req, {}, repoRoot);
+      const fn = await loadAiRoutingHandleApi(repoRoot);
+      const result = await fn(req, {}, repoRoot);
       sendJson(res, 200, result);
       return;
     }
-    
+
     if (req.method === "POST" && normalizedPath === "/api/llm/routing") {
       const body = await readJson(req);
-      const result = await aiRoutingHandler(req, { action: "update", ...body }, repoRoot);
+      const fn = await loadAiRoutingHandleApi(repoRoot);
+      const result = await fn(req, { action: "update", ...body }, repoRoot);
       sendJson(res, result.ok ? 200 : 400, result);
       return;
     }

@@ -63,7 +63,7 @@ export function saveKernelAppRegistrySync(repoRoot, state, registryPath) {
   fs.writeFileSync(file, `${JSON.stringify(normalized, null, 2)}\n`, "utf8");
 }
 
-function sha256Json(obj) {
+export function sha256Json(obj) {
   return createHash("sha256").update(JSON.stringify(obj)).digest("hex");
 }
 
@@ -103,17 +103,17 @@ export function assertValidManifest(repoRoot, manifest) {
 }
 
 /**
- * @typedef {{ app_id: string, install_path: string, manifest: object, manifest_sha256: string, enabled: boolean, registered_at_ms: number, updated_at_ms: number }} KernelRegisteredApp
+ * @typedef {{ app_id: string, install_path: string, manifest: object, manifest_sha256: string, enabled: boolean, registered_at_ms: number, updated_at_ms: number, auth_secret_sha256?: string, builtin?: boolean }} KernelRegisteredApp
  */
 
 /**
  * @param {string} repoRoot
  * @param {string} installPath
- * @param {{ registryPath?: string, audit?: boolean }} [opts]
+ * @param {{ registryPath?: string, audit?: boolean, deploymentSecret?: string }} [opts]
  * @returns {Promise<{ ok: true, app_id: string, created: boolean }>}
  */
 export async function registerKernelApp(repoRoot, installPath, opts = {}) {
-  const { registryPath, audit = true } = opts;
+  const { registryPath, audit = true, deploymentSecret } = opts;
   const abs = resolveInstallPath(installPath);
   const manifest = readMeimeiAppManifestFromDir(abs);
   assertValidManifest(repoRoot, manifest);
@@ -125,12 +125,21 @@ export async function registerKernelApp(repoRoot, installPath, opts = {}) {
   const existingIdx = state.apps.findIndex((a) => a.install_path === abs);
   if (existingIdx >= 0) {
     const prev = state.apps[existingIdx];
-    state.apps[existingIdx] = {
+    const next = {
       ...prev,
       manifest,
       manifest_sha256: hash,
       updated_at_ms: now
     };
+    if (deploymentSecret !== undefined) {
+      const s = String(deploymentSecret);
+      if (s) {
+        next.auth_secret_sha256 = createHash("sha256").update(s, "utf8").digest("hex");
+      } else {
+        delete next.auth_secret_sha256;
+      }
+    }
+    state.apps[existingIdx] = next;
     saveKernelAppRegistrySync(repoRoot, state, registryPath);
     if (audit) {
       const { appendAuditEvent } = createAuditTrail(repoRoot);
@@ -152,7 +161,7 @@ export async function registerKernelApp(repoRoot, installPath, opts = {}) {
   }
 
   const app_id = randomUUID();
-  state.apps.push({
+  const newApp = {
     app_id,
     install_path: abs,
     manifest,
@@ -160,7 +169,11 @@ export async function registerKernelApp(repoRoot, installPath, opts = {}) {
     enabled: true,
     registered_at_ms: now,
     updated_at_ms: now
-  });
+  };
+  if (deploymentSecret !== undefined && String(deploymentSecret)) {
+    newApp.auth_secret_sha256 = createHash("sha256").update(String(deploymentSecret), "utf8").digest("hex");
+  }
+  state.apps.push(newApp);
   saveKernelAppRegistrySync(repoRoot, state, registryPath);
 
   if (audit) {

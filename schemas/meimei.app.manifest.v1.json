@@ -63,7 +63,26 @@
         "pathSuffix": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*$",
-          "description": "Suffix after /dashboard/api/functions/ — kernel maps to full path at registration."
+          "description": "Primary suffix after /dashboard/api/functions/ — kernel maps to full path at registration."
+        },
+        "subroutes": {
+          "type": "array",
+          "description": "Extra POST paths under /api/functions/ (one extra path segment), different named exports.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pathSuffix", "export"],
+            "properties": {
+              "pathSuffix": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*(/[a-z][a-z0-9-]*)?$"
+              },
+              "export": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       }
     },
@@ -120,6 +139,17 @@
           "minLength": 1,
           "maxLength": 80,
           "pattern": "^[A-Za-z0-9_]+$"
+        }
+      }
+    },
+    "kernel": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kernel runtime hints (MM-KERNEL-301 / builtins).",
+      "properties": {
+        "authExempt": {
+          "type": "boolean",
+          "description": "When MEIMEI_KERNEL_APP_AUTH=1, skip X-MeiMei-App-Id requirement (e.g. same-origin dashboard miniapps)."
         }
       }
     }

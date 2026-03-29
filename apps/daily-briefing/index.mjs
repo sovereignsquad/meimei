@@ -1,12 +1,14 @@
 /**
  * Daily Briefing App
- * 
+ *
  * AI-powered daily business briefing
  */
 
+import path from "node:path";
 import { inferenceCallOllamaJson } from "../../dashboard/lib/meimei-inference-client.mjs";
 import brain from "../../dashboard/lib/brain/index.mjs";
 import { getInboxMessages, getUnreadCount, isMailAvailable } from "../../dashboard/lib/mail-adapter.mjs";
+import { createRuntimeHelpers } from "../../dashboard/lib/runtime.mjs";
 
 const META = {
   id: "daily-briefing",
@@ -122,4 +124,29 @@ Generate a concise daily briefing. Return ONLY JSON:
   }
 }
 
-export { META, handleApi };
+/** POST …/daily-briefing/open — open Notes or a markdown file (was inline in server.mjs). */
+async function handleOpenPost(req, body, repoRoot) {
+  const { runScript } = createRuntimeHelpers(repoRoot);
+  const target = String(body.target || "").trim();
+  if (target === "notes") {
+    const opened = await runScript("open", ["-a", "Notes"], { timeoutMs: 8000 });
+    if (opened.code !== 0) {
+      return { ok: false, error: opened.stderr || "Could not open Notes." };
+    }
+    return { ok: true, target: "notes" };
+  }
+  if (target === "markdown") {
+    const markdownPath = String(body.markdownPath || "").trim();
+    if (!markdownPath || !path.isAbsolute(markdownPath)) {
+      return { ok: false, error: "Missing or invalid markdownPath." };
+    }
+    const opened = await runScript("open", [markdownPath], { timeoutMs: 8000 });
+    if (opened.code !== 0) {
+      return { ok: false, error: opened.stderr || "Could not open markdown file." };
+    }
+    return { ok: true, target: "markdown", markdownPath };
+  }
+  return { ok: false, error: "Unknown open target." };
+}
+
+export { META, handleApi, handleOpenPost };

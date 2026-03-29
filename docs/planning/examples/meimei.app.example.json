@@ -19,5 +19,8 @@
   "routes": {
     "dashboardIssueId": 999999,
     "slug": "Example_pilot"
+  },
+  "kernel": {
+    "authExempt": false
   }
 }

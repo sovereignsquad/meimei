@@ -71,6 +71,16 @@ Escalate to OC when:
 
 ## Local Dashboard
 
+MeiMei is an **operator-local** stack (Node upstream + optional TLS proxy + LaunchAgents). **Do not** treat third-party “deploy to cloud” flows as the product runtime; ship updates with **`git pull`** on the Mac and **`npm run dashboard:reload`** (or equivalent LaunchAgent refresh).
+
+### Operator chrome (nav + themes)
+
+- **Admin → Operator chrome** edits nav **icon paths** (under `/images/…`) and **colours** for menu chips and `data-theme` shells.
+- **Persistence:** `data/operator-chrome.v1.json` (gitignored) — only stores **diffs** from [`chrome-theme-defaults.mjs`](../../dashboard/lib/chrome-theme-defaults.mjs) / `design-system.css` defaults.
+- **API:** `GET` / `POST` **`/api/operator/chrome`** (configurable as `surface.api.operatorChrome` in [`config/dashboard-surface.v1.json`](../../config/dashboard-surface.v1.json)). `POST` `{ reset: true }` removes overrides.
+- **Dynamic CSS:** **`GET /styles/operator-chrome.css`** — `no-store`; linked **after** `design-system.css` on all platform shells.
+- **Canonical audit:** [`docs/planning/meimei-docs-code-sync-audit.v1.md`](../planning/meimei-docs-code-sync-audit.v1.md).
+
 ### Canonical operator URL (HTTPS)
 
 - **Browser and operator tooling** should use **`https://meimei.localhost:8443/dashboard/`** when the TLS proxy is running (**`./scripts/meimei-domain`** / LaunchAgent stack). This is the **product** surface ([ADR-003](../architecture/adr/ADR-003-tls-termination-v1.md), [topology](../architecture/meimei-https-topology.v1.md)).
@@ -80,6 +90,7 @@ Escalate to OC when:
 ### Upstream Node (HTTP on loopback)
 
 - `npm run dashboard` starts **Node `http.createServer`** on **`127.0.0.1:<defaults.port>`** (commonly **45285**) — **upstream HTTP** on loopback only, not the canonical URL. Boot logs print both upstream and **public HTTPS** hint.
+- **`MEIMEI_PUBLIC_PREFIX`** (default **`/dashboard`**): browser-visible paths for HTML **stylesheet and image URLs** are prefixed so `/images/…` and `/styles/…` resolve correctly behind the same mount (see `browserPathForNormalized` in `dashboard/server.mjs`).
 - **Hardening (optional):** `MEIMEI_DASHBOARD_LOOPBACK_ONLY=1` forces bind **`127.0.0.1`**. `MEIMEI_DASHBOARD_DISALLOW_LAN_BIND=1` coerces **`0.0.0.0`/`::`** to **`127.0.0.1`** unless **`MEIMEI_DASHBOARD_ALLOW_LAN_BIND=1`**.
 
 ### Operations

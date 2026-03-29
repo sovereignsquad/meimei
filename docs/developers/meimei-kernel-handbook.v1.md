@@ -1,6 +1,6 @@
 # MeiMei kernel — technical handbook
 
-**Document revision:** v1.1  
+**Document revision:** v1.2  
 **Audience:** Software architects and senior engineers integrating, extending, or reviewing the MeiMei platform core.  
 **Runtime:** Node.js **ESM** (`.mjs`), engines **≥22.5** per [`package.json`](../../package.json).  
 **Normative audit:** [meimei-kernel-code-audit.v1.md](../architecture/meimei-kernel-code-audit.v1.md) (inventory, contracts, governance, line anchors).  
@@ -87,6 +87,7 @@ There is no separate mandatory worker binary for inference in v1; horizontal sca
 | Listen / surface | [`dashboard-surface.mjs`](../../dashboard/lib/dashboard-surface.mjs), [`config/dashboard-surface.v1.json`](../../config/dashboard-surface.v1.json) |
 | Bind normalization | [`config/dashboard-listen-normalize.mjs`](../../config/dashboard-listen-normalize.mjs) |
 | Layout | [`page-layout.mjs`](../../dashboard/lib/page-layout.mjs) |
+| Operator chrome (optional) | `data/operator-chrome.v1.json` (gitignored) — merged with [`chrome-theme-defaults.mjs`](../../dashboard/lib/chrome-theme-defaults.mjs); API + dynamic CSS in [`operator-chrome.mjs`](../../dashboard/lib/operator-chrome.mjs); audit [`meimei-docs-code-sync-audit.v1.md`](../planning/meimei-docs-code-sync-audit.v1.md) |
 | Operator secrets/config | [`meimei-env-store.mjs`](../../dashboard/lib/meimei-env-store.mjs) → `data/meimei-environment.v1.json`; catalog `config/meimei-env-catalog.v1.json` |
 | Inference | `OLLAMA_HOST`, `MEIMEI_INFERENCE_MAX_CONTEXT` |
 
@@ -94,21 +95,23 @@ There is no separate mandatory worker binary for inference in v1; horizontal sca
 
 ## 6. HTTP entry and dispatch
 
-**Entry:** `http.createServer` begins near **line 1170** in [`dashboard/server.mjs`](../../dashboard/server.mjs) (~2181 lines as of package **0.8.12** / K2); **`server.listen`** near **line 2177**. Line numbers drift with edits — use `grep -n 'createServer\|server.listen'` after large merges.
+**Entry:** `http.createServer` in [`dashboard/server.mjs`](../../dashboard/server.mjs). Line numbers drift — use `grep -n 'createServer\|server.listen' dashboard/server.mjs` after large merges.
 
 **HTTPS (operator contract):** Browsers and operators should use the **TLS reverse proxy** (`scripts/meimei-domain.mjs` → **`https://meimei.localhost:8443/dashboard/`**). The Node process is **upstream HTTP on loopback** only — see [meimei-https-topology.v1.md](../architecture/meimei-https-topology.v1.md). **`GET /api/health`** returns **`public_https.operator_url`** and **`listen.url`** for probes.
 
-**Dispatch order (summary)** — see audit §5 for rationale:
+**Dispatch order (summary)** — see [sync audit §5](../planning/meimei-docs-code-sync-audit.v1.md) for rationale; exact order: `grep -n normalizedPath dashboard/server.mjs`.
 
 1. Health  
-2. `GET /api/meimei/monitor/feed` (≈ L1188)  
-3. `POST /api/meimei/route` (≈ L1215)  
-4. Checklist integration paths  
-5. Static assets under `public/`  
-6. JSON APIs and `apps/*` POST delegation  
-7. HTML `render*` responses  
+2. `GET /api/meimei/monitor/feed`  
+3. `POST /api/meimei/route`  
+4. Checklist public path — reverse-proxy attempt when configured  
+5. **`GET`/`HEAD` `/styles/operator-chrome.css`** — dynamic merged operator theme CSS ([`operator-chrome.mjs`](../../dashboard/lib/operator-chrome.mjs))  
+6. Static assets under `public/` for `surface.staticPrefixes` (`/images/`, `/styles/` …)  
+7. JSON APIs (e.g. **`GET`/`POST /api/operator/chrome`**, page layout, config, …) and `apps/*` POST branches where still inlined in `server.mjs`  
+8. Fallback **`POST /api/functions/<suffix>`** — [`kernel-external-app-dispatch.mjs`](../../dashboard/lib/kernel-external-app-dispatch.mjs): **builtins** from `apps/<pkg>/meimei.app.json` (always), plus **`data/kernel/apps/registry.json`** when **`MEIMEI_KERNEL_EXTERNAL_APPS=1`**. **Auth:** optional **`MEIMEI_KERNEL_APP_AUTH=1`** + headers **`X-MeiMei-App-Id`** / **`X-MeiMei-App-Secret`**; see [`kernel-app-auth.mjs`](../../dashboard/lib/kernel-app-auth.mjs) and program doc MM-KERNEL-301.  
+9. HTML `render*` responses  
 
-**Adding behavior:** introduce a module under `apps/*` or allowlisted `dashboard/lib/*`, then add a **short** branch in `server.mjs` that parses input and delegates — per boundaries §4.
+**Adding behavior:** prefer `meimei.app.json` + dynamic dispatch for new POST APIs; legacy path is a **short** branch in `server.mjs` — per boundaries §4 and **`meimei-dashboard-static-apps-import-check.mjs`** allowlist.
 
 ---
 

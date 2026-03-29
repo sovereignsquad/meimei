@@ -3,7 +3,7 @@
 **Version:** v1  
 **Date:** 2026-03-29  
 **Owner:** Platform / architecture  
-**Status:** Planning — **MM-KERNEL-201**–**203** delivered; **MM-KERNEL-501** **partial** (opt-in `MEIMEI_KERNEL_EXTERNAL_APPS=1` POST dispatch + selftest); catalog/GET shells (**MM-KERNEL-502**), policy/SDK (**MM-KERNEL-301+**), static-import removal (**MM-KERNEL-603**) open
+**Status:** Planning — **MM-KERNEL-201**–**203** delivered; **MM-KERNEL-501** extended with **builtins** (`apps/*/meimei.app.json`, always on) + registry when **`MEIMEI_KERNEL_EXTERNAL_APPS=1`**; **MM-KERNEL-301** ( **`kernel-app-auth.mjs`**, register **`--secret`**, env **`MEIMEI_KERNEL_APP_AUTH`**) and **MM-KERNEL-603** pilot (**explain-it** + static-import allowlist check) delivered; catalog/GET shells (**MM-KERNEL-502**), policy model (**MM-KERNEL-302+**), further static-import migration open
 
 ## Executive summary
 
@@ -274,11 +274,13 @@ Scan: `dashboard/server.mjs`, menubar scripts, smoke scripts, OpenClaw wrappers,
 
 ### Deliverables
 
-- Middleware module + unit tests; threat notes for secret storage.
+- [x] **`dashboard/lib/kernel-app-auth.mjs`** — optional **`MEIMEI_KERNEL_APP_AUTH=1`** ( **`X-MeiMei-App-Id`** vs registry/builtin **`app_id`**; manifest **`kernel.authExempt`**); optional per-app **`auth_secret_sha256`** + **`X-MeiMei-App-Secret`**; integrated in **`kernel-external-app-dispatch.mjs`**.
+- [x] **`register … --secret`** + registry field **`auth_secret_sha256`**; extended **`meimei-kernel-external-dispatch-selftest.mjs`**.
+- Threat: store **only** SHA-256 of deployment secret on disk; rotate by re-registering with a new secret.
 
 ### Acceptance criteria
 
-- Fuzz: missing header → 401/403; disabled app → 403.
+- [x] Missing / wrong identity or secret → **401**/**403**; disabled app → **403** (selftest).
 
 ---
 
@@ -463,7 +465,8 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 ### Deliverables
 
-- Extend `meimei-repo-boundaries-check.mjs` (or successor) to forbid new static `apps/*` imports except an explicit legacy allowlist.
+- [x] **`scripts/meimei-dashboard-static-apps-import-check.mjs`** — explicit legacy allowlist must match static **`../apps/<pkg>/`** imports in **`dashboard/server.mjs`** (**`npm run boundary:check`**).
+- [x] Pilot: **`apps/explain-it/meimei.app.json`** + removal of static **`explain-it`** import and POST branch (dispatch via **`kernel-external-app-dispatch.mjs`**).
 
 ---
 
@@ -535,6 +538,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 | Date | Change |
 |------|--------|
+| 2026-03-30 | MM-KERNEL-301: `kernel-app-auth.mjs`, `MEIMEI_KERNEL_APP_AUTH`, `X-MeiMei-App-Id` / `X-MeiMei-App-Secret`, register `--secret`, manifest `kernel.authExempt`. MM-KERNEL-603: builtins (`kernel-builtin-apps.mjs`), explain-it manifest + no static server import, `meimei-dashboard-static-apps-import-check.mjs`. |
 | 2026-03-29 | MM-KERNEL-501 (partial): `kernel-external-app-dispatch.mjs`, `MEIMEI_KERNEL_EXTERNAL_APPS=1`, server fallback POST, `kernel:external-dispatch:selftest` in CI. |
 | 2026-03-29 | MM-KERNEL-202/203: `kernel-app-registry.mjs`, CLI, selftest, gitignored `data/kernel/apps/registry.json`, audit event types for register/update/remove. |
 | 2026-03-29 | MM-KERNEL-201: `schemas/meimei.app.manifest.v1.json`, planning example, `validate-meimei-app-manifest.mjs`, CI hook. |

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "name": "explain-it",
+  "displayName": "Explain it",
+  "description": "URL summarization and structured explanation",
+  "version": "1.0.0",
+  "entry": {
+    "module": "./index.mjs",
+    "export": "handleApi"
+  },
+  "api": {
+    "method": "POST",
+    "pathSuffix": "explain-it"
+  },
+  "capabilities": {
+    "required": ["inference"]
+  },
+  "routes": {
+    "dashboardIssueId": 516,
+    "slug": "Explain_it"
+  },
+  "kernel": {
+    "authExempt": true
+  }
+}

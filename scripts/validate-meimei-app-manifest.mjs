@@ -35,36 +35,60 @@ function ok(msg) {
   console.log(`PASS: ${msg}`);
 }
 
-function main() {
-  const manifestPath = path.resolve(repoRoot, process.argv[2] || defaultManifestPath);
-
-  if (!fs.existsSync(manifestPath)) {
-    fail(`manifest not found: ${manifestPath}`);
-    return;
-  }
-
-  let schema;
+function validateOne(schema, manifestPath) {
   let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  } catch (e) {
+    fail(`invalid manifest JSON: ${e instanceof Error ? e.message : String(e)}`);
+    return false;
+  }
+  const errors = validateManifestAgainstSchema(schema, manifest, "$");
+  if (errors.length) {
+    for (const line of errors) console.error(line);
+    fail(`meimei app manifest validation: ${errors.length} error(s) for ${manifestPath}`);
+    return false;
+  }
+  ok(`meimei app manifest OK — ${path.relative(repoRoot, manifestPath)}`);
+  return true;
+}
+
+function collectAppManifests() {
+  const appsDir = path.join(repoRoot, "apps");
+  const out = [];
+  if (!fs.existsSync(appsDir)) return out;
+  for (const name of fs.readdirSync(appsDir, { withFileTypes: true })) {
+    if (!name.isDirectory()) continue;
+    const p = path.join(appsDir, name.name, "meimei.app.json");
+    if (fs.existsSync(p)) out.push(p);
+  }
+  return out.sort();
+}
+
+function main() {
+  let schema;
   try {
     schema = loadManifestSchemaSync(repoRoot);
   } catch (e) {
     fail(`schema load failed: ${e instanceof Error ? e.message : String(e)}`);
     return;
   }
-  try {
-    manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  } catch (e) {
-    fail(`invalid manifest JSON: ${e instanceof Error ? e.message : String(e)}`);
+
+  const arg = process.argv[2];
+  if (arg) {
+    const manifestPath = path.resolve(repoRoot, arg);
+    if (!fs.existsSync(manifestPath)) {
+      fail(`manifest not found: ${manifestPath}`);
+      return;
+    }
+    validateOne(schema, manifestPath);
     return;
   }
 
-  const errors = validateManifestAgainstSchema(schema, manifest, "$");
-  if (errors.length) {
-    for (const line of errors) console.error(line);
-    fail(`meimei app manifest validation: ${errors.length} error(s) for ${manifestPath}`);
-    return;
+  if (!validateOne(schema, defaultManifestPath)) return;
+  for (const p of collectAppManifests()) {
+    if (!validateOne(schema, p)) return;
   }
-  ok(`meimei app manifest OK — ${path.relative(repoRoot, manifestPath)}`);
 }
 
 main();

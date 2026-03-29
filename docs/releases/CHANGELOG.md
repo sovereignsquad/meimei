@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## 2026-03-31 — Docs: code sync audit + design-system / handbook alignment
+
+- **`docs/planning/meimei-docs-code-sync-audit.v1.md`** — Living **matrix** (operator chrome, surface config, kernel registry, lint); HTTP early-chain notes; PR rule for routes/env/persisted files.
+- **`docs/architecture/design-system-v1.md`** — **Theme model** aligned with `data-theme` in CSS (`meimei`, `apps`, `tools`, …); **Navigation** documents global nav **without** OpenClaw row; **two stylesheets** (base + `operator-chrome.css`); removed stale `--brand-openclaw-*` token bullet.
+- **`docs/operations/runbook.md`** — Operator chrome (admin UI, API, dynamic CSS, gitignored file); **local-only** deployment reminder; **`MEIMEI_PUBLIC_PREFIX`** for asset URLs.
+- **`docs/developers/meimei-kernel-handbook.v1.md`** — §5 operator chrome row; §6 dispatch order includes **`/styles/operator-chrome.css`** and **`/api/operator/chrome`**; revision **v1.2**.
+- **`dashboard/lib/platform-pages/README.md`** — Operator chrome + audit link.
+- **`docs/README.md`** — Index entry for the sync audit.
+- **`.github/workflows/ci.yml`** — **Node 22** to match `package.json` **`engines`** (`>=22.5.0`).
+
+## 2026-03-30 — Kernel: all in-repo miniapps on meimei.app.json + dynamic POST dispatch
+
+- **11 `apps/*/meimei.app.json`** (checklist, lead-enrichment, lead-outreach, ai-sdr-analytics, inbox, what-next, memory, mission-control, supabase-connector, daily-briefing + existing explain-it); **`kernel.app.authExempt`** on each for same-origin dashboard clients.
+- **`dashboard/server.mjs`** — no static `../apps/*` imports; miniapp **`POST /api/functions/…`** handled by **`tryKernelExternalAppPost`** (after checklist shell branch). **`daily-briefing/open`** via manifest **`api.subroutes`** + **`handleOpenPost`** in **`apps/daily-briefing/index.mjs`**.
+- **`apps/ai-routing`** — **no** manifest: **`POST /api/functions/ai-routing`** remains **`routeViaApiAdapter`** (tool surface); **`loadAiRoutingHandleApi`** serves legacy **`GET`/`POST /api/llm/routing`** only.
+- **`kernel-app-api-match.mjs`**, **`checklist-app-handler.mjs`**, **`lazy-ai-routing-handler.mjs`**; dispatch supports **`result.httpStatus`**; **`meimei-dashboard-static-apps-import-check`** allowlist empty.
+
+## 2026-03-30 — Kernel: MM-KERNEL-301 app auth + MM-KERNEL-603 builtins / explain-it
+
+- **`dashboard/lib/kernel-app-auth.mjs`** — optional **`MEIMEI_KERNEL_APP_AUTH=1`** with **`X-MeiMei-App-Id`**; optional per-app **`X-MeiMei-App-Secret`** vs registry **`auth_secret_sha256`**; manifest **`kernel.authExempt`** for same-origin-style builtins.
+- **`dashboard/lib/kernel-builtin-apps.mjs`** — dynamic **`POST /api/functions/<suffix>`** for in-repo **`apps/<pkg>/meimei.app.json`** without **`MEIMEI_KERNEL_EXTERNAL_APPS`**; registry file entries still require **`MEIMEI_KERNEL_EXTERNAL_APPS=1`** (disabled entries return **403**).
+- **Pilot:** **`apps/explain-it/meimei.app.json`**; removed static **`explain-it`** import and dedicated POST branch from **`dashboard/server.mjs`**.
+- **`scripts/meimei-dashboard-static-apps-import-check.mjs`** — legacy allowlist for remaining static **`../apps/*`** imports (**`npm run boundary:check`**).
+- **`register … --secret`** on **`scripts/meimei-kernel-app-registry.mjs`**; **`kernel:validate-app-manifest`** validates example + all **`apps/*/meimei.app.json`**; extended **`kernel:external-dispatch:selftest`**.
+
+## 2026-03-30 — HTTPS: TLS-060 E2E in CI (`meimei-https-e2e-ci.mjs`)
+
+- **`scripts/meimei-https-e2e-ci.mjs`** + **`npm run https:e2e-ci`** — ephemeral **`openssl`** cert, subprocess dashboard, minimal TLS reverse proxy, **`GET /dashboard/api/health`** over **HTTPS** with asserted **`public_https`** / **`listen`** fields; runs as part of **`npm run ci`**.
+
 ## 2026-03-30 — HTTPS: doc contract CI + topology TLS-042/043 + handbook
 
 - **`scripts/validate-https-doc-contract.mjs`** + **`npm run https:validate-docs`** (in **`npm run ci`**) — locks ADR-003, topology, runbook, README, miniapp ingress, health JSON shape.

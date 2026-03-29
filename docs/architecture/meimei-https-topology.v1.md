@@ -14,6 +14,8 @@ TLS certificates: **`~/.openclaw/certs/meimei.localhost.{crt,key}`** (`npm run c
 
 Trust: install the cert into the **macOS keychain** (script does this) or set **`NODE_EXTRA_CA_CERTS`** to the `.crt` path for Node **`fetch`** / **`curl --cacert`**.
 
+**CI:** **`npm run https:e2e-ci`** (`scripts/meimei-https-e2e-ci.mjs`) proves a real **HTTPS** client path without `meimei.localhost` — ephemeral cert and mini proxy in front of the dashboard.
+
 ## Upstream (Node dashboard)
 
 - **`dashboard/server.mjs`** listens with **`http.createServer`** on **`config/dashboard-surface.v1.json`** → **`server.bindHost`** + **`defaults.port`** (typically **`127.0.0.1:45285`**).

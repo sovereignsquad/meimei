@@ -13,21 +13,28 @@ Define one centralized UI system for `agent.meimei` so all pages and miniapps sh
 ## Canonical source of truth
 
 - Global stylesheet: `public/styles/design-system.css`
-- Server integration: `dashboard/server.mjs`
+- **Operator overrides (optional):** dynamic **`GET /styles/operator-chrome.css`** — merged nav chip accents + `body[data-theme="…"]` tokens from `data/operator-chrome.v1.json` (see [`meimei-docs-code-sync-audit.v1.md`](../planning/meimei-docs-code-sync-audit.v1.md)). Shells link this **after** the base stylesheet so overrides win.
+- Server integration: `dashboard/server.mjs` (static asset paths prefixed with `browserPathForNormalized` when `MEIMEI_PUBLIC_PREFIX` is set)
 - **Page layout (order, row breaks, column span, desktop column count):** `config/page-layout.v1.json` — loaded/merged by `dashboard/lib/page-layout.mjs`; CSS for the grid lives in the stylesheet above (not in the JSON).
 
 No page should hardcode full style systems inline. New pages and miniapps must consume centralized classes/tokens. **Do not** invent ad hoc full-page grids; add named blocks to the page-layout model and render them through `buildLayoutFlowHtml` (see [Global layout system](#global-layout-system)).
 
 ## Theme model
 
-Theme is selected per page via `data-theme` on `<body>`:
+Theme is selected per page via `data-theme` on `<body>`. **Primary** values (also what the operator chrome editor controls for page chrome):
 
-- `green` -> dashboard surfaces
-- `blue` -> knowmore surfaces
-- `orange` -> admin surfaces
-- `red` -> reserved for OpenClaw or red-themed pages
+| `data-theme` | Typical use |
+|--------------|-------------|
+| `meimei` | Default MeiMei product shell (e.g. home `/`) — blue accent |
+| `dashboard` | Gold accent for “Dashboard” nav destination context |
+| `admin` | Admin / settings |
+| `apps` | Apps catalog and most app miniapp shells |
+| `tools` | Tools catalog and tool-heavy pages (routing, system monitor, …) |
+| `knowmore` | knowmore catalog |
 
-Theme tokens resolve these variables:
+**Legacy aliases** in CSS (`green`, `blue`, `orange`, `red`) remain for old bookmarks or external shells; prefer the primary keys above for new pages.
+
+Theme tokens resolve these variables (among others):
 
 - `--accent`
 - `--accent-2`
@@ -36,7 +43,8 @@ Theme tokens resolve these variables:
 - `--surface-terminal`
 - `--surface-code`
 - `--text-code`
-- `--brand-openclaw-*`
+
+Nav menu chips use **`--chip-accent`** per `.nav-chip.nav-dest-*` (overridable via operator chrome).
 
 ## Core component modules
 
@@ -65,7 +73,9 @@ UI wording style:
 - Mobile toggle: `.nav-toggle`
 - Nav item: `.nav-chip`
 - Active nav item: `.nav-chip.active`
-- OpenClaw nav item: `.nav-chip.openclaw`
+- Section chips: `.nav-chip.nav-dest-apps`, `.nav-dest-tools`, `.nav-dest-dashboard`, `.nav-dest-knowmore`, `.nav-dest-admin` (icon + `--chip-accent` border/hover/active)
+
+Global nav items (in order): **Apps**, **Tools**, **Dashboard**, **knowmore**, **Admin**. OpenClaw is **not** a menu row (gateway remains an under-the-hood / scripts concern).
 
 Mobile behavior is standardized:
 
@@ -73,11 +83,7 @@ Mobile behavior is standardized:
 - open state uses `.nav-actions.is-open`
 - desktop (`>=901px`) keeps nav open horizontally
 
-OpenClaw branding is component-scoped by default (`.nav-chip.openclaw`) and can also be represented as a full page theme via `data-theme="red"` when needed.
-
-Inactive chips (not `.active`, not `.openclaw`) use a slightly stronger border than global `--line` so they still read as pills next to branded items:
-
-- `.nav-actions .nav-chip:not(.openclaw):not(.active)`
+Inactive section chips use a tint of `--chip-accent`; see `public/styles/design-system.css` (and optional `operator-chrome.css` overrides).
 
 ### Shared surface primitives
 
@@ -134,7 +140,7 @@ Child boxes use `minmax(0, 1fr)` tracks so wide content (tables, pre) scrolls in
 
 Every new miniapp page must:
 
-1. Include `public/styles/design-system.css`
+1. Include `public/styles/design-system.css` **and** link **`/styles/operator-chrome.css`** after it (use the same prefixed URL as other static assets — `shellStyleDeps()` in `server.mjs` supplies both for platform shells)
 2. Set `data-theme` on `<body>`
 3. Reuse design-system components/classes rather than introducing page-local style systems
 4. Participate in the **global layout system** for shell content: split the page into named fragments (e.g. `topbar`, `main`) and render via `buildLayoutFlowHtml` with `miniapp:<registry-id>` as `pageKey` unless a dedicated layout page key is documented
