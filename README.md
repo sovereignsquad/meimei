@@ -104,7 +104,7 @@ Current baseline includes:
 
 Current version line:
 
-- `foundation 0.8.9` (`kernel-k1c-reader-pages-0.8.9`, `2026-03-30`) — prior: `0.8.8` (K1b gtm-pages), `0.8.7`, `0.8.0` (`gtm-env-operator-726`, `2026-03-28`)
+- `foundation 0.8.10` (`kernel-k1d-routing-settings-pages-0.8.10`, `2026-03-30`) — prior: `0.8.9` (K1c reader-pages), `0.8.8`, `0.8.0` (`gtm-env-operator-726`, `2026-03-28`)
 
 Release metadata source of truth:
 

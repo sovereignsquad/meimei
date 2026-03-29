@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-03-30 — Kernel K1d: AI routing & API access settings shells (`0.8.10`)
+
+- **`dashboard/lib/platform-pages/routing-settings-pages.mjs`** — GET HTML for **AI routing** and **API access** **settings** moved out of `server.mjs` (`routingSettingsPageDeps()` thin wrappers). Main routing / API adapter tool pages stay in **`tool-surface-pages.mjs`**.
+- **Docs:** `meimei-repo-boundaries.v1.md` allowlist; **`miniapp-platform-audit.v1.md`**; **`meimei-kernel-completion-plan.v1.md`** K1d delivered; `platform-pages/README.md`, app development guide, kernel code audit metrics.
+- **Version:** package **0.8.10**; checklist + platform modules **`@aligned package agent-meimei 0.8.10`**.
+
 ## 2026-03-30 — Kernel K1c: Reader shells — What next, Explain it, Daily briefing (`0.8.9`)
 
 - **`dashboard/lib/platform-pages/reader-pages.mjs`** — GET HTML for **What next** (main + settings), **Explain it** (URL summary + settings), **Daily briefing** moved out of `server.mjs` (`readerPageDeps()` thin wrappers). Module-level **`whatNextIssueId`** in `server.mjs` for deps.
@@ -8,7 +14,7 @@
 
 ## 2026-03-30 — Docs: kernel audit v1.1 + handbook v1.1 (architect baseline)
 
-- **`docs/architecture/meimei-kernel-code-audit.v1.md`** — Revision **v1.1**: document control (scope, method, refresh rules), executive summary reframed around strengths and contracted seams, design invariants, subsystem diagram, **full** boundaries §3 allowlist table + non-allowlisted `dashboard/lib` inventory, expanded job queue **public API** surface, concurrency/failure-domain matrix, **verification & governance** (`npm run ci` matrix), professional **disclosure alignment** section (kernel inference vs wider product per `ai-runtime-audit`), corrected **`server.mjs` line anchors** (v1.1 snapshot ~3840 lines; re-measured **~2924** after K1c in **0.8.9** — see audit §3.1), updated JSDoc metrics (**49** `dashboard/lib` files), peer-review **commentary rubric**, completeness / non-goals statement.
+- **`docs/architecture/meimei-kernel-code-audit.v1.md`** — Revision **v1.1**: document control (scope, method, refresh rules), executive summary reframed around strengths and contracted seams, design invariants, subsystem diagram, **full** boundaries §3 allowlist table + non-allowlisted `dashboard/lib` inventory, expanded job queue **public API** surface, concurrency/failure-domain matrix, **verification & governance** (`npm run ci` matrix), professional **disclosure alignment** section (kernel inference vs wider product per `ai-runtime-audit`), corrected **`server.mjs` line anchors** (v1.1 snapshot ~3840 lines; re-measured **~2680** after K1d in **0.8.10** — see audit §3.1), updated JSDoc metrics (**49** `dashboard/lib` files), peer-review **commentary rubric**, completeness / non-goals statement.
 - **`docs/developers/meimei-kernel-handbook.v1.md`** — Revision **v1.1**: aligned with audit (invariants, persistence, HTTP line anchors + drift note), integration and v1 scope sections retitled for professional use.
 - **`docs/developers/README.md`** — Reading order and audience descriptions updated.
 - **`docs/README.md`** — Architecture index row for kernel audit updated.

@@ -1,7 +1,7 @@
 /**
  * Platform UI — Reference app 1 & 2 GET shells (queue + inter-app bus demo).
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.9
+ * @aligned package agent-meimei 0.8.10
  */
 
 export function renderReferenceApp1Page(layoutDoc, d) {

@@ -2,7 +2,7 @@
  * Platform UI — Inbox, Memory, Mission Control (main + settings GET shells).
  * @see docs/architecture/meimei-kernel-completion-plan.v1.md Phase K1a
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.9
+ * @aligned package agent-meimei 0.8.10
  */
 
 export function renderInboxPage(layoutDoc, d) {

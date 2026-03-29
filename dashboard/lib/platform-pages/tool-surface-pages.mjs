@@ -3,7 +3,7 @@
  * Injected deps keep `dashboard/server.mjs` thin (Phase 0).
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.9
+ * @aligned package agent-meimei 0.8.10
  */
 
 export function renderRoutingPage(layoutDoc, d) {

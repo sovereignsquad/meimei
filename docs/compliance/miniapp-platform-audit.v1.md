@@ -30,8 +30,8 @@
 | reference-app-1 | apps | API: `reference-app-queue-api.mjs` + worker; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | Canonical queue + `handleMeimeiInferenceRoute` in worker. |
 | reference-app-2 | apps | API: `reference-app-2-queue-api.mjs` + `meimei-reference-app-inbox.mjs`; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | SQLite `app_task` only; correlation replies per bus doc. |
 | environment-variables | tools | `meimei-env-store.mjs` | — | — | — | G | G | — | G | Y | P2 | Platform SoT; `reveal` is intentional plaintext server-side. |
-| ai-routing | tools | `routeViaApiAdapter` + `previewModelRouting` (bash) | — | Y | — | Y | G | — | Y | Y | P2 | Preview via `oc-agent --route-not-llm-router`; not `/api/meimei/route`. |
-| api-access | tools | Same as ai-routing (`routeViaApiAdapter`) | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |
+| ai-routing | tools | `routeViaApiAdapter` + `previewModelRouting` (bash); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | Y | — | Y | G | — | Y | Y | P2 | Preview via `oc-agent --route-not-llm-router`; not `/api/meimei/route`. |
+| api-access | tools | Same as ai-routing (`routeViaApiAdapter`); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |
 | supabase-connector | tools | `apps/supabase-connector/index.mjs` | — | — | — | G | G | — | G | G | P2 | **R4:** Operator text in **`functions/supabase-connector.md`** — prefer env store for `MEIMEI_SUPABASE_*`; handler reads `process.env` only (no second SoT). |
 | mission-control | tools | `apps/mission-control/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | — | — | — | G | Y | G | Y | P2 | OpenClaw/telemetry read-only; not on `meimei_jobs` feed. |
 | memory | tools | `apps/memory/index.mjs` → `brain/*`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | `brain/memory.mjs` uses `callOllama` for summarization / queries. |

@@ -3,12 +3,13 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.8.9`
+- Version: `0.8.10`
 - Date: `2026-03-30`
-- Codename: `kernel-k1c-reader-pages-0.8.9`
+- Codename: `kernel-k1d-routing-settings-pages-0.8.10`
 
 ## Included issue deliveries
 
+- **2026-03-30 — Kernel plan K1d (`0.8.10`):** **`dashboard/lib/platform-pages/routing-settings-pages.mjs`** — AI routing + API access **settings** GET HTML out of `server.mjs` (`routingSettingsPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1c (`0.8.9`):** **`dashboard/lib/platform-pages/reader-pages.mjs`** — What next (main + settings), Explain it URL summary + settings, Daily briefing GET HTML out of `server.mjs` (`readerPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1b (`0.8.8`):** **`dashboard/lib/platform-pages/gtm-pages.mjs`** — Lead enrichment + Lead outreach main + settings GET HTML out of `server.mjs` (`gtmPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1a (`0.8.7`):** **`dashboard/lib/platform-pages/ops-tool-pages.mjs`** — Inbox, Memory, Mission Control main + settings GET HTML out of `server.mjs` (`opsToolPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
