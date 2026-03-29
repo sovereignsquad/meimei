@@ -133,7 +133,7 @@ Changelog, roadmap, and version history.
 | File | Description |
 |------|-------------|
 | [CHANGELOG.md](releases/CHANGELOG.md) | Full changelog with all releases |
-| [DELIVERY-phase-0-2026-03-29.v1.md](releases/DELIVERY-phase-0-2026-03-29.v1.md) | Phase 0 / Phase B delivery (`0.8.1`–`0.8.5` — boundaries, Checklist stack, platform + tool surface pages, monitor feed) |
+| [DELIVERY-phase-0-2026-03-29.v1.md](releases/DELIVERY-phase-0-2026-03-29.v1.md) | Phase 0 / Phase B (`0.8.1`–`0.8.6` — boundaries, Checklist stack, platform pages incl. reference apps) |
 | [0.9.0.md](releases/0.9.0.md) | Release 0.9.0 notes (AI-Native Platform) |
 | [product_roadmap.md](releases/product_roadmap.md) | Product roadmap |
 | [roadmap.md](releases/roadmap.md) | Technical roadmap |

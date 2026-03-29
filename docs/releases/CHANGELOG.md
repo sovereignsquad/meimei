@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-03-30 — Platform pages: Reference app 1 & 2 shells (`0.8.6`)
+
+- **`dashboard/lib/platform-pages/reference-app-pages.mjs`** — GET HTML for **Reference app 1** and **Reference app 2** moved out of `server.mjs` (`referenceAppPageDeps()` thin wrappers).
+- **Docs:** `meimei-repo-boundaries.v1.md` allowlist; **`miniapp-platform-audit.v1.md`** — handler column cites API modules + GET shell path; `platform-pages/README.md`.
+- **Version:** package **0.8.6**; checklist + platform modules **`@aligned package agent-meimei 0.8.6`**.
+
 ## 2026-03-30 — Phase 0 + Phase B: Tool surface pages + monitor kinds + audit (`0.8.5`)
 
 - **`dashboard/lib/platform-pages/tool-surface-pages.mjs`** — GET HTML for **AI routing**, **API channel adapter**, **AI SDR analytics**, **Supabase connector**, **Environment variables** moved out of `server.mjs` (`toolSurfacePageDeps()` thin wrappers).

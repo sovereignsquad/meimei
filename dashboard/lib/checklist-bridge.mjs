@@ -5,7 +5,7 @@
  * Registry shell: `checklist-api-shell.mjs`. HTTP `/api/checklist/bridge`: `checklist-bridge-http.mjs`.
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.5
+ * @aligned package agent-meimei 0.8.6
  */
 import http from "node:http";
 import fs from "node:fs";

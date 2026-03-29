@@ -3,7 +3,7 @@
  * Set MEIMEI_CHECKLIST_ENGINE=python to use the checklist-repo HTTP worker instead.
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.5
+ * @aligned package agent-meimei 0.8.6
  */
 import path from "node:path";
 import { processJobPayload } from "./jobs.mjs";

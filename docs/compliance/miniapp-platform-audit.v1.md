@@ -27,8 +27,8 @@
 
 | id | Category | Primary handler | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | Pri | Notes |
 |----|----------|-----------------|----|----|----|----|----|----|----|----|-----|-------|
-| reference-app-1 | apps | `dashboard/lib/reference-app-queue-api.mjs` + job worker | G | G | G | G | G | G | G | Y | P2 | Canonical queue + `handleMeimeiInferenceRoute` in worker. |
-| reference-app-2 | apps | `reference-app-2-queue-api.mjs` + `meimei-reference-app-inbox.mjs` | G | G | G | G | G | G | G | Y | P2 | SQLite `app_task` only; correlation replies per bus doc. |
+| reference-app-1 | apps | API: `reference-app-queue-api.mjs` + worker; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | Canonical queue + `handleMeimeiInferenceRoute` in worker. |
+| reference-app-2 | apps | API: `reference-app-2-queue-api.mjs` + `meimei-reference-app-inbox.mjs`; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | SQLite `app_task` only; correlation replies per bus doc. |
 | environment-variables | tools | `meimei-env-store.mjs` | — | — | — | G | G | — | G | Y | P2 | Platform SoT; `reveal` is intentional plaintext server-side. |
 | ai-routing | tools | `routeViaApiAdapter` + `previewModelRouting` (bash) | — | Y | — | Y | G | — | Y | Y | P2 | Preview via `oc-agent --route-not-llm-router`; not `/api/meimei/route`. |
 | api-access | tools | Same as ai-routing (`routeViaApiAdapter`) | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |

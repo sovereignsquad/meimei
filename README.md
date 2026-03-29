@@ -104,7 +104,7 @@ Current baseline includes:
 
 Current version line:
 
-- `foundation 0.8.5` (`platform-phase0-phaseB-tool-pages-0.8.5`, `2026-03-30`) — prior: `0.8.4` (`2026-03-29`), `0.8.0` (`gtm-env-operator-726`, `2026-03-28`)
+- `foundation 0.8.6` (`platform-reference-app-pages-0.8.6`, `2026-03-30`) — prior: `0.8.5` (tool surface + Phase B docs), `0.8.4`, `0.8.0` (`gtm-env-operator-726`, `2026-03-28`)
 
 Release metadata source of truth:
 

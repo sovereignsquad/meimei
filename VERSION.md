@@ -3,12 +3,13 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.8.5`
+- Version: `0.8.6`
 - Date: `2026-03-30`
-- Codename: `platform-phase0-phaseB-tool-pages-0.8.5`
+- Codename: `platform-reference-app-pages-0.8.6`
 
 ## Included issue deliveries
 
+- **2026-03-30 — Reference app GET shells (`0.8.6`):** **`dashboard/lib/platform-pages/reference-app-pages.mjs`** — Reference app 1 & 2 HTML moved out of `server.mjs` (`referenceAppPageDeps()`). Audit rows note GET shell location. See `docs/releases/CHANGELOG.md`.
 - **2026-03-30 — Phase 0 + Phase B batch (`0.8.5`):** Further `server.mjs` shrink — **`dashboard/lib/platform-pages/tool-surface-pages.mjs`** (routing preview, API channel adapter, AI SDR analytics, Supabase connector, environment variables GET HTML). System monitor feed shows **unknown `payload_kind`** values. Roadmap Phase 0 wiring/sign-off log + Phase B R3/R4/monitor items closed in docs; audit rows updated (**checklist** R3/R4 **G**, **supabase-connector** R4 **G**). See `docs/releases/CHANGELOG.md`.
 - **2026-03-29 — Phase 0 platform alignment (0.8.1–0.8.4):** Mandatory repo boundaries doc; Checklist POST shell + local Next proxy/page + HTTP bridge extracted from `dashboard/server.mjs`; lead-outreach / ai-sdr-analytics / supabase-connector / lead-enrichment handlers in `apps/*`; Apps·Tools·knowmore catalog HTML in `dashboard/lib/platform-pages/catalog-pages.mjs`; `npm run boundary:check` = single Checklist POST invariant + no `apps/*` → sibling `apps/*` imports; all `functions/*.md` gain **Operator transport & secrets (R8 / R4)**; MeiMei Checklist integration (`integrations/checklist-web/`, `dashboard/lib/checklist-node/*`, renamed scripts). See `docs/releases/CHANGELOG.md` and `docs/releases/DELIVERY-phase-0-2026-03-29.v1.md`.
 - `mvp-factory-control#631` - Supabase connector miniapp + Lead Enrichment `source: supabase` (PostgREST)
