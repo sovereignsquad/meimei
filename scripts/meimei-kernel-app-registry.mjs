@@ -11,6 +11,7 @@
  *
  * Env:
  *   MEIMEI_KERNEL_APP_REGISTRY — override registry JSON path (default data/kernel/apps/registry.json)
+ *   MEIMEI_KERNEL_EXTERNAL_APPS — set to 0/false/off/"" to disable registry dispatch at runtime (default: enabled)
  *
  * @see docs/planning/kernel-app-separation-and-https-program.v1.md
  */

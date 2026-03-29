@@ -7,8 +7,10 @@
 - **`meimei-docs-code-sync-audit.v1.md`** — P1 items **closed**; matrix row for **`surface:validate-api`**.
 - **`scripts/validate-dashboard-surface-api.mjs`** + **`npm run surface:validate-api`** — CI ensures each **`config/dashboard-surface.v1.json`** `api` key is wired as **`surface.api.<key>`** in **`dashboard/server.mjs`**.
 
-## 2026-03-31 — Docs: code sync audit + design-system / handbook alignment
+## 2026-03-31 — Kernel registry default-on + docs sync (design-system / handbook)
 
+- **`dashboard/lib/kernel-external-app-dispatch.mjs`** — **`data/kernel/apps/registry.json`** consulted when **`MEIMEI_KERNEL_EXTERNAL_APPS`** is **unset**; **`0`** / **`false`** / **`off`** / **`""`** disables registry matching (builtins unchanged).
+- **`docs/planning/kernel-app-separation-and-https-program.v1.md`** — **MM-KERNEL-501** / **603** status and acceptance criteria aligned with shipped code.
 - **`docs/planning/meimei-docs-code-sync-audit.v1.md`** — Living **matrix** (operator chrome, surface config, kernel registry, lint); HTTP early-chain notes; PR rule for routes/env/persisted files.
 - **`docs/architecture/design-system-v1.md`** — **Theme model** aligned with `data-theme` in CSS (`meimei`, `apps`, `tools`, …); **Navigation** documents global nav **without** OpenClaw row; **two stylesheets** (base + `operator-chrome.css`); removed stale `--brand-openclaw-*` token bullet.
 - **`docs/operations/runbook.md`** — Operator chrome (admin UI, API, dynamic CSS, gitignored file); **local-only** deployment reminder; **`MEIMEI_PUBLIC_PREFIX`** for asset URLs.

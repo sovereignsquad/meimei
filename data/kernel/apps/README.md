@@ -6,7 +6,7 @@
 - Manage with: `npm run kernel:app-registry -- list|register|…` (see `scripts/meimei-kernel-app-registry.mjs`).
 - Each app package must include **`meimei.app.json`** validated by **`npm run kernel:validate-app-manifest`**.
 
-**Dynamic dispatch (MM-KERNEL-501 / MM-KERNEL-603):** `dashboard/lib/kernel-external-app-dispatch.mjs` resolves **`POST /api/functions/<manifest.api.pathSuffix>`** after static routes. **Builtins:** any in-repo package under **`apps/<name>/meimei.app.json`** is **`import()`**’d without **`MEIMEI_KERNEL_EXTERNAL_APPS`**. **Registry file:** when **`MEIMEI_KERNEL_EXTERNAL_APPS=1`**, entries in this registry are also matched (including **disabled** entries → **403**). Static **`server.mjs`** POST branches still win if matched earlier.
+**Dynamic dispatch (MM-KERNEL-501 / MM-KERNEL-603):** `dashboard/lib/kernel-external-app-dispatch.mjs` resolves **`POST /api/functions/<manifest.api.pathSuffix>`** after static routes. **Builtins:** any in-repo package under **`apps/<name>/meimei.app.json`** is **`import()`**’d without **`MEIMEI_KERNEL_EXTERNAL_APPS`**. **Registry file:** entries in this registry are matched by default (including **disabled** entries → **403**). Set **`MEIMEI_KERNEL_EXTERNAL_APPS=0`** (or **`false`** / **`off`**) to ignore the file. Static **`server.mjs`** POST branches still win if matched earlier.
 
 **Auth (MM-KERNEL-301):** optional **`MEIMEI_KERNEL_APP_AUTH=1`** requires **`X-MeiMei-App-Id`** to equal the resolved app’s **`app_id`**, unless the manifest sets **`kernel.authExempt`:** **`true`**. Per-app deployment secret: register with **`--secret`** (stored as **`auth_secret_sha256`**); callers must send **`X-MeiMei-App-Secret`** (plaintext; compared via SHA-256).
 

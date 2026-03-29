@@ -108,7 +108,7 @@ There is no separate mandatory worker binary for inference in v1; horizontal sca
 5. **`GET`/`HEAD` `/styles/operator-chrome.css`** — dynamic merged operator theme CSS ([`operator-chrome.mjs`](../../dashboard/lib/operator-chrome.mjs))  
 6. Static assets under `public/` for `surface.staticPrefixes` (`/images/`, `/styles/` …)  
 7. JSON APIs (e.g. **`GET`/`POST /api/operator/chrome`**, page layout, config, …) and `apps/*` POST branches where still inlined in `server.mjs`  
-8. Fallback **`POST /api/functions/<suffix>`** — [`kernel-external-app-dispatch.mjs`](../../dashboard/lib/kernel-external-app-dispatch.mjs): **builtins** from `apps/<pkg>/meimei.app.json` (always), plus **`data/kernel/apps/registry.json`** when **`MEIMEI_KERNEL_EXTERNAL_APPS=1`**. **Auth:** optional **`MEIMEI_KERNEL_APP_AUTH=1`** + headers **`X-MeiMei-App-Id`** / **`X-MeiMei-App-Secret`**; see [`kernel-app-auth.mjs`](../../dashboard/lib/kernel-app-auth.mjs) and program doc MM-KERNEL-301.  
+8. Fallback **`POST /api/functions/<suffix>`** — [`kernel-external-app-dispatch.mjs`](../../dashboard/lib/kernel-external-app-dispatch.mjs): **builtins** from `apps/<pkg>/meimei.app.json` (always), plus **`data/kernel/apps/registry.json`** (on by default; **`MEIMEI_KERNEL_EXTERNAL_APPS=0`** to disable). **Auth:** optional **`MEIMEI_KERNEL_APP_AUTH=1`** + headers **`X-MeiMei-App-Id`** / **`X-MeiMei-App-Secret`**; see [`kernel-app-auth.mjs`](../../dashboard/lib/kernel-app-auth.mjs) and program doc MM-KERNEL-301.  
 9. HTML `render*` responses  
 
 **Adding behavior:** prefer `meimei.app.json` + dynamic dispatch for new POST APIs; legacy path is a **short** branch in `server.mjs` — per boundaries §4 and **`meimei-dashboard-static-apps-import-check.mjs`** allowlist.

@@ -85,7 +85,7 @@ async function main() {
     /** @type {import("node:http").IncomingMessage} */ ({}),
     readJson
   );
-  if (skipped !== null) fail("expected null when MEIMEI_KERNEL_EXTERNAL_APPS unset and no builtin suffix");
+  if (skipped !== null) fail("expected null when external registry dispatch disabled and no builtin suffix");
 
   const emptyReg = path.join(base, "empty-registry.json");
   fs.writeFileSync(emptyReg, `${JSON.stringify({ schemaVersion: 1, apps: [], tombstones: [] }, null, 2)}\n`, "utf8");

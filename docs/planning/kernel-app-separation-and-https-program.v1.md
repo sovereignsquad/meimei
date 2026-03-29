@@ -3,7 +3,7 @@
 **Version:** v1  
 **Date:** 2026-03-29  
 **Owner:** Platform / architecture  
-**Status:** Planning — **MM-KERNEL-201**–**203** delivered; **MM-KERNEL-501** extended with **builtins** (`apps/*/meimei.app.json`, always on) + registry when **`MEIMEI_KERNEL_EXTERNAL_APPS=1`**; **MM-KERNEL-301** ( **`kernel-app-auth.mjs`**, register **`--secret`**, env **`MEIMEI_KERNEL_APP_AUTH`**) and **MM-KERNEL-603** pilot (**explain-it** + static-import allowlist check) delivered; catalog/GET shells (**MM-KERNEL-502**), policy model (**MM-KERNEL-302+**), further static-import migration open
+**Status:** Planning — **MM-KERNEL-201**–**203**, **301**, **501** (builtins + registry dispatch default-on), **603** (all in-repo miniapps on **`meimei.app.json`**, no static **`server.mjs`** app imports) delivered; catalog/GET shells (**MM-KERNEL-502**), policy (**MM-KERNEL-302+**), external pilot/SDK (**MM-KERNEL-602** / **401**) remain open
 
 ## Executive summary
 
@@ -399,14 +399,14 @@ Scan: `dashboard/server.mjs`, menubar scripts, smoke scripts, OpenClaw wrappers,
 
 ### Technical design
 
-- **Delivered (phase 1):** **`MEIMEI_KERNEL_EXTERNAL_APPS=1`** enables **`tryKernelExternalAppPost`** in **`dashboard/server.mjs`** (fallback **after** built-in POST routes). Resolves **`POST /api/functions/<manifest.api.pathSuffix>`** → dynamic **`import()`** of **`manifest.entry.module`**, default export **`handleApi`** (same signature as in-repo miniapps). **`kernel-external-app-dispatch.mjs`** + **`npm run kernel:external-dispatch:selftest`** (CI).
-- **Open:** make dispatch default-on for registered paths without env flag; **`MEIMEI_LEGACY_STATIC_APPS`**-style migration to drop static `apps/*` imports (**MM-KERNEL-603**).
+- **Delivered:** **`tryKernelExternalAppPost`** in **`dashboard/server.mjs`** (fallback **after** built-in POST routes). **`POST /api/functions/<suffix>`** → dynamic **`import()`** of **`manifest.entry.module`** (+ optional **`api.subroutes`** exports). **Registry file** dispatch is **on by default**; set **`MEIMEI_KERNEL_EXTERNAL_APPS=0`** to disable. **`kernel-external-app-dispatch.mjs`** + **`npm run kernel:external-dispatch:selftest`** (CI).
+- **Open:** none for in-repo static-import removal (**MM-KERNEL-603** done); optional future: generated catalog from manifests (**MM-KERNEL-601**).
 
 ### Acceptance criteria
 
 - [x] At least one route can be served via registry + dynamic import — **verified in CI** by **`npm run kernel:external-dispatch:selftest`** (in-process; **no plain-HTTP assumption**).
-- **End-to-end through the real edge:** only over **HTTPS** (e.g. `https://meimei.localhost:8443` after **`meimei-cert` / `npm run cert:install`**), with **`MEIMEI_KERNEL_EXTERNAL_APPS=1`** and a registered app — same transport contract as the rest of MeiMei (**ADR-003** / TLS program). Do **not** document or rely on ad-hoc **`http://`** checks for this path.
-- [ ] Most miniapps no longer use static `import` in `server.mjs` — **MM-KERNEL-603**.
+- **End-to-end through the real edge:** only over **HTTPS** (e.g. `https://meimei.localhost:8443` after **`meimei-cert` / `npm run cert:install`**), with a registered app (registry on by default) — same transport contract as the rest of MeiMei (**ADR-003** / TLS program). Do **not** document or rely on ad-hoc **`http://`** checks for this path.
+- [x] In-repo miniapps use **`meimei.app.json`** + dynamic dispatch; no static **`apps/*`** imports in **`server.mjs`** — **MM-KERNEL-603**.
 
 ---
 
@@ -465,8 +465,8 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 ### Deliverables
 
-- [x] **`scripts/meimei-dashboard-static-apps-import-check.mjs`** — explicit legacy allowlist must match static **`../apps/<pkg>/`** imports in **`dashboard/server.mjs`** (**`npm run boundary:check`**).
-- [x] Pilot: **`apps/explain-it/meimei.app.json`** + removal of static **`explain-it`** import and POST branch (dispatch via **`kernel-external-app-dispatch.mjs`**).
+- [x] **`scripts/meimei-dashboard-static-apps-import-check.mjs`** — fails on any static **`../apps/<pkg>/`** import in **`dashboard/server.mjs`** (**`npm run boundary:check`**); allowlist empty when fully migrated.
+- [x] All in-repo miniapps: **`meimei.app.json`**, no static app imports; **`POST /api/functions/…`** via **`kernel-external-app-dispatch.mjs`** (checklist shell branch + dynamic **`apps/checklist`** load retained for boundary CI).
 
 ---
 
@@ -538,7 +538,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 | Date | Change |
 |------|--------|
-| 2026-03-30 | MM-KERNEL-301: `kernel-app-auth.mjs`, `MEIMEI_KERNEL_APP_AUTH`, `X-MeiMei-App-Id` / `X-MeiMei-App-Secret`, register `--secret`, manifest `kernel.authExempt`. MM-KERNEL-603: builtins (`kernel-builtin-apps.mjs`), explain-it manifest + no static server import, `meimei-dashboard-static-apps-import-check.mjs`. |
+| 2026-03-30 | **MM-KERNEL-301** auth; **MM-KERNEL-501** builtins + registry (**default on** since follow-up: `MEIMEI_KERNEL_EXTERNAL_APPS=0` disables); **MM-KERNEL-603** all in-repo manifests, no static `server.mjs` app imports, static-import CI guard. |
 | 2026-03-29 | MM-KERNEL-501 (partial): `kernel-external-app-dispatch.mjs`, `MEIMEI_KERNEL_EXTERNAL_APPS=1`, server fallback POST, `kernel:external-dispatch:selftest` in CI. |
 | 2026-03-29 | MM-KERNEL-202/203: `kernel-app-registry.mjs`, CLI, selftest, gitignored `data/kernel/apps/registry.json`, audit event types for register/update/remove. |
 | 2026-03-29 | MM-KERNEL-201: `schemas/meimei.app.manifest.v1.json`, planning example, `validate-meimei-app-manifest.mjs`, CI hook. |

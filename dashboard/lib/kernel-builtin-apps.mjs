@@ -1,6 +1,6 @@
 /**
  * In-repo apps: each package may ship meimei.app.json under apps/<name>/ (dynamic load, MM-KERNEL-603).
- * No MEIMEI_KERNEL_EXTERNAL_APPS required (unlike data/kernel/apps/registry.json).
+ * External registry (`data/kernel/apps/registry.json`) is consulted by default; set **`MEIMEI_KERNEL_EXTERNAL_APPS=0`** to skip it.
  *
  * @see docs/planning/kernel-app-separation-and-https-program.v1.md
  */

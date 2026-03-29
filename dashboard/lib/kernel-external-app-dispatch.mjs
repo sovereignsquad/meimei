@@ -1,5 +1,5 @@
 /**
- * POST dispatch for kernel apps: data/kernel/apps/registry.json (opt-in MEIMEI_KERNEL_EXTERNAL_APPS=1)
+ * POST dispatch for kernel apps: data/kernel/apps/registry.json (on by default; set MEIMEI_KERNEL_EXTERNAL_APPS=0 to disable)
  * and in-repo apps (meimei.app.json per package, builtins, always on). Static server routes win if matched earlier.
  *
  * @see docs/planning/kernel-app-separation-and-https-program.v1.md (MM-KERNEL-501, MM-KERNEL-603, MM-KERNEL-301)
@@ -27,7 +27,11 @@ function registryPathOverride() {
 }
 
 function externalAppsEnabled() {
-  return String(process.env.MEIMEI_KERNEL_EXTERNAL_APPS || "").trim() === "1";
+  const raw = process.env.MEIMEI_KERNEL_EXTERNAL_APPS;
+  if (raw === undefined) return true;
+  const v = String(raw).trim().toLowerCase();
+  if (v === "" || v === "0" || v === "false" || v === "off") return false;
+  return true;
 }
 
 /**
