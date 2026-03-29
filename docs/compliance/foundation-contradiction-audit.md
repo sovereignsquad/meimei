@@ -30,8 +30,8 @@ It is intended to be a deterministic starting point for foundation remediation. 
 - Severity: `High` *(at time of finding)*
 - Contradiction: Architecture claims a `docs/` directory defines the human contract, but no `docs/` directory exists in this repository.
 - Evidence:
-  - `architecture.md` states: "`docs/` define the human contract."
-  - Repository layout contains root-level markdown docs, not `docs/`.
+  - *(Historical)* Earlier “architecture” prose referred to `docs/` as the human contract while the tree was still mostly root-level `.md` files (see also informal `architecture.md` naming).
+  - At time of finding, many contracts were not yet namespaced under `docs/`.
 - Impact:
   - New contributors will look for a structure that does not exist.
   - Architecture references become non-actionable at first contact.

@@ -102,6 +102,6 @@ MeiMei is an **operator-local** stack (Node upstream + optional TLS proxy + Laun
 - **CLI / Node smoke against HTTPS:** set **`NODE_EXTRA_CA_CERTS=$HOME/.openclaw/certs/meimei.localhost.crt`** (or trust via keychain) so **`fetch`** accepts the local cert. Examples: **`MEIMEI_SMOKE_HTTPS=1 npm run dashboard:smoke:https`**; **`MEIMEI_PROBE_TLS=1 npm run dashboard:probe:tls`**.
 - Use the settings form to update the repo-local OpenClaw config.
 - Use the operations panel to run status, skills, doctor, and launch checks.
-- **Page layout** (grid columns, block order, row breaks): **Admin → Page layout**; spec and CSS classes in `design-system-v1.md` (**Global layout system**); data in `config/page-layout.v1.json`.
+- **Page layout** (grid columns, block order, row breaks): **Admin → Page layout**; spec and CSS classes in [`docs/architecture/design-system-v1.md`](../architecture/design-system-v1.md) (**Global layout system**); data in `config/page-layout.v1.json`.
 - Optional **menu bar control** app **MeiMei Control**: `npm run menubar:build` → `macos/MeiMei/build/MeiMei Control.app`. For **Spotlight**, run `npm run menubar:install` (installs `~/Applications/MeiMei Control.app`; removes legacy `MeiMei.app` / `MeiMeiMenuBar.app` if present). Add **MeiMei Control** under **Login Items** if you want it at login (see `macos/MeiMei/README.md`).
 - Use `npm run setup` for the one-step local domain start/open flow.

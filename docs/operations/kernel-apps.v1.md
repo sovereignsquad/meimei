@@ -13,6 +13,7 @@ Use the **public** dashboard base (e.g. `https://meimei.localhost:8443/dashboard
 - Inference: `POST …/api/meimei/v1/apps/{app_id}/inference`
 - Jobs: `POST …/api/meimei/v1/apps/{app_id}/jobs/enqueue`
 - Env: `GET …/api/meimei/v1/apps/{app_id}/env?keys=KEY1,KEY2`
+- Filesystem (read-only roots): `GET …/api/meimei/v1/apps/{app_id}/fs/roots` — requires `filesystem.scoped` + `policy.filesystem.roots`
 
 When `MEIMEI_KERNEL_APP_AUTH=1`, set `X-MeiMei-App-Id` and `X-MeiMei-App-Secret` as documented in the kernel handbook.
 

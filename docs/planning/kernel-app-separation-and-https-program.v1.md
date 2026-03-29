@@ -3,7 +3,7 @@
 **Version:** v1  
 **Date:** 2026-03-29  
 **Owner:** Platform / architecture  
-**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + pilot package (**602** partial), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** full **604** (generated `registry.v1.json`), optional **303d** file roots implementation, migrating a production miniapp into **`packages/*`** beyond the SDK-only pilot.
+**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + pilot package (**602** partial), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** full **604** (generated `registry.v1.json`); optional deeper FS APIs (read file bytes); migrating a production miniapp into **`packages/*`** beyond the SDK-only pilot.
 
 ## Executive summary
 
@@ -359,7 +359,7 @@ Scan: `dashboard/server.mjs`, menubar scripts, smoke scripts, OpenClaw wrappers,
 
 ### Deliverables
 
-- [x] Placeholder `GET …/fs/roots` → **501** until install-path serving exists; `filesystem.roots` reserved in policy schema.
+- [x] `GET …/fs/roots` — read-only root listing + shallow `entries_sample` per [`kernel-app-fs-roots.mjs`](../../dashboard/lib/kernel-app-fs-roots.mjs); jailed to **`install_path`**; **`npm run kernel:fs-roots:selftest`**.
 
 ---
 
@@ -375,7 +375,7 @@ Scan: `dashboard/server.mjs`, menubar scripts, smoke scripts, OpenClaw wrappers,
 
 ### Deliverables
 
-- [x] `packages/meimei-sdk` (workspace); `MeiMeiKernelClient` — inference, jobs, env.
+- [x] `packages/meimei-sdk` (workspace); `MeiMeiKernelClient` — inference, jobs, env, filesystem roots (GET).
 
 ### Acceptance criteria
 
@@ -553,6 +553,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 | Date | Change |
 |------|--------|
+| 2026-03-29 | **303d read-only `fs/roots`:** `kernel-app-fs-roots.mjs`, SDK `readFilesystemRoots`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`. |
 | 2026-03-29 | **MM-KERNEL-302–303d, 401–402, 501 policy gate, 502, 601, 604 snapshot, 701–703, pilot SDK package:** façades, merged catalog, monitor `app_id`, workspaces `@meimei/sdk`, CI selftests. |
 | 2026-03-29 | **Doc pass:** dependency graph — **ADR-003 (accepted)** (was marked proposed). |
 | 2026-03-30 | **MM-KERNEL-301** auth; **MM-KERNEL-501** builtins + registry (**default on** since follow-up: `MEIMEI_KERNEL_EXTERNAL_APPS=0` disables); **MM-KERNEL-603** all in-repo manifests, no static `server.mjs` app imports, static-import CI guard. |

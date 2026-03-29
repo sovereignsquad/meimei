@@ -13,6 +13,7 @@ import { findKernelAppMatchByAppId } from "./kernel-app-resolve.mjs";
 import { handleMeimeiInferenceRoute } from "./inference-route.mjs";
 import { createMeimeiJobQueue } from "./meimei-job-queue.mjs";
 import { loadStoreSync, entryAppliesToRuntime, getActiveProfile } from "./meimei-env-store.mjs";
+import { buildKernelAppFsRootsPayload } from "./kernel-app-fs-roots.mjs";
 
 const APP_ID_PATH_RE =
   /^\/api\/meimei\/v1\/apps\/([^/]+)\/(inference|jobs\/enqueue|env|fs\/roots)$/;
@@ -196,20 +197,12 @@ export function handleKernelAppEnvReadFacade(req, url, repoRoot, appIdFromPath) 
   };
 }
 
-/** MM-KERNEL-303d placeholder — scoped FS not implemented on this façade yet. */
+/** MM-KERNEL-303d — read-only `policy.filesystem.roots` (jailed to install_path). */
 export function handleKernelAppFsRootsFacade(req, repoRoot, appIdFromPath) {
   const gate = resolveKernelAppFacadeAuth(req, repoRoot, appIdFromPath);
   if (!gate.ok) return { statusCode: gate.status, json: gate.json };
   const cap = assertCapabilityAllowed(gate.match, "filesystem.scoped");
   if (!cap.ok) return { statusCode: cap.status, json: cap.payload };
-  return {
-    statusCode: 501,
-    json: {
-      ok: false,
-      error: "not_implemented",
-      code: "NOT_IMPLEMENTED",
-      scope: "MM-KERNEL-303d",
-      message: "App-scoped filesystem roots are policy-defined; server integration is not wired yet."
-    }
-  };
+  const out = buildKernelAppFsRootsPayload(gate.match);
+  return { statusCode: out.statusCode, json: out.json };
 }

@@ -27,6 +27,8 @@
     "kernel:policy:selftest": "node scripts/meimei-kernel-policy-selftest.mjs",
     "kernel:validate-app-policy": "node scripts/validate-meimei-app-policy.mjs",
     "kernel:sdk:selftest": "node scripts/meimei-sdk-contract-selftest.mjs",
+    "kernel:fs-roots:selftest": "node scripts/meimei-kernel-fs-roots-selftest.mjs",
+    "kernel:facades:http:selftest": "node scripts/meimei-kernel-facades-http-selftest.mjs",
     "kernel:registry:snapshot": "node scripts/meimei-registry-manifest-snapshot.mjs",
     "surface:validate-api": "node scripts/validate-dashboard-surface-api.mjs",
     "https:validate-docs": "node scripts/validate-https-doc-contract.mjs",
@@ -63,7 +65,7 @@
     "menubar:services:start": "bash -c 'exec scripts/meimei-menubar-orchestrate-start.sh \"$PWD\"'",
     "menubar:services:stop": "bash -c 'exec scripts/meimei-menubar-orchestrate-stop.sh \"$PWD\"'",
     "start": "node dashboard/server.mjs",
-    "ci": "npm run boundary:check && npm run ui:lint-inline-styles && npm run registry:validate && npm run kernel:validate-app-manifest && npm run kernel:validate-app-policy && npm run kernel:app-registry:selftest && npm run kernel:policy:selftest && npm run kernel:external-dispatch:selftest && npm run kernel:sdk:selftest && npm run surface:validate-api && npm run https:validate-docs && npm run https:e2e-ci && npm run policy:validate && npm run audit:validate && npm run telemetry:validate && npm run handoff:validate -- handoffs/sample.stage-gate.v1.json && npm run adapter:whatsapp:validate && npm run imessage:validate && npm run release:gates -- releases/sample.release-gate.v1.json",
+    "ci": "npm run boundary:check && npm run ui:lint-inline-styles && npm run registry:validate && npm run kernel:validate-app-manifest && npm run kernel:validate-app-policy && npm run kernel:app-registry:selftest && npm run kernel:policy:selftest && npm run kernel:external-dispatch:selftest && npm run kernel:sdk:selftest && npm run kernel:fs-roots:selftest && npm run kernel:facades:http:selftest && npm run surface:validate-api && npm run https:validate-docs && npm run https:e2e-ci && npm run policy:validate && npm run audit:validate && npm run telemetry:validate && npm run handoff:validate -- handoffs/sample.stage-gate.v1.json && npm run adapter:whatsapp:validate && npm run imessage:validate && npm run release:gates -- releases/sample.release-gate.v1.json",
     "checklist:queue-consumer": "node scripts/checklist-queue-consumer.mjs",
     "checklist:sync-theme": "node scripts/sync-checklist-theme.mjs",
     "ui:lint-inline-styles": "node scripts/lint-dashboard-inline-styles.mjs"

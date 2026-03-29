@@ -21,7 +21,7 @@ const raw = execSync(
 if (!raw.includes(LEDGER)) raw.push(LEDGER);
 raw.sort((a, b) => a.localeCompare(b, "en"));
 
-const baseSec = Math.floor(Date.parse("2026-03-30T12:00:00Z") / 1000);
+const baseSec = Math.floor(Date.parse("2026-03-30T18:00:00Z") / 1000);
 const ts = (i) => new Date((baseSec + i) * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
 
 /** Paths with explicit post-audit notes */
@@ -43,19 +43,23 @@ const SPECIFIC = {
   "docs/architecture/system-overview.md":
     "**Completed:** Dev workflow doc pointer → this file instead of missing `ARCHITECTURE.md`.",
   "docs/compliance/documentation-audit.md":
-    "**Completed (wave 3):** Scope **149**; recommendation line aligned with `docs/` layout.",
+    "**Completed (wave 3–4):** Scope **149**; tier tables → canonical `docs/…` markdown links; Wave 4 executive summary.",
   "docs/compliance/doc_meimei.md":
-    "**Completed (wave 3):** Repo note — generic names vs `docs/` paths + ledger link.",
+    "**Completed (wave 3–4):** Generic filename → `agent.meimei` path table + ledger link.",
   "docs/compliance/foundation-contradiction-audit.md":
-    "**Completed (wave 3):** C-001 marked historical closed (`docs/` exists).",
+    "**Completed (wave 3–4):** C-001 historical evidence (no implied live root `architecture.md`).",
+  "docs/compliance/ai-runtime-audit.md":
+    "**Completed (wave 4):** `runbook.md` → `docs/operations/runbook.md` link.",
   "docs/governance/AGENTS.md":
     "**Completed (wave 3):** Read-first list → real paths + ledger link.",
   "docs/operations/runbook.md":
-    "**Completed:** Daily start → link `docs/agent-identity/agent.md` (repo layout).",
+    "**Completed (wave 3–4):** Daily start → `docs/agent-identity/agent.md`; page layout → `docs/architecture/design-system-v1.md`.",
+  "docs/architecture/meimei-app-development-guide.v1.md":
+    "**Completed (wave 4):** Prerequisites + §6 themes / `operator-chrome.css` vs primary `data-theme` keys.",
+  "docs/architecture/design-system-v1.md":
+    "**Completed (wave 4):** Doc/versioning paths → `docs/releases/CHANGELOG.md` + `VERSION.md`.",
   "docs/planning/kernel-app-separation-and-https-program.v1.md":
     "**Completed (2nd pass):** ADR-003 **accepted** in dependency graph + changelog (regenerate ledger preserves hand rows or patch after `generate`).",
-  "docs/planning/meimei-docs-code-sync-audit.v1.md":
-    "**Completed (2nd pass):** Link to full markdown ledger in revision history.",
   "docs/planning/meimei-https-full-integration-program.v1.md":
     "**Completed (2nd pass):** Status, ADR-003, current-state table, TLS-001/TLS-003, target §3.6, §9 row.",
   "docs/api/meimei-app-facades-v1.md":
@@ -69,9 +73,9 @@ const SPECIFIC = {
   "docs/developers/README.md":
     "**Completed (wave 3):** Table rows for facades, kernel-apps, threat model, external shells.",
   "docs/planning/meimei-docs-code-sync-audit.v1.md":
-    "**Completed (wave 3):** Matrix rows for façades, shells, runbook, threat model.",
+    "**Completed (2nd pass + wave 3–4):** Ledger link; matrix rows; Wave 4 revision history row.",
   "docs/releases/CHANGELOG.md":
-    "**Completed (wave 3):** 2026-03-30 full-corpus doc hygiene + prior audit entries.",
+    "**Completed (wave 3–4):** Full-corpus hygiene; Wave 4 historical footnotes for superseded root filenames.",
   "releases/0.9.0.md":
     "**Completed:** `ARCHITECTURE.md` bullet → `docs/architecture/system-overview.md`.",
 };
@@ -100,13 +104,13 @@ let md = `# Full comprehensive detailed documents audit
 
 **Enumeration:** **${raw.length}** paths (includes this ledger).
 
-**Ledger generated:** 2026-03-30T12:00:00Z  
+**Ledger generated:** 2026-03-30T18:00:00Z  
 **Row timestamps (column 2):** ISO-8601 UTC, **one second per row** in lexicographic path order (latest regen proof).
 
 ## Method (mandated rounds)
 
 1. **Round 1:** Enumerate all paths — omissions forbidden (this table). **${raw.length}** paths via \`find … ! -path '*/node_modules/*'\`.  
-2. **Rounds 2–N:** Prior waves: entry docs + \`docs/planning/*\` deep read. **Wave 3 (2026-03-30):** repo-wide grep (stale root \`agent.md\`, \`ARCHITECTURE.md\`); **full read** of four new kernel docs; fixes to **AGENTS**, **doc_meimei**, **documentation-audit**, **foundation-contradiction C-001**, **VERSION** count, **docs/README**, **developers/README**, **sync audit** matrix. Remaining rows: **SPECIFIC** or default **None** (sampled \`brain/\`, \`functions/\`, \`skills/\` unchanged).  
+2. **Rounds 2–N:** Prior waves: entry docs + \`docs/planning/*\` deep read. **Wave 3 (2026-03-30):** repo-wide grep (stale root \`agent.md\`, \`ARCHITECTURE.md\`); **full read** of four new kernel docs; fixes to **AGENTS**, **doc_meimei**, **documentation-audit**, **foundation-contradiction C-001**, **VERSION** count, **docs/README**, **developers/README**, **sync audit** matrix. **Wave 4 (2026-03-30):** tier tables + **doc_meimei** path map; **runbook** / **ai-runtime-audit** / **app-dev guide** / **design-system** cross-links; **CHANGELOG** historical footnotes; **sync audit** revision row. Remaining rows: **SPECIFIC** or default **None** (sampled \`brain/\`, \`functions/\`, \`skills/\` unchanged).  
 3. **Rounds N+1–N+M:** Apply fixes where column 3 starts with **Completed:**.  
 4. **Round N+M+1:** Maintainer report (below).
 
@@ -116,6 +120,7 @@ let md = `# Full comprehensive detailed documents audit
 |--------|------:|
 | Documents in scope | ${raw.length} |
 | Wave 3 edits | AGENTS, doc_meimei, documentation-audit, foundation-contradiction, VERSION, docs/README, developers/README, meimei-docs-code-sync, + four new doc rows indexed |
+| Wave 4 edits | documentation-audit tiers, doc_meimei map, foundation-contradiction C-001 phrasing, ai-runtime-audit, runbook, app-dev guide, design-system, CHANGELOG footnotes, sync-audit revision |
 | Normative code sync | [\`docs/planning/meimei-docs-code-sync-audit.v1.md\`](docs/planning/meimei-docs-code-sync-audit.v1.md) |
 
 ---
@@ -137,7 +142,7 @@ md += `
 
 ## N+M+1 — Report to maintainers
 
-**Healthness:** **${raw.length}** markdown files listed. **Wave 3** closed the worst cross-doc drift (\`AGENTS\` / meta-doc root paths) and indexed **kernel app** docs. Not every long architecture file was re-read line-by-line in this wave.
+**Healthness:** **${raw.length}** markdown files listed. **Wave 3** closed the worst cross-doc drift (\`AGENTS\` / meta-doc root paths) and indexed **kernel app** docs. **Wave 4** normalized bare \`agent.md\` / \`architecture.md\` / \`runbook.md\` references in normative docs to canonical \`docs/…\` links. Not every long architecture file was re-read line-by-line in these waves.
 
 **Proof:** Column 2 **${ts(0)}** → **${lastTs}** (this regen).
 

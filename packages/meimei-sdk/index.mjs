@@ -87,4 +87,14 @@ export class MeiMeiKernelClient {
     const json = await r.json().catch(() => ({}));
     return { ok: r.ok, status: r.status, json };
   }
+
+  /** `GET …/fs/roots` — requires `policy.filesystem.roots` + `filesystem.scoped` capability. */
+  async readFilesystemRoots() {
+    const r = await fetch(this._appPath("fs/roots"), {
+      method: "GET",
+      headers: this._headers({ jsonBody: false })
+    });
+    const json = await r.json().catch(() => ({}));
+    return { ok: r.ok, status: r.status, json };
+  }
 }

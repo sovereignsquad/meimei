@@ -1,15 +1,27 @@
 # CHANGELOG
 
+## 2026-03-29 — MM-KERNEL-303d: filesystem roots façade + façade HTTP smoke
+
+- **`dashboard/lib/kernel-app-fs-roots.mjs`** — `GET /api/meimei/v1/apps/{id}/fs/roots`: **`policy.filesystem.roots`** jailed to **`install_path`**, shallow directory sample, **`realpath`**-aligned containment.
+- **`@meimei/sdk`** — `readFilesystemRoots()`; **`npm run kernel:fs-roots:selftest`**, **`kernel:facades:http:selftest`** in **`npm run ci`**.
+
+## 2026-03-30 — Docs: wave 4 (canonical `docs/…` paths, stale root filenames)
+
+- **Ledger:** regen base **`2026-03-30T18:00:00Z`** — [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md) (**Wave 4** rows in method + outcome table).
+- **`docs/compliance/documentation-audit.md`** (tier links), **`doc_meimei.md`** (generic → path map), **`foundation-contradiction-audit.md`** (C-001 evidence as historical).
+- **`docs/compliance/ai-runtime-audit.md`**, **`docs/operations/runbook.md`**, **`docs/architecture/meimei-app-development-guide.v1.md`**, **`docs/architecture/design-system-v1.md`** — cross-links off bare `runbook.md` / root-style paths where appropriate.
+- **`docs/planning/meimei-docs-code-sync-audit.v1.md`** — revision history **Wave 4** row; **CHANGELOG** historical bullets footnoted to current `docs/…` locations where needed.
+
 ## 2026-03-30 — Docs: full-corpus wave 3 (149 `.md`, cross-doc path hygiene)
 
-- **Ledger:** **149** paths; regen base **`2026-03-30T12:00:00Z`** — [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
+- **Ledger:** **149** paths; first regen base **`2026-03-30T12:00:00Z`** — [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
 - **`docs/governance/AGENTS.md`**, **`docs/compliance/doc_meimei.md`**, **`docs/compliance/documentation-audit.md`**, **`docs/compliance/foundation-contradiction-audit.md`** (C-001 closed as historical).
 - **`docs/README.md`** (149 count + kernel doc index rows), **`docs/developers/README.md`**, **`docs/planning/meimei-docs-code-sync-audit.v1.md`** (matrix rows for façades / shells / runbook / threat model).
 - **`VERSION.md`** — delivery bullet count **149**.
 
 ## 2026-03-29 — Kernel program: policy, app façades, SDK, catalog merge, monitor `app_id`
 
-- **`dashboard/lib/kernel-app-http-facades.mjs`** — `POST /api/meimei/v1/apps/{app_id}/inference|jobs/enqueue`, `GET …/env`, `GET …/fs/roots` (**501** placeholder).
+- **`dashboard/lib/kernel-app-http-facades.mjs`** — `POST /api/meimei/v1/apps/{app_id}/inference|jobs/enqueue`, `GET …/env`, `GET …/fs/roots` (roots listing: **`kernel-app-fs-roots.mjs`**).
 - **`dashboard/lib/kernel-external-app-dispatch.mjs`** — after auth, **`assertManifestCapabilitiesSatisfiedForDispatch`**.
 - **`dashboard/lib/kernel-app-policy.mjs`** — manifests with no `capabilities` inherit full v1 cap set for policy resolution; registry row **`policy`** supported.
 - **`dashboard/lib/kernel-catalog-merge.mjs`**, **`catalog-pages.mjs`**, **`server.mjs`** — merged Apps/Tools catalog; monitor feed **`app_id`** query + row field; inference worker passes **`appId`** from queued payload.
@@ -324,14 +336,14 @@
 
 - Added miniapp route `/700/API_channel_adapter` and HTTP `GET`/`POST` `/api/functions/api-channel-adapter` (same adapter engine as model routing; dedicated contract path).
 - Documented delivery artifact in `channel-api-adapter-reference-v1.md` and `functions/api-channel-adapter.md`; registry entry `api-channel-adapter`.
-- Updated knowmore card for issue 700, `product_roadmap.md`, and `architecture.md` channel layer references.
+- Updated knowmore card for issue 700, `product_roadmap.md`, and `architecture.md` channel layer references. *(Historical filenames; today use [`docs/releases/product_roadmap.md`](product_roadmap.md), [`docs/architecture/system-overview.md`](../architecture/system-overview.md) or related architecture docs.)*
 
 ## 2026-03-27 - Design system hardening wave (`0.7.3`)
 
 ### Documentation and communication quality
 
 - Added `project-vocabulary-v1.md` to standardize project-level wording and release-note language.
-- Rewrote `architecture.md` with explicit layer boundaries, runtime topology, and enforceability principles.
+- Rewrote `architecture.md` with explicit layer boundaries, runtime topology, and enforceability principles. *(Superseded path: [`docs/architecture/system-overview.md`](../architecture/system-overview.md); see [`docs/README.md`](../README.md) for the full architecture index.)*
 - Updated `README.md` state/version language to match released runtime maturity and `VERSION.md`.
 
 ### Design system centralization and hardening

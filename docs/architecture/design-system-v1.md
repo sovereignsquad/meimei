@@ -158,8 +158,8 @@ Every new miniapp page must:
 Any UI module/token change must update:
 
 - `design-system-v1.md` (this file)
-- `CHANGELOG.md` (Unreleased section)
-- `VERSION.md` (current version metadata when released)
+- [`docs/releases/CHANGELOG.md`](../releases/CHANGELOG.md) (Unreleased section)
+- [`VERSION.md`](../../VERSION.md) (current version metadata when released)
 
 ## Release policy
 

@@ -1,6 +1,15 @@
 # Agentic Work Docs for Agent MeiMei
 
-**Repo note (`agent.meimei`):** Below lists **generic** filenames. In this repository, many live under **`docs/`** (e.g. `docs/agent-identity/agent.md`, `docs/architecture/system-overview.md`, `docs/operations/runbook.md`). See [`docs/README.md`](../README.md) and [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
+**Repo note (`agent.meimei`):** Below lists **generic** filenames. In this repository, many live under **`docs/`**. See [`docs/README.md`](../README.md) and [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
+
+| Generic name | `agent.meimei` canonical path |
+|--------------|-------------------------------|
+| `agent.md` | [`docs/agent-identity/agent.md`](../agent-identity/agent.md) |
+| `architecture.md` | [`docs/architecture/system-overview.md`](../architecture/system-overview.md) |
+| `runbook.md` | [`docs/operations/runbook.md`](../operations/runbook.md) |
+| `CHANGELOG.md` | [`docs/releases/CHANGELOG.md`](../releases/CHANGELOG.md) |
+| `AGENTS.md` | [`docs/governance/AGENTS.md`](../governance/AGENTS.md) |
+| `documentation-audit.md` | [`docs/compliance/documentation-audit.md`](../compliance/documentation-audit.md) |
 
 This is the recommended document set for a clean, maintainable agentic workspace. The names below use common industry conventions where possible, and map your examples to the standard form.
 

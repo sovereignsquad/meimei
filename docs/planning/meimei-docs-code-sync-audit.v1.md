@@ -97,3 +97,4 @@ Exact order drifts with edits; verify with `grep -n normalizedPath dashboard/ser
 | 2026-03-31 | v1 initial matrix + P0 fixes linked to design-system, runbook, handbook, platform README, CI Node 22, CHANGELOG |
 | 2026-03-29 | Full markdown inventory: [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md) — use for completeness; this file remains **normative** for code↔doc matrix. |
 | 2026-03-30 | Matrix rows: app façades, external app shells, kernel-apps runbook, threat model + `docs/README` / `developers/README` index. |
+| 2026-03-30 | **Wave 4:** [`documentation-audit.md`](../compliance/documentation-audit.md) tier tables → canonical `docs/…` paths; [`doc_meimei.md`](../compliance/doc_meimei.md) path map; cross-links in runbook, ai-runtime-audit, app-dev guide, design-system, foundation-contradiction evidence. |

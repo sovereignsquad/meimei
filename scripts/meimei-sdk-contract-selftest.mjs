@@ -55,6 +55,13 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    if (req.method === "GET" && path === `/api/meimei/v1/apps/${APP_ID}/fs/roots`) {
+      assert.equal(req.headers["x-meimei-app-id"], APP_ID);
+      res.writeHead(200);
+      res.end(JSON.stringify({ ok: true, roots: [{ configured: ".", resolved: "/tmp", exists: true }] }));
+      return;
+    }
+
     res.writeHead(404);
     res.end(JSON.stringify({ ok: false }));
   });
@@ -88,6 +95,10 @@ server.listen(0, "127.0.0.1", async () => {
     const env = await client.readEnvKeys(["PORT", "HOME"]);
     assert.equal(env.ok, true);
     assert.equal(env.json.values?.HOME, "/x");
+
+    const fsr = await client.readFilesystemRoots();
+    assert.equal(fsr.ok, true);
+    assert.equal(fsr.json.roots?.length, 1);
 
     ok("meimei-sdk contract selftest");
   } catch (e) {

@@ -26,7 +26,10 @@ All paths below are **after** stripping `MEIMEI_PUBLIC_PREFIX` (e.g. browser cal
 ## `GET /api/meimei/v1/apps/{app_id}/fs/roots`
 
 - **Capability:** `filesystem.scoped`.
-- **Status:** **501** — policy field `filesystem.roots` is reserved; server integration not implemented (MM-KERNEL-303d placeholder).
+- **Policy:** `policy.filesystem.roots` — non-empty array of paths **relative to `install_path`** or absolute paths that still resolve **under** `install_path` (after `realpath`). `..` escapes → **400**.
+- **403** if `filesystem.roots` is missing or empty — operator must explicitly configure roots.
+- **Response (200):** `{ "ok": true, "roots": [ { "configured", "resolved", "exists", "is_directory", "entries_sample"?, … } ], "note" }` — read-only metadata + shallow directory sample (cap **50** entries per root). No file read/write API in v1.
+- **Implementation:** [`kernel-app-fs-roots.mjs`](../../dashboard/lib/kernel-app-fs-roots.mjs); **`npm run kernel:fs-roots:selftest`**.
 
 ## Monitor feed
 

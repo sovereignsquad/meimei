@@ -77,7 +77,7 @@
 2. **Unify or document the split** — Either route more product features through **one** spine (e.g. OpenClaw-only) or publish an **architecture diagram**: OpenClaw vs Ollama vs deterministic.
 3. **Replace or gate sample data** — Prefer **explicit demo mode** (`?demo=1` or settings flag) over silent fictional inbox when Mail is absent.
 4. **What next / Daily briefing** — If the roadmap promises “AI”, add an **optional** `oc-agent` summarization step over aggregated context, or rename features to “Daily digest (local files)” / “Prioritized queue (rules)”.
-5. **CI** — Existing `npm run ci` does not prove OpenClaw or Ollama; add a **documented manual smoke** (`oc-readiness`, one Explain-it request, Ollama health) in `runbook.md` (partially present; extend for Ollama).
+5. **CI** — Existing `npm run ci` does not prove OpenClaw or Ollama; add a **documented manual smoke** (`oc-readiness`, one Explain-it request, Ollama health) in [`docs/operations/runbook.md`](../operations/runbook.md) (partially present; extend for Ollama).
 
 ---
 

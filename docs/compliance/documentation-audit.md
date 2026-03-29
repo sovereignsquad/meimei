@@ -5,6 +5,8 @@
 **Scope (current):** **149** repo-owned markdown files (excluding `node_modules/**`) — canonical table with **per-file audit timestamps** in **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** at repo root.  
 **Goal:** Surface overlap, staleness risk, and a **practical** path to a unified doc system without breaking OC/repo conventions.
 
+**Wave 4 (2026-03-30):** Tier tables below are updated so **canonical paths** match today’s tree (**`docs/…`**). Older prose that said “root `agent.md`” described a **prior layout**.
+
 ---
 
 ## Executive summary
@@ -12,10 +14,10 @@
 | Finding | Severity |
 |--------|----------|
 | **~55+ root-level `.md` files** (plus `skills/**`) — discovery is hard; search hits many parallel “roadmaps,” ideation dumps, and meta-docs. | High |
-| **Duplicate or overlapping roles:** `roadmap.md` vs `product_roadmap.md`, `tasks.md` vs board vs `product_roadmap` priorities, `agent.md` vs `IDENTITY.md` / `SOUL.md` / `MEMORY.md`, `doc_meimei.md` as a *meta* index vs `README.md`. | High |
+| **Duplicate or overlapping roles:** `docs/releases/roadmap.md` vs `docs/releases/product_roadmap.md`, `docs/governance/tasks.md` vs board vs product roadmap priorities, `docs/agent-identity/agent.md` vs `IDENTITY.md` / `SOUL.md` / `MEMORY.md`, `doc_meimei.md` as a *meta* index vs `README.md`. | High |
 | **Time-bound / inventory docs** (`agent.meimei.ideabank.*`, board line counts, issue ranges) **rot** unless someone owns refresh; they read authoritative but drift. | Medium |
 | **Large ideation corpora** (`10hrs.md`, `ice_meimei.md`, `idea-support-map.md`) are valuable **backlog intelligence** but clutter **operator** search if kept at repo root. | Medium |
-| **Canonical engineering docs** (`architecture.md`, `design-system-v1.md`, `miniapp-contract-v1.md`, `runbook.md`, `CHANGELOG.md`) are in good shape relative to code; link graph from `README.md` is incomplete. | Low (structure) |
+| **Canonical engineering docs** live under **`docs/`** (e.g. `docs/architecture/system-overview.md`, `design-system-v1.md`, `miniapp-contract-v1.md`, `docs/operations/runbook.md`, `docs/releases/CHANGELOG.md`); link graph from root `README.md` is much improved but still grep occasionally for bare legacy names. | Low (structure) |
 
 **Recommendation:** Treat docs as **layers** (entry → operations → product → governance → archive). Move or namespace **archive/ideation** first; add **`docs/README.md` as a map**; keep **`README.md`**, **`docs/governance/AGENTS.md`**, and identity under **`docs/agent-identity/`** (some tooling still expects `AGENTS.md` under `docs/governance/`).
 
@@ -23,33 +25,33 @@
 
 ## Inventory by tier
 
-### Tier A — Entry & daily use (keep at repository root)
+### Tier A — Entry & daily use
 
-| File | Role |
-|------|------|
-| `README.md` | Project front door |
-| `AGENTS.md` | AI/agent operating rules for this workspace |
-| `agent.md` | MeiMei identity & collaboration contract |
-| `runbook.md` | Operator procedures |
-| `CHANGELOG.md` | Shipped history |
-| `VERSION.md` | Current line/version/issue mapping |
+| Canonical path | Role |
+|----------------|------|
+| [`README.md`](../../README.md) | Project front door |
+| [`docs/governance/AGENTS.md`](../governance/AGENTS.md) | AI/agent operating rules for this workspace |
+| [`docs/agent-identity/agent.md`](../agent-identity/agent.md) | MeiMei identity & collaboration contract |
+| [`docs/operations/runbook.md`](../operations/runbook.md) | Operator procedures |
+| [`docs/releases/CHANGELOG.md`](../releases/CHANGELOG.md) | Shipped history |
+| [`VERSION.md`](../../VERSION.md) | Current line/version/issue mapping |
 
-**Action:** Expand `README.md` “What is in the repo” with a **single link** to `documentation-audit.md` or future `docs/README.md` map (not a full duplicate list).
+**Action:** Root `README.md` should link [`docs/README.md`](../README.md) and [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
 
-### Tier B — Engineering & UX contracts (keep at root *or* under `docs/engineering/` in a later phase)
+### Tier B — Engineering & UX contracts (`docs/architecture/`, `docs/api/`, …)
 
-| File | Role |
-|------|------|
-| `architecture.md` | System shape |
-| `design-system-v1.md` | Global UI + layout system |
-| `miniapp-contract-v1.md` | Miniapp schema |
-| `function-lifecycle.md` | How functions ship |
-| `model-routing-spec.md` | Routing policy |
-| `project-vocabulary-v1.md` | Wording rules |
-| `workflow.md` | Idea → delivery flow |
-| `testing.md`, `security.md`, `definition-of-done.md` | Quality & safety |
+| Canonical path | Role |
+|----------------|------|
+| [`docs/architecture/system-overview.md`](../architecture/system-overview.md) | System shape (product architecture) |
+| [`docs/architecture/design-system-v1.md`](../architecture/design-system-v1.md) | Global UI + layout system |
+| [`docs/architecture/miniapp-contract-v1.md`](../architecture/miniapp-contract-v1.md) | Miniapp schema |
+| [`docs/architecture/function-lifecycle.md`](../architecture/function-lifecycle.md) | How functions ship |
+| [`docs/architecture/model-routing-spec.md`](../architecture/model-routing-spec.md) | Routing policy |
+| [`docs/architecture/project-vocabulary-v1.md`](../architecture/project-vocabulary-v1.md) | Wording rules |
+| [`docs/operations/workflow.md`](../operations/workflow.md) | Idea → delivery flow |
+| [`docs/operations/testing.md`](../operations/testing.md), [`docs/compliance/security.md`](security.md), [`docs/governance/definition-of-done.md`](../governance/definition-of-done.md) | Quality & safety |
 
-**Action:** No merge required; ensure `architecture.md` links stay aligned when files move.
+**Action:** Prefer linking **`docs/…`** paths in new prose; avoid resurrecting root-only `architecture.md` as if it still lived at repo root.
 
 ### Tier C — Governance & compliance specs (often `*-v1.md`)
 
@@ -61,9 +63,9 @@ Frozen-style specs: channel adapters, handoff, release gates, policy, audit, tel
 
 | File | Notes |
 |------|--------|
-| `roadmap.md` | **Phased** foundation/runtime/multi-channel — stable, abstract |
-| `product_roadmap.md` | **Executive** Apps/Tools, issues, board link — **most current for product** |
-| `tasks.md` | Short execution bullets — often **stale** vs board |
+| [`docs/releases/roadmap.md`](../releases/roadmap.md) | **Phased** foundation/runtime/multi-channel — stable, abstract |
+| [`docs/releases/product_roadmap.md`](../releases/product_roadmap.md) | **Executive** Apps/Tools, issues, board link — **most current for product** |
+| [`docs/governance/tasks.md`](../governance/tasks.md) | Short execution bullets — often **stale** vs board |
 
 **Merge proposal (lightweight):**
 
@@ -89,31 +91,31 @@ Frozen-style specs: channel adapters, handoff, release gates, policy, audit, tel
 
 | File | Notes |
 |------|--------|
-| `doc_meimei.md` | **Recommended doc set** (generic template); overlaps `README` + `AGENTS` pointers — risk of **two competing maps** |
+| [`doc_meimei.md`](doc_meimei.md) | **Recommended doc set** (generic template); overlaps `README` + `AGENTS` pointers — risk of **two competing maps** |
 
-**Action:** **Merge** into `docs/README.md` (when created) or trim `doc_meimei.md` to a single paragraph: “See `documentation-audit.md`.”
+**Action:** **`docs/README.md` exists** — keep `doc_meimei.md` as generic industry template + repo note; point operators at [`documentation-audit.md`](documentation-audit.md) + [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
 
 ### Tier G — Short identity fragments (merge candidates)
 
 | File | Content |
 |------|---------|
-| `IDENTITY.md` | Name, product, vibe |
-| `SOUL.md` | Tone & behavior bullets |
-| `MEMORY.md` | Four durable bullets |
-| `USER.md` | OC operator addressing convention |
+| [`docs/agent-identity/IDENTITY.md`](../agent-identity/IDENTITY.md) | Name, product, vibe |
+| [`docs/agent-identity/SOUL.md`](../agent-identity/SOUL.md) | Tone & behavior bullets |
+| [`docs/agent-identity/MEMORY.md`](../agent-identity/MEMORY.md) | Four durable bullets |
+| [`docs/agent-identity/USER.md`](../agent-identity/USER.md) | OC operator addressing convention |
 
-**Action:** Fold into **`agent.md`** sections (Identity, Voice, Durable context) **or** keep only if external tooling requires separate files; document in `agent.md` frontmatter which files are authoritative.
+**Action:** Fold into **`docs/agent-identity/agent.md`** sections **or** keep fragments if tooling requires them; document hierarchy in `agent.md`.
 
 ### Tier H — Misc / situational
 
 | File | Notes |
 |------|--------|
-| `HEARTBEAT.md` | Ultra-short checklist — OK; link from `runbook` or OC playbooks |
-| `learnings.md` | Lessons — keep; link from README map |
-| `issue-merge-walkthrough.md`, `issue-quality-standard.md`, `issue-ready-gate-checklist.md` | Governance — keep; could live under `docs/governance/issues/` later |
-| `mac-mini-migration-audit.md`, `mac-mini-go-live-checklist.md`, `second-mac-mini-handoff.md` | **Same theme** — candidate **single** `docs/migration/mac-mini.md` with anchors |
-| `vercel-env-inventory.md` | Environment-specific — `docs/infra/` or leave root with label |
-| `naming-conventions.md`, `TOOLS.md` | Support docs — namespace or link from catalog |
+| [`docs/operations/HEARTBEAT.md`](../operations/HEARTBEAT.md) | Ultra-short checklist — OK; link from runbook or OC playbooks |
+| [`docs/operations/learnings.md`](../operations/learnings.md) | Lessons — keep; link from README map |
+| [`docs/governance/issue-merge-walkthrough.md`](../governance/issue-merge-walkthrough.md), [`issue-quality-standard.md`](../governance/issue-quality-standard.md), [`issue-ready-gate-checklist.md`](../governance/issue-ready-gate-checklist.md) | Governance — keep |
+| [`docs/operations/mac-mini-migration-audit.md`](../operations/mac-mini-migration-audit.md), [`mac-mini-go-live-checklist.md`](../operations/mac-mini-go-live-checklist.md), [`second-mac-mini-handoff.md`](../operations/second-mac-mini-handoff.md) | **Same theme** — migration / go-live |
+| [`docs/operations/vercel-env-inventory.md`](../operations/vercel-env-inventory.md) | Environment-specific inventory |
+| [`docs/architecture/naming-conventions.md`](../architecture/naming-conventions.md), [`docs/agent-identity/TOOLS.md`](../agent-identity/TOOLS.md) | Support docs |
 
 ### Tier I — `functions/*.md` & `skills/**`
 
@@ -123,9 +125,9 @@ Product function specs and skills: **correct location**; avoid duplicating regis
 
 Local app; keep next to code.
 
-### Tier K — `ai-runtime-audit.md`
+### Tier K — [`docs/compliance/ai-runtime-audit.md`](ai-runtime-audit.md)
 
-Runtime truth table for **OpenClaw vs Ollama vs rules vs sample data**; keep at repo root next to `architecture.md`; update when adding miniapps or changing `dashboard/server.mjs` AI paths.
+Runtime truth table for **OpenClaw vs Ollama vs rules vs sample data**; update when adding miniapps or changing `dashboard/server.mjs` AI paths.
 
 ---
 

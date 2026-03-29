@@ -1,6 +1,6 @@
 # MeiMei kernel — technical handbook
 
-**Document revision:** v1.3  
+**Document revision:** v1.4  
 **Audience:** Software architects and senior engineers integrating, extending, or reviewing the MeiMei platform core.  
 **Runtime:** Node.js **ESM** (`.mjs`), engines **≥22.5** per [`package.json`](../../package.json).  
 **Normative audit:** [meimei-kernel-code-audit.v1.md](../architecture/meimei-kernel-code-audit.v1.md) (inventory, contracts, governance, line anchors).  
@@ -104,7 +104,7 @@ There is no separate mandatory worker binary for inference in v1; horizontal sca
 
 1. Health  
 2. `GET /api/meimei/monitor/feed` — optional `trace_id`, **`app_id`** (filters rows with `kernel_app_id` in payload JSON)  
-3. **App-scoped façades** — `POST /api/meimei/v1/apps/{app_id}/inference`, `POST …/jobs/enqueue`, `GET …/env`, `GET …/fs/roots` (**501** until implemented) — [`kernel-app-http-facades.mjs`](../../dashboard/lib/kernel-app-http-facades.mjs); policy via manifest + optional registry row **`policy`** ([`schemas/meimei.app.policy.v1.json`](../../schemas/meimei.app.policy.v1.json), [`kernel-app-policy.mjs`](../../dashboard/lib/kernel-app-policy.mjs))  
+3. **App-scoped façades** — `POST /api/meimei/v1/apps/{app_id}/inference`, `POST …/jobs/enqueue`, `GET …/env`, `GET …/fs/roots` (read-only roots + shallow listing — [`kernel-app-fs-roots.mjs`](../../dashboard/lib/kernel-app-fs-roots.mjs)) — [`kernel-app-http-facades.mjs`](../../dashboard/lib/kernel-app-http-facades.mjs); policy via manifest + optional registry row **`policy`** ([`schemas/meimei.app.policy.v1.json`](../../schemas/meimei.app.policy.v1.json), [`kernel-app-policy.mjs`](../../dashboard/lib/kernel-app-policy.mjs))  
 4. `POST /api/meimei/route`  
 5. Checklist public path — reverse-proxy attempt when configured  
 6. **`GET`/`HEAD` `/styles/operator-chrome.css`** — dynamic merged operator theme CSS ([`operator-chrome.mjs`](../../dashboard/lib/operator-chrome.mjs))  
@@ -238,3 +238,4 @@ The kernel’s strength is **explicit contracts** (inference + jobs) and **enfor
 | v1.1 | 2026-03-30 | Aligned with audit v1.1: invariants, persistence, corrected HTTP anchors, professional scope section, integration modes clarified. |
 | v1.2 | 2026-03-29 | Operator chrome row in dispatch summary. |
 | v1.3 | 2026-03-29 | App-scoped façades, policy + dispatch gate, merged catalog, monitor `app_id`, `@meimei/sdk`; dispatch order renumbered. |
+| v1.4 | 2026-03-29 | MM-KERNEL-303d: `GET …/fs/roots` read-only root listing (`kernel-app-fs-roots.mjs`). |

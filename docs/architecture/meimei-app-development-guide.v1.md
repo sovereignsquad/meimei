@@ -1,7 +1,7 @@
 # MeiMei app development guide — v1
 
 **Audience:** Engineers adding miniapps, adapters, or workers on `agent.meimei`.  
-**Prerequisites:** Read `adapter-contract.v1.md`, `inference-route.v1.md`, `design-system-v1.md`, and this doc’s companion **`meimei-env-ui-contract.v1.md`**.
+**Prerequisites:** Read [`adapter-contract.v1.md`](adapter-contract.v1.md), [`../api/inference-route.v1.md`](../api/inference-route.v1.md), [`design-system-v1.md`](design-system-v1.md), and this doc’s companion [`meimei-env-ui-contract.v1.md`](meimei-env-ui-contract.v1.md).
 
 ---
 
@@ -101,9 +101,9 @@ See **`docs/architecture/adapter-contract.v1.md`** and **`adapter-obsidian.v1.md
 ## 6. UI & design system
 
 - **Global CSS:** `public/styles/design-system.css` — linked via `config/dashboard-surface.v1.json`.
-- **Themes:** `data-theme` on `<body>` (`green` / `blue` / `orange` / `red`).
+- **Themes:** `data-theme` on `<body>` — primary keys `meimei`, `dashboard`, `admin`, `apps`, `tools`, `knowmore` (legacy aliases in CSS: `green`, `blue`, `orange`, `red`). See [`design-system-v1.md`](design-system-v1.md).
 - **Layout:** page chrome uses **`.layout-flow` / `.layout-box`** and `config/page-layout.v1.json`—no one-off full-page grids.
-- **Components:** `.card`, `.ds-flashcard*`, `.button`, `.panel`, etc.—see **`design-system-v1.md`**.
+- **Components:** `.card`, `.ds-flashcard*`, `.button`, `.panel`, etc.—see [`design-system-v1.md`](design-system-v1.md) and link **`/styles/operator-chrome.css`** after the base stylesheet when using platform shells.
 - **No secrets in DOM** except masked fields; reveal only through explicit, same-origin actions.
 
 Miniapps that are **only** API backends still follow registry + contract docs for naming and error shape.
