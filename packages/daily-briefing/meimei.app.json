@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "daily-briefing",
   "displayName": "Daily Briefing",
-  "description": "AI-powered daily business briefing",
+  "description": "AI-powered daily business briefing — scheduled digest via Explain it stack; POST API and /open subroute for operator scripts.",
   "version": "1.0.0",
   "entry": { "module": "./index.mjs", "export": "handleApi" },
   "api": {

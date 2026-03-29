@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "explain-it",
   "displayName": "Explain it",
-  "description": "URL summarization and structured explanation",
+  "description": "Paste a URL or add a source, get a fast structured explanation. Use 'Set alarm' to schedule daily briefings.",
   "version": "1.0.0",
   "entry": {
     "module": "./index.mjs",

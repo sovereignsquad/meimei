@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "ai-sdr-analytics",
   "displayName": "AI SDR analytics",
-  "description": "Operator dashboard for outbound metrics — SDR events plus lead workflow funnel, local logs only.",
+  "description": "Operator dashboard for outbound metrics — SDR events (#654) plus lead workflow funnel (#650), local logs only.",
   "version": "1.0.0",
   "entry": { "module": "./index.mjs", "export": "handleApi" },
   "api": { "method": "POST", "pathSuffix": "ai-sdr-analytics" },

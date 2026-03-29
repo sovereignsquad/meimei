@@ -3,7 +3,7 @@
 **Version:** v1  
 **Date:** 2026-03-29  
 **Owner:** Platform / architecture  
-**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + **602** pilot (**packages/daily-briefing**), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** full **604** (generated `registry.v1.json`); optional deeper FS APIs (read file bytes); migrate additional miniapps into **`packages/*`** using the **`daily-briefing`** pilot pattern.
+**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + **602** pilot (**packages/daily-briefing**), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** optional **604** polish (narrow fragments per-function files, richer codegen from manifests only); optional deeper FS APIs (read file bytes); migrate additional miniapps into **`packages/*`** using the **`daily-briefing`** pilot pattern.
 
 ## Executive summary
 
@@ -22,9 +22,9 @@ Decouple MeiMei **applications** from the **kernel** so each app can live in its
 | **T5 Migration** | 601, 604, 602 | **Partial** | **601** merged catalog; **604** snapshot + **`npm run kernel:registry:drift-check`** (allowlists; scans **`apps/*`** and **`packages/*`** manifests); **`daily-briefing`** in `registry.v1.json` + GET route, pilot under **`packages/daily-briefing/`**; **602** playbook + pilot. |
 | **T6 Governance** | 502, 701–703 | **Delivered** (502 = strategy doc) | Shells ADR note, threat model, `kernel-apps.v1.md` runbook, monitor `app_id` filter + row field. |
 
-**CI hooks (kernel-related):** `kernel:registry:drift-check`, `kernel:validate-app-manifest`, `kernel:validate-app-policy`, `kernel:app-registry:selftest`, `kernel:policy:selftest`, `kernel:external-dispatch:selftest`, `kernel:sdk:selftest`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`, `kernel:registry:snapshot` (manual / audit).
+**CI hooks (kernel-related):** `kernel:registry:generate-check`, `kernel:registry:drift-check`, `kernel:validate-app-manifest`, `kernel:validate-app-policy`, `kernel:app-registry:selftest`, `kernel:policy:selftest`, `kernel:external-dispatch:selftest`, `kernel:sdk:selftest`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`, `kernel:registry:snapshot` (manual / audit).
 
-**Largest remaining epics:** **generate** `registry.v1.json` from manifests (604 stretch); optional **job status/query façade** for 303b; **file read** API beyond fs/roots listing; **rate limits** in policy (302 stretch); **602** — migrate more miniapps to `packages/*` ( **`daily-briefing`** pilot done).
+**Largest remaining epics:** optional **604** fragment ergonomics; optional **job status/query façade** for 303b; **file read** API beyond fs/roots listing; **rate limits** in policy (302 stretch); **602** — migrate more miniapps to `packages/*` ( **`daily-briefing`** pilot done).
 
 ---
 
@@ -506,8 +506,9 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 
 ### Deliverables (incremental)
 
-- [x] **`npm run kernel:registry:snapshot`** — JSON snapshot of registry + manifests for audit / drift detection. **`functions/registry.v1.json`** remains operator SoT for legacy miniapps until full generation exists.
-- [x] **`npm run kernel:registry:drift-check`** — CI ensures `registry.v1.json` ↔ `apps/*/meimei.app.json` parity (`config/kernel-registry-drift-allowlists.v1.json`).
+- [x] **`npm run kernel:registry:snapshot`** — JSON snapshot of registry + manifests for audit / drift detection.
+- [x] **`npm run kernel:registry:generate`** / **`kernel:registry:generate-check`** — assemble **`functions/registry.v1.json`** from **`registry.shell.v1.json`**, **`registry.fragments.v1.json`**, **`config/registry-functions-order.v1.json`**, and disk manifests; CI runs **`generate-check`**.
+- [x] **`npm run kernel:registry:drift-check`** — CI ensures generated registry ↔ `apps|packages/*/meimei.app.json` parity (`config/kernel-registry-drift-allowlists.v1.json`).
 
 ---
 
@@ -572,6 +573,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 |------|--------|
 | 2026-03-29 | **604 drift-check CI**, **daily-briefing** registry + GET route, **602** migration playbook (`kernel-apps.v1.md`, `packages/README.md`). |
 | 2026-03-29 | **602 pilot:** **`packages/daily-briefing/`**; builtin loader + drift + **`kernel:validate-app-manifest`** scan **`packages/*`**. |
+| 2026-03-29 | **604 generate:** **`kernel:registry:generate`**, **`registry.shell.v1.json`**, **`registry.fragments.v1.json`**, **`config/registry-functions-order.v1.json`**; catalog **`description`** aligned on manifests where needed. |
 | 2026-03-29 | **303d read-only `fs/roots`:** `kernel-app-fs-roots.mjs`, SDK `readFilesystemRoots`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`. |
 | 2026-03-29 | **MM-KERNEL-302–303d, 401–402, 501 policy gate, 502, 601, 604 snapshot, 701–703, pilot SDK package:** façades, merged catalog, monitor `app_id`, workspaces `@meimei/sdk`, CI selftests. |
 | 2026-03-29 | **Doc pass:** dependency graph — **ADR-003 (accepted)** (was marked proposed). |

@@ -1,26 +1,10 @@
 {
-  "version": "v1",
-  "generatedAt": "2026-03-29",
-  "platformAlignment": {
-    "asOf": "2026-03-30",
-    "package": "0.8.15",
-    "inferenceHotPath": "dashboard/lib/meimei-inference-client.mjs → handleMeimeiInferenceRoute",
-    "routingPreview": "dashboard/lib/openclaw-routing-preview.mjs (default); MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1 restores subprocess",
-    "notes": "Kernel K3: blocking LLM via inference client. Deterministic routing preview in-process. llm.mjs: routing config, health, gateway, utilities."
-  },
-  "functions": [
-    {
-      "id": "checklist",
-      "version": "v1",
+  "version": 1,
+  "description": "MM-KERNEL-604 — input to meimei-kernel-registry-generate.mjs. Manifest-backed rows omit id, version, displayName, description, route, api (derived from meimei.app.json). __static rows are emitted verbatim (minus __static).",
+  "fragments": {
+    "checklist": {
       "category": "apps",
-      "displayName": "Checklist",
-      "description": "MeiMei Checklist — default Node engine (local SQLite + Ollama); optional python engine for checklist-repo HTTP worker. Bridge for deployed Next.js + Neon.",
       "catalogOrder": 0,
-      "route": "/dashboard/727/Checklist",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/checklist"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -73,18 +57,9 @@
         "fallbackBehavior": "Return ok:false for unknown actions; bridge returns 502 if worker is down"
       }
     },
-    {
-      "id": "lead-enrichment",
-      "version": "v1",
+    "lead-enrichment": {
       "category": "apps",
-      "displayName": "Lead Enrichment",
-      "description": "Enrich contacts and companies with structured sales data for personalized outreach campaigns.",
       "catalogOrder": 3,
-      "route": "/dashboard/649/Lead_enrichment",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/lead-enrichment"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -186,18 +161,9 @@
         "fallbackBehavior": "Return partial results from available sources"
       }
     },
-    {
-      "id": "lead-outreach",
-      "version": "v1",
+    "lead-outreach": {
       "category": "apps",
-      "displayName": "Lead outreach",
-      "description": "Hyper-personalized cold email campaigns — build sequences and messaging from enriched leads (mvp-factory-control#653).",
       "catalogOrder": 4,
-      "route": "/dashboard/653/Lead_outreach",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/lead-outreach"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -269,18 +235,9 @@
         "fallbackBehavior": "Return structured error with suggested next step"
       }
     },
-    {
-      "id": "ai-sdr-analytics",
-      "version": "v1",
+    "ai-sdr-analytics": {
       "category": "apps",
-      "displayName": "AI SDR analytics",
-      "description": "Operator dashboard for outbound metrics — SDR events (#654) plus lead workflow funnel (#650), local logs only.",
       "catalogOrder": 5,
-      "route": "/dashboard/651/AI_SDR_analytics",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/ai-sdr-analytics"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -323,18 +280,9 @@
         "fallbackBehavior": "Return error payload with empty series"
       }
     },
-    {
-      "id": "inbox",
-      "version": "v1",
+    "inbox": {
       "category": "apps",
-      "displayName": "Inbox",
-      "description": "MeiMei's email inbox — receive, review, and act on messages like a real assistant.",
       "catalogOrder": 6,
-      "route": "/dashboard/563/Inbox",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/inbox"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -388,18 +336,9 @@
         "fallbackBehavior": "Return error with permission instructions"
       }
     },
-    {
-      "id": "what-next",
-      "version": "v1",
+    "what-next": {
       "category": "apps",
-      "displayName": "What next?",
-      "description": "Your daily guide — get prioritized recommendations based on your sources and AI analysis.",
       "catalogOrder": 1,
-      "route": "/dashboard/724/What_next",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/what-next"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -453,18 +392,9 @@
         "fallbackBehavior": "Return partial results with available sources"
       }
     },
-    {
-      "id": "explain-it",
-      "version": "v1",
+    "explain-it": {
       "category": "apps",
-      "displayName": "Explain it",
-      "description": "Paste a URL or add a source, get a fast structured explanation. Use 'Set alarm' to schedule daily briefings.",
       "catalogOrder": 2,
-      "route": "/dashboard/516/Explain_it",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/explain-it"
-      },
       "input": {
         "required": [
           "url"
@@ -521,18 +451,9 @@
         "fallbackBehavior": "return structured failure payload"
       }
     },
-    {
-      "id": "daily-briefing",
-      "version": "v1",
+    "daily-briefing": {
       "category": "apps",
-      "displayName": "Daily Briefing",
-      "description": "AI-powered daily business briefing — scheduled digest via Explain it stack; POST API and /open subroute for operator scripts.",
       "catalogOrder": 2,
-      "route": "/dashboard/518/Daily_briefing",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/daily-briefing"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -583,7 +504,8 @@
         "fallbackBehavior": "return structured failure payload"
       }
     },
-    {
+    "ai-routing": {
+      "__static": true,
       "id": "ai-routing",
       "version": "v1",
       "category": "tools",
@@ -640,7 +562,8 @@
         "fallbackBehavior": "return route calculation error"
       }
     },
-    {
+    "api-access": {
+      "__static": true,
       "id": "api-access",
       "version": "v1",
       "category": "tools",
@@ -705,18 +628,9 @@
         "fallbackBehavior": "return structured error with adapter lifecycle"
       }
     },
-    {
-      "id": "memory",
-      "version": "v1",
+    "memory": {
       "category": "tools",
-      "displayName": "Memory",
-      "description": "Business Brain — MeiMei's identity, mission, values, and operating principles as a durable context layer.",
       "catalogOrder": 3,
-      "route": "/dashboard/601/Memory",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/memory"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -773,18 +687,9 @@
         "fallbackBehavior": "Return default memory layer"
       }
     },
-    {
-      "id": "mission-control",
-      "version": "v1",
+    "mission-control": {
       "category": "tools",
-      "displayName": "Mission Control",
-      "description": "Live board of MeiMei activity and state — agent status, runs, failures, and action traces.",
       "catalogOrder": 4,
-      "route": "/dashboard/635/Mission_control",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/mission-control"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -832,18 +737,9 @@
         "fallbackBehavior": "Return partial data with available telemetry"
       }
     },
-    {
-      "id": "supabase-connector",
-      "version": "v1",
+    "supabase-connector": {
       "category": "tools",
-      "displayName": "Supabase connector",
-      "description": "PostgREST health and previews; powers Lead Enrichment source supabase for durable lead rows (mvp-factory-control#631).",
       "catalogOrder": 5,
-      "route": "/dashboard/631/Supabase_connector",
-      "api": {
-        "method": "POST",
-        "path": "/dashboard/api/functions/supabase-connector"
-      },
       "input": {
         "required": [],
         "optional": [
@@ -905,7 +801,8 @@
         "fallbackBehavior": "Return structured REST error message"
       }
     },
-    {
+    "environment-variables": {
+      "__static": true,
       "id": "environment-variables",
       "version": "v1",
       "category": "tools",
@@ -988,7 +885,8 @@
         "fallbackBehavior": "Return structured error without echoing stored values"
       }
     },
-    {
+    "reference-app-1": {
+      "__static": true,
       "id": "reference-app-1",
       "version": "v1",
       "category": "apps",
@@ -1051,7 +949,8 @@
         "fallbackBehavior": "Return structured error; job may be failed or retried by worker"
       }
     },
-    {
+    "reference-app-2": {
+      "__static": true,
       "id": "reference-app-2",
       "version": "v1",
       "category": "apps",
@@ -1107,5 +1006,5 @@
         "fallbackBehavior": "Return structured error"
       }
     }
-  ]
+  }
 }

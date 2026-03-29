@@ -7,3 +7,5 @@
 | **`daily-briefing`** | Pilot miniapp (`meimei.app.json` + `index.mjs`); loaded as a kernel builtin from `packages/` (MM-KERNEL-602). |
 
 **MM-KERNEL-602:** Register any external install path with `npm run kernel:app-registry -- register <dir>`. In-repo pilots can live under `packages/<name>/` like **`daily-briefing`**. See [`kernel-apps.v1.md`](../docs/operations/kernel-apps.v1.md) (section *Migrate a miniapp toward `packages/*`*).
+
+**MM-KERNEL-604:** After changing a manifest’s **`routes`**, **`api.pathSuffix`**, or catalog **`description`**, run **`npm run kernel:registry:generate`** and commit **`functions/registry.v1.json`**. Contract-heavy fields live in **`functions/registry.fragments.v1.json`**.

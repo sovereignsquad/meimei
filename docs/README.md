@@ -98,7 +98,7 @@ How to run, deploy, maintain, and troubleshoot.
 | [mac-mini-migration-audit.md](operations/mac-mini-migration-audit.md) | Migration audit |
 | [second-mac-mini-handoff.md](operations/second-mac-mini-handoff.md) | Multi-machine setup |
 | [vercel-env-inventory.md](operations/vercel-env-inventory.md) | Environment variables |
-| [kernel-apps.v1.md](operations/kernel-apps.v1.md) | Kernel external apps — register, HTTPS URLs, catalog merge, pilot, `kernel:registry:drift-check`, migration playbook |
+| [kernel-apps.v1.md](operations/kernel-apps.v1.md) | Kernel external apps — register, HTTPS URLs, catalog merge, pilot, `kernel:registry:generate` / `generate-check`, `kernel:registry:drift-check`, migration playbook |
 
 ## Agent Identity
 

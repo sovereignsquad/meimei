@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "description": "Emit order for functions/registry.v1.json (MM-KERNEL-604).",
+  "functionIds": [
+    "checklist",
+    "lead-enrichment",
+    "lead-outreach",
+    "ai-sdr-analytics",
+    "inbox",
+    "what-next",
+    "explain-it",
+    "daily-briefing",
+    "ai-routing",
+    "api-access",
+    "memory",
+    "mission-control",
+    "supabase-connector",
+    "environment-variables",
+    "reference-app-1",
+    "reference-app-2"
+  ]
+}

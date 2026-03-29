@@ -5,7 +5,9 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const registryPath = path.resolve(__dirname, "..", "functions", "registry.v1.json");
+const registryPath = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.resolve(__dirname, "..", "functions", "registry.v1.json");
 
 function fail(message) {
   console.error(`FAIL: ${message}`);
@@ -126,7 +128,8 @@ async function main() {
   data.functions.forEach((fn, index) => validateFunctionContract(fn, index, seenIds));
 
   if (process.exitCode) return;
-  ok(`Validated ${data.functions.length} function contracts in functions/registry.v1.json`);
+  const repoRoot = path.resolve(__dirname, "..");
+  ok(`Validated ${data.functions.length} function contracts in ${path.relative(repoRoot, registryPath) || registryPath}`);
 }
 
 main().catch((error) => {

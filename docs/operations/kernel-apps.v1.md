@@ -23,7 +23,8 @@ When `MEIMEI_KERNEL_APP_AUTH=1`, set `X-MeiMei-App-Id` and `X-MeiMei-App-Secret`
 
 ## Registry vs disk drift (MM-KERNEL-604)
 
-- `npm run kernel:registry:drift-check` — every `apps/<pkg>/meimei.app.json` must have a matching `functions` row with `id === <pkg>`; registry **apps** (except allowlisted) must have that manifest on disk; registry **tools** must have a manifest or be listed as kernel-implemented. Allowlists: `config/kernel-registry-drift-allowlists.v1.json`.
+- **`functions/registry.v1.json` is generated** — source: `functions/registry.shell.v1.json`, `functions/registry.fragments.v1.json`, `config/registry-functions-order.v1.json`, plus `meimei.app.json` under `apps/*` and `packages/*`. Run **`npm run kernel:registry:generate`** after editing those inputs; CI runs **`npm run kernel:registry:generate-check`**.
+- `npm run kernel:registry:drift-check` — every disk manifest must have a matching `functions` row with `id === <pkg>`; registry **apps** (except allowlisted) must have that manifest on disk; registry **tools** must have a manifest or be listed as kernel-implemented. Allowlists: `config/kernel-registry-drift-allowlists.v1.json`.
 
 ## Registry snapshot (audit)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * MM-KERNEL-604 — align functions/registry.v1.json with each apps/<pkg>/ or packages/<pkg>/ meimei.app.json on disk.
- * See config/kernel-registry-drift-allowlists.v1.json
+ * MM-KERNEL-604 — align generated functions/registry.v1.json with each apps/<pkg>/ or packages/<pkg>/ meimei.app.json on disk.
+ * Registry file is produced by meimei-kernel-registry-generate.mjs. See config/kernel-registry-drift-allowlists.v1.json
  */
 import fs from "node:fs";
 import path from "node:path";

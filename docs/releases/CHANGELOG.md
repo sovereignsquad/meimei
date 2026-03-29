@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-03-29 — MM-KERNEL-604: generated `functions/registry.v1.json`
+
+- **`npm run kernel:registry:generate`** — writes **`functions/registry.v1.json`** from **`functions/registry.shell.v1.json`**, **`functions/registry.fragments.v1.json`**, **`config/registry-functions-order.v1.json`**, and **`meimei.app.json`** ( **`apps/*`**, **`packages/*`** ). **`npm run kernel:registry:generate-check`** in **`npm run ci`**.
+- **Manifest catalog copy** — **`lead-outreach`**, **`ai-sdr-analytics`**, **`explain-it`**, **`daily-briefing`**, **`supabase-connector`** descriptions updated to match prior registry text (≤480 chars).
+- **`scripts/meimei-kernel-registry-bootstrap-fragments.mjs`** — optional one-shot to rebuild **`registry.fragments.v1.json`** from a legacy flat registry.
+
 ## 2026-03-29 — MM-KERNEL-602: pilot miniapp under `packages/daily-briefing`
 
 - **`packages/daily-briefing/`** — `meimei.app.json` + `index.mjs` moved from **`apps/daily-briefing/`**; workspace package **`@meimei/daily-briefing`**.
