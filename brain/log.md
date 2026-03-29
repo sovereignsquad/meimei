@@ -63,3 +63,10 @@
 [2026-03-28T18:44:39.369Z] Mission control viewed (filter: all)
 [2026-03-28T18:48:54.893Z] Mission control viewed (filter: all)
 [2026-03-28T18:57:36.858Z] Mission control viewed (filter: all)
+[2026-03-28T19:42:28.880Z] Enriched lead: email -> {"name":"Alex Johnson","title":"Senior Software En...
+[2026-03-28T22:27:19.988Z] Enriched lead: email -> {"name":"Alex Johnson","title":"Senior Software En...
+[2026-03-28T22:27:20.925Z] Mission control viewed (filter: all)
+[2026-03-28T22:27:28.444Z] Generated 3 recommendations
+[2026-03-28T22:27:57.101Z] Summarized URL: https://example.com
+[2026-03-29T06:07:43.208Z] Summarized URL: https://index.hu
+[2026-03-29T06:07:55.749Z] Summarized URL: https://index.hu

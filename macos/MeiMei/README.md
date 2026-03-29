@@ -1,6 +1,6 @@
 # MeiMei menu bar app
 
-Small macOS status-bar app: open the local MeiMei HTTPS dashboard, Apps/Tools, Admin, OpenClaw chat, copy URL, preferences.
+Small macOS status-bar app: open the local MeiMei HTTPS dashboard, **Checklist** (proxied local Next.js), **MeiMei weekly pipeline** (`/original-checklist`), Apps/Tools, Admin, OpenClaw chat, copy URLs, preferences.
 
 ## Background
 
@@ -35,7 +35,7 @@ swift build -c release
 - **MeiMei base URL** — default `https://meimei.localhost:8443` (no trailing slash).
 - **OpenClaw chat URL** — default `http://127.0.0.1:18789/chat?session=main`.
 
-Stored in `UserDefaults` under keys `meimei.baseURL` and `meimei.openclawChatURL`.
+Stored in `UserDefaults` under keys `meimei.baseURL`, `meimei.openclawChatURL`, `meimei.repoRoot`, and `meimei.checklistPublicPath` (default `/dashboard/727/Checklist`, i.e. HTTPS `…/dashboard/727/Checklist/` → local Next with `MEIMEI_CHECKLIST_LOCAL_UPSTREAM`).
 
 ## Repo root
 
@@ -59,6 +59,23 @@ There is **no** MeiMei menu bar app pre-installed by the repo: you build it loca
   ```
   Then **⌘Space** → `meimei`. The app icon comes from `public/images/logo_sovereign.png`. If Spotlight still shows a stale name, run **`mdimport ~/Applications/MeiMei.app`**.
 
-- **Start automatically at login:** **System Settings → General → Login Items & Extensions → Open at Login** → add **MeiMei** from Applications. (The dashboard **server** is separate: `meimei-domain` / `dashboard:watchdog` — this menu app only opens URLs.)
+- **Start automatically at login:** **System Settings → General → Login Items & Extensions → Open at Login** → add **MeiMei** from Applications.
+
+### Local services (dashboard + HTTPS proxy + health watcher)
+
+The menu bar shows **live status** from `GET` on the **Health check URL** (Preferences → default `http://127.0.0.1:45285/api/health`). **Start / Stop / Restart** run the same orchestration scripts on a **background queue** (no main-thread `waitUntilExit`). Script output is appended to **`~/.meimei/logs/MeiMeiControl.log`** (“Reveal control log” in the menu).
+
+When **MeiMei** starts, it runs `scripts/meimei-menubar-orchestrate-start.sh` against your **agent.meimei** checkout:
+
+- **`meimei-domain install`** — `com.agent.meimei.dashboard-ui` + `com.agent.meimei.dashboard-proxy` (logs under `~/.meimei/logs/`; see `docs/operations/meimei-platform-launchd.v1.md`)
+- If **`com.agent.meimei.dashboard-health`** is not loaded, installs it (periodic probe → `GET /api/health` → `kickstart` UI if needed)
+
+When you **Quit MeiMei**, it runs `scripts/meimei-menubar-orchestrate-stop.sh` and unloads those agents.
+
+**Repository root:** If you copy **MeiMei.app** to `~/Applications`, set **MeiMei → Preferences → MeiMei repository root** to your checkout (e.g. `~/Projects/agent.meimei`). If you only run the app from `macos/MeiMei/build/MeiMei.app` inside the repo, the path is detected automatically.
+
+CLI equivalents from the repo: `npm run menubar:services:start` / `npm run menubar:services:stop`.
+
+**`npm run dashboard:watchdog:install`** now runs the same **`meimei-domain install`** + health installer (no duplicate `com.agent.meimei.dashboard` job). Prefer one flow; avoid hand-editing LaunchAgent plists outside the repo templates.
 
 This bundle uses **`LSUIElement`**: it appears in the **menu bar**, not the Dock.

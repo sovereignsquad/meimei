@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dashboard": "node dashboard/server.mjs",
+    "dashboard:probe": "node scripts/meimei-dashboard-probe.mjs",
     "config:seed": "node scripts/meimei-config.mjs seed",
     "config:export": "node scripts/meimei-config.mjs export-template",
     "readiness": "./scripts/oc-readiness",
@@ -33,13 +34,23 @@
     "dashboard:watchdog:uninstall": "./scripts/meimei-dashboard-watchdog-uninstall",
     "dashboard:watchdog:status": "./scripts/meimei-dashboard-watchdog-status",
     "dashboard:reload": "./scripts/meimei-dashboard-reload",
+    "platform:migrate": "./scripts/meimei-platform-migrate.sh",
+    "jobs:demo-enqueue": "node scripts/meimei-demo-enqueue-job.mjs",
+    "jobs:demo-file-drop": "node scripts/meimei-demo-file-drop-ingest.mjs",
+    "adapter:obsidian": "node scripts/meimei-adapter-obsidian.mjs",
+    "test:mas-handshake": "node scripts/meimei-test-mas-handshake.mjs",
     "menubar:build": "bash macos/MeiMei/build-app.sh",
     "menubar:install": "bash scripts/meimei-menubar-install-user.sh",
     "menubar:test": "bash scripts/meimei-menubar-smoke-test.sh",
+    "menubar:services:start": "bash -c 'exec scripts/meimei-menubar-orchestrate-start.sh \"$PWD\"'",
+    "menubar:services:stop": "bash -c 'exec scripts/meimei-menubar-orchestrate-stop.sh \"$PWD\"'",
     "start": "node dashboard/server.mjs",
-    "ci": "npm run registry:validate && npm run policy:validate && npm run audit:validate && npm run telemetry:validate && npm run handoff:validate -- handoffs/sample.stage-gate.v1.json && npm run adapter:whatsapp:validate && npm run imessage:validate && npm run release:gates -- releases/sample.release-gate.v1.json"
+    "ci": "npm run registry:validate && npm run policy:validate && npm run audit:validate && npm run telemetry:validate && npm run handoff:validate -- handoffs/sample.stage-gate.v1.json && npm run adapter:whatsapp:validate && npm run imessage:validate && npm run release:gates -- releases/sample.release-gate.v1.json",
+    "agent-chappie:queue-consumer": "node scripts/agent-chappie-queue-consumer.mjs",
+    "agent-chappie:sync-checklist-theme": "node scripts/sync-agent-chappie-checklist-theme.mjs"
   },
   "dependencies": {
+    "chokidar": "^4.0.3",
     "pdf-parse": "^2.4.5"
   }
 }

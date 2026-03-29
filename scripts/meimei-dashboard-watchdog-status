@@ -1,18 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 uid="$(id -u)"
-dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
+dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard-ui}"
 watchdog_label="${MEIMEI_DASHBOARD_WATCHDOG_LABEL:-com.agent.meimei.dashboard-health}"
-dashboard_port="${PORT:-3030}"
-health_url="${MEIMEI_DASHBOARD_HEALTH_URL:-http://127.0.0.1:${dashboard_port}/api/telemetry/summary}"
-logs_dir="$HOME/Library/Logs/agent.meimei"
+proxy_label="com.agent.meimei.dashboard-proxy"
+if [[ -n "${PORT:-}" ]]; then
+  dashboard_port="$PORT"
+else
+  dashboard_port="$(node "${ROOT_DIR}/config/print-dashboard-default-port.mjs")"
+fi
+health_url="${MEIMEI_DASHBOARD_HEALTH_URL:-http://127.0.0.1:${dashboard_port}/api/health}"
+logs_dir="${HOME}/.meimei/logs"
 
-echo "Dashboard label: $dashboard_label"
-echo "Watchdog label:  $watchdog_label"
+echo "Dashboard UI label: $dashboard_label"
+echo "Proxy label:        $proxy_label"
+echo "Watchdog label:     $watchdog_label"
 echo
-echo "Dashboard launchctl:"
-launchctl print "gui/$uid/$dashboard_label" 2>/dev/null || echo "Dashboard service not loaded."
+echo "Dashboard UI launchctl:"
+launchctl print "gui/$uid/$dashboard_label" 2>/dev/null || echo "Dashboard UI service not loaded."
+echo
+echo "Proxy launchctl:"
+launchctl print "gui/$uid/$proxy_label" 2>/dev/null || echo "Proxy service not loaded."
 echo
 echo "Watchdog launchctl:"
 launchctl print "gui/$uid/$watchdog_label" 2>/dev/null || echo "Watchdog service not loaded."
@@ -24,8 +34,10 @@ else
   echo "Health: FAIL"
 fi
 echo
-echo "Logs:"
-echo "  $logs_dir/dashboard.out.log"
-echo "  $logs_dir/dashboard.err.log"
-echo "  $logs_dir/dashboard-watchdog.out.log"
-echo "  $logs_dir/dashboard-watchdog.err.log"
+echo "Logs (canonical):"
+echo "  $logs_dir/dashboard-ui.log"
+echo "  $logs_dir/dashboard-ui.err"
+echo "  $logs_dir/dashboard-proxy.log"
+echo "  $logs_dir/dashboard-proxy.err"
+echo "  $logs_dir/dashboard-health.log"
+echo "  $logs_dir/dashboard-health.err"

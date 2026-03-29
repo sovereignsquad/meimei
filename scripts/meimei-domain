@@ -3,11 +3,18 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${HOME}/.openclaw/.env"
-PLIST_PATH="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-proxy.plist"
-DASHBOARD_PLIST_PATH="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-ui.plist"
-LABEL="ai.openclaw.meimei.dashboard-proxy"
-UI_LABEL="ai.openclaw.meimei.dashboard-ui"
+PLIST_DIR="${HOME}/Library/LaunchAgents"
+LOG_DIR="${HOME}/.meimei/logs"
+PLIST_PATH="${PLIST_DIR}/com.agent.meimei.dashboard-proxy.plist"
+DASHBOARD_PLIST_PATH="${PLIST_DIR}/com.agent.meimei.dashboard-ui.plist"
+LABEL="com.agent.meimei.dashboard-proxy"
+UI_LABEL="com.agent.meimei.dashboard-ui"
 NODE_BIN="$(command -v node)"
+
+# Retired MeiMei labels (pre–Milestone A); bootout + remove plist on install.
+LEGACY_UI_PLIST="${PLIST_DIR}/ai.openclaw.meimei.dashboard-ui.plist"
+LEGACY_PROXY_PLIST="${PLIST_DIR}/ai.openclaw.meimei.dashboard-proxy.plist"
+LEGACY_HEALTH_PLIST="${PLIST_DIR}/ai.openclaw.meimei.dashboard-health.plist"
 
 if [[ -f "${ENV_FILE}" ]]; then
   set -a
@@ -16,8 +23,26 @@ if [[ -f "${ENV_FILE}" ]]; then
   set +a
 fi
 
+# Single source of truth: config/dashboard-surface.v1.json (see config/print-dashboard-default-port.mjs).
+read_dashboard_port() {
+  "${NODE_BIN}" "${ROOT_DIR}/config/print-dashboard-default-port.mjs"
+}
+DASHBOARD_PORT="$(read_dashboard_port)"
+
+bootout_legacy_meimei_plists() {
+  local uid
+  uid="$(id -u)"
+  launchctl bootout "gui/${uid}" "${LEGACY_UI_PLIST}" 2>/dev/null || true
+  launchctl bootout "gui/${uid}" "${LEGACY_PROXY_PLIST}" 2>/dev/null || true
+  launchctl bootout "gui/${uid}" "${LEGACY_HEALTH_PLIST}" 2>/dev/null || true
+}
+
+remove_legacy_plist_files() {
+  rm -f "${LEGACY_UI_PLIST}" "${LEGACY_PROXY_PLIST}" "${LEGACY_HEALTH_PLIST}"
+}
+
 install_plist() {
-  mkdir -p "$(dirname "${PLIST_PATH}")"
+  mkdir -p "${PLIST_DIR}" "${LOG_DIR}"
   cat > "${PLIST_PATH}" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -37,16 +62,16 @@ install_plist() {
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-proxy.out</string>
+  <string>${LOG_DIR}/dashboard-proxy.log</string>
   <key>StandardErrorPath</key>
-  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-proxy.err</string>
+  <string>${LOG_DIR}/dashboard-proxy.err</string>
 </dict>
 </plist>
 PLIST
 }
 
 install_dashboard_plist() {
-  mkdir -p "$(dirname "${DASHBOARD_PLIST_PATH}")"
+  mkdir -p "${PLIST_DIR}" "${LOG_DIR}"
   cat > "${DASHBOARD_PLIST_PATH}" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -64,16 +89,16 @@ install_dashboard_plist() {
   <key>EnvironmentVariables</key>
   <dict>
     <key>PORT</key>
-    <string>3030</string>
+    <string>${DASHBOARD_PORT}</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-ui.out</string>
+  <string>${LOG_DIR}/dashboard-ui.log</string>
   <key>StandardErrorPath</key>
-  <string>${HOME}/Library/Logs/ai.openclaw.meimei.dashboard-ui.err</string>
+  <string>${LOG_DIR}/dashboard-ui.err</string>
 </dict>
 </plist>
 PLIST
@@ -81,12 +106,16 @@ PLIST
 
 status() {
   echo "Domain: https://meimei.localhost:8443/dashboard"
+  echo "Dashboard upstream: http://127.0.0.1:${DASHBOARD_PORT} (from config/dashboard-surface.v1.json — re-run install/restart after changing it)"
+  echo "Launchd contract: docs/operations/meimei-platform-launchd.v1.md"
   launchctl print "gui/$(id -u)/${LABEL}" 2>/dev/null || true
   launchctl print "gui/$(id -u)/${UI_LABEL}" 2>/dev/null || true
 }
 
 case "${1:-status}" in
   install)
+    bootout_legacy_meimei_plists
+    remove_legacy_plist_files
     install_dashboard_plist
     install_plist
     launchctl bootout "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}" 2>/dev/null || true
@@ -103,8 +132,11 @@ case "${1:-status}" in
   stop)
     launchctl bootout "gui/$(id -u)" "${DASHBOARD_PLIST_PATH}" 2>/dev/null || true
     launchctl bootout "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null || true
+    bootout_legacy_meimei_plists
     ;;
   restart)
+    bootout_legacy_meimei_plists
+    remove_legacy_plist_files
     install_dashboard_plist
     launchctl bootout "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null || true
     install_plist

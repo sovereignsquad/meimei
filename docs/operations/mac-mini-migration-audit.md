@@ -265,7 +265,7 @@ Run:
 
 This installs:
 
-- dashboard service on `127.0.0.1:3030`
+- dashboard service on `127.0.0.1:<defaults.port>` (`config/dashboard-surface.v1.json`)
 - HTTPS local domain proxy on `https://meimei.localhost:8443/dashboard/`
 
 ### 9. Start the product

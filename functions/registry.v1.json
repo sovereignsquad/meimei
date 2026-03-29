@@ -678,6 +678,90 @@
         "clearErrorMessages": true,
         "fallbackBehavior": "Return structured error without echoing stored values"
       }
+    },
+    {
+      "id": "reference-app-1",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "Reference app (queue)",
+      "description": "Platform demo: REFAPP_FEATURE_TOGGLE, enqueue inference_v1 to SQLite meimei_jobs, poll status — no direct LLM from the handler.",
+      "catalogOrder": 14,
+      "route": "/dashboard/790/Reference_app_1",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/reference-app-1"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action", "prompt", "jobId"],
+        "examples": [
+          { "action": "config" },
+          { "action": "enqueue", "prompt": "What is 2+2?" },
+          { "action": "status", "jobId": 1 }
+        ]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Requires MEIMEI_JOB_WORKER=1 (default) and local Ollama for inference.",
+          "Jobs are scoped to adapter_name reference-app-1; status polls cannot read other adapters' rows."
+        ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["local-file-write"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return structured error; job may be failed or retried by worker"
+      }
+    },
+    {
+      "id": "reference-app-2",
+      "version": "v1",
+      "category": "apps",
+      "displayName": "Reference app 2 (inbox)",
+      "description": "Milestone G sovereign inbox for reference-app-2: consumes app_task from SQLite only; no peer HTTP. Debug/status API only.",
+      "catalogOrder": 16,
+      "route": "/dashboard/791/Reference_app_2",
+      "api": {
+        "method": "POST",
+        "path": "/dashboard/api/functions/reference-app-2"
+      },
+      "input": {
+        "required": [],
+        "optional": ["action"],
+        "examples": [{ "action": "config" }, { "action": "inbox" }]
+      },
+      "output": {
+        "statusField": "ok",
+        "payloadShape": "object",
+        "requiredFields": ["ok"]
+      },
+      "safety": {
+        "untrustedInput": false,
+        "allowedProtocols": [],
+        "notes": [
+          "Same REFAPP_FEATURE_TOGGLE as Reference App 1.",
+          "Inter-app traffic is SQLite-only; this handler never calls Reference App 1 over HTTP."
+        ]
+      },
+      "capabilities": {
+        "channels": ["dashboard", "api"],
+        "sideEffects": ["local-file-write"],
+        "requiresApproval": false
+      },
+      "failureModel": {
+        "clearErrorMessages": true,
+        "fallbackBehavior": "Return structured error"
+      }
     }
   ]
 }

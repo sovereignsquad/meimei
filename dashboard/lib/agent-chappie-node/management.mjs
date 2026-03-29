@@ -4,6 +4,7 @@
 import { getAgentChappieDb } from "./db.mjs";
 import { buildWorkspacePayload } from "./workspace.mjs";
 import { processJobPayload } from "./jobs.mjs";
+import { applyTaskFeedbackV2, processTaskFeedback } from "./feedback.mjs";
 
 function nowIso() {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
@@ -13,17 +14,6 @@ function parsePath(pathname) {
   const parts = pathname.split("/").filter(Boolean);
   if (parts[0] !== "projects" || parts.length < 3) return null;
   return { projectId: parts[1], parts };
-}
-
-function getActiveTasksJson(db, projectId) {
-  const row = db.prepare(`select tasks_json from project_active_checklist where project_id = ?`).get(projectId);
-  if (!row?.tasks_json) return null;
-  try {
-    const t = JSON.parse(row.tasks_json);
-    return Array.isArray(t) && t.length === 3 ? t : null;
-  } catch {
-    return null;
-  }
 }
 
 /**
@@ -174,35 +164,37 @@ export async function handleManagementRequest(dbPath, method, pathname, body) {
   }
 
   if (resource === "tasks" && method === "POST" && parts.length === 4 && parts[3] === "feedback") {
-    const tasks = getActiveTasksJson(db, projectId);
-    if (!tasks) {
-      return { status: 400, body: { error: "invalid_task_feedback", detail: "no_active_checklist" } };
+    try {
+      const out = await applyTaskFeedbackV2(dbPath, { ...body, project_id: projectId });
+      return { status: 200, body: out };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (
+        msg.includes("required") ||
+        msg.includes("Unsupported action_type") ||
+        msg.includes("edit requires") ||
+        msg.includes("does not match")
+      ) {
+        return { status: 400, body: { error: "invalid_task_feedback", detail: msg } };
+      }
+      throw e;
     }
-    if (body.action_type === "edit" && !(body.edited_title || body.comment)) {
-      return { status: 400, body: { error: "invalid_task_feedback", detail: "edit requires edited_title or comment" } };
+  }
+
+  if (resource === "task-feedback" && method === "POST" && parts.length === 3) {
+    try {
+      const r = await processTaskFeedback(dbPath, projectId, body);
+      return {
+        status: 200,
+        body: { job_result: r.job_result, workspace: r.workspace }
+      };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("requires at least one")) {
+        return { status: 400, body: { error: "invalid_task_feedback", detail: msg } };
+      }
+      throw e;
     }
-    if (body.action_type === "edit") {
-      const tid = String(body.task_id || "");
-      const next = tasks.map((t, i) => {
-        const match =
-          String(t.task_id || "") === tid ||
-          String(t.rank) === tid ||
-          (tid === String(i + 1) ? true : false);
-        if (match) {
-          return {
-            ...t,
-            title: String(body.edited_title || body.comment || t.title).slice(0, 500)
-          };
-        }
-        return t;
-      });
-      const row = db.prepare(`select job_id from project_active_checklist where project_id = ?`).get(projectId);
-      db.prepare(
-        `update project_active_checklist set tasks_json = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') where project_id = ?`
-      ).run(JSON.stringify(next), projectId);
-      return { status: 200, body: { tasks: next, job_id: row?.job_id } };
-    }
-    return { status: 200, body: { tasks } };
   }
 
   if (resource === "checklist" && method === "POST" && parts.length === 3) {

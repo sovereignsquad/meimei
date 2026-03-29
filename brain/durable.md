@@ -19,7 +19,7 @@
   - Markdown-based, human-readable, git-tracked
 
 - [2026-03-28] Proxy routing fixed in `scripts/meimei-domain.mjs`:
-  - `/api/functions/*` routes to dashboard (port 3030)
+  - `/api/functions/*` routes to the dashboard HTTP server (`config/dashboard-surface.v1.json` `defaults.port`)
   - `/api/*` routes to OpenClaw gateway (port 18789)
 
 ### Phase 2: Real Data Integration (COMPLETE)
@@ -86,7 +86,7 @@
 
 - Template literal regex escaping is fragile - use `new RegExp()` with strings
 - Ollama `format: "json"` puts output in `thinking` field for some models
-- Port 3030 requires `pkill -9 node` when stuck
+- A stuck dashboard `node` process may require `pkill -9 node` (use sparingly)
 - AppleScript requires Mail app permissions
 - Proxy path stripping: `/dashboard/api/*` → `/api/*`
 

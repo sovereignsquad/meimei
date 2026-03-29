@@ -24,7 +24,7 @@ The **reference implementation** of the channel adapter lifecycle for the **`api
 
 1. Run `npm run registry:validate` (registry includes `api-channel-adapter`).
 2. Start dashboard: `npm run dashboard`.
-3. Open `http://127.0.0.1:3030/700/API_channel_adapter` (or via `meimei.localhost` proxy: `/dashboard/700/API_channel_adapter`).
+3. Open `http://127.0.0.1:<defaults.port>/700/API_channel_adapter` (see `config/dashboard-surface.v1.json`), or via `meimei.localhost` proxy: `/dashboard/700/API_channel_adapter`.
 4. Run **Run adapter** with defaults — expect `adapter.state` `delivered` and a `route` object.
 5. Toggle **approved** / pick a channel that triggers policy block if configured — expect HTTP 400 with `adapter` and blocked lifecycle.
 

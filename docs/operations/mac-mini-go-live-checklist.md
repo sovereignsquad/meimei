@@ -38,7 +38,7 @@ Use this before declaring the second Mac mini ready for daily operation.
 ### 5. Dashboard and proxy
 
 - [ ] `./scripts/meimei-domain install` succeeds
-- [ ] `http://127.0.0.1:3030/` returns `200`
+- [ ] `http://127.0.0.1:<defaults.port>/` returns `200` (see `config/dashboard-surface.v1.json`)
 - [ ] `https://meimei.localhost:8443/dashboard/` returns `200`
 - [ ] The dashboard root loads the miniapp catalog
 

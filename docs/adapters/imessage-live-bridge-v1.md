@@ -44,7 +44,7 @@ Deliver a live iMessage inbound/outbound bridge path so you can message MeiMei a
 ## Local Test
 
 ```bash
-curl -sS -X POST "http://127.0.0.1:3030/api/channels/imessage/inbound" \
+curl -sS -X POST "http://127.0.0.1:45285/api/channels/imessage/inbound" \
   -H "content-type: application/json" \
   -d '{
     "eventId":"imsg-manual-001",

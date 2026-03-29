@@ -9,7 +9,11 @@ logs_dir="$HOME/Library/Logs/agent.meimei"
 stdout_log="$logs_dir/gateway.out.log"
 stderr_log="$logs_dir/gateway.err.log"
 openclaw_port="${OPENCLAW_GATEWAY_PORT:-18789}"
-dashboard_port="${PORT:-3030}"
+if [[ -n "${PORT:-}" ]]; then
+  dashboard_port="$PORT"
+else
+  dashboard_port="$(node "${repo_root}/config/print-dashboard-default-port.mjs")"
+fi
 existing_label="ai.openclaw.gateway"
 uid="$(id -u)"
 

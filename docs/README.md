@@ -39,6 +39,9 @@ System design, technical contracts, and standards.
 | [model-routing-spec.md](architecture/model-routing-spec.md) | Brain-muscle model routing architecture |
 | [naming-conventions.md](architecture/naming-conventions.md) | File naming and code conventions |
 | [project-vocabulary-v1.md](architecture/project-vocabulary-v1.md) | Standardized project terminology |
+| [inference-route.v1.md](api/inference-route.v1.md) | `POST /api/meimei/route` — OpenAI-shaped inference contract (v1) |
+| [adapter-contract.v1.md](architecture/adapter-contract.v1.md) | Job spooler + adapter quarantine (ingress/egress, dead letters) |
+| [adapter-obsidian.v1.md](architecture/adapter-obsidian.v1.md) | Vault watcher daemon (`chokidar`), ingress/egress rules |
 
 ## Governance
 

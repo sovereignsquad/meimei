@@ -1,5 +1,7 @@
 {
   "version": "v1",
+  "deprecatedDashboardListenPorts": [3030],
+  "migrationCanonicalListenPort": 45285,
   "routes": {
     "home": "/",
     "apps": "/apps",
@@ -8,6 +10,7 @@
     "knowmore": "/knowmore"
   },
   "api": {
+    "health": "/api/health",
     "config": "/api/config",
     "run": "/api/run",
     "telemetrySummary": "/api/telemetry/summary",
@@ -29,7 +32,7 @@
     "setupCommand": "MEIMEI_SETUP_COMMAND"
   },
   "defaults": {
-    "port": 3030,
+    "port": 45285,
     "openclawChatUrl": "http://127.0.0.1:18789/chat?session=main",
     "setupCommand": "./scripts/meimei-setup"
   },

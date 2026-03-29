@@ -112,7 +112,8 @@ main() {
   ensure_domain_services
   start_gateway_if_needed
   "$ROOT_DIR/scripts/meimei-domain" status || true
-  wait_for_http "http://127.0.0.1:3030/"
+  dashboard_port="$(node "${ROOT_DIR}/config/print-dashboard-default-port.mjs")"
+  wait_for_http "http://127.0.0.1:${dashboard_port}/"
   wait_for_http "https://meimei.localhost:8443/dashboard/"
   note "Running OpenClaw status..."
   "$ROOT_DIR/scripts/oc-status" || true

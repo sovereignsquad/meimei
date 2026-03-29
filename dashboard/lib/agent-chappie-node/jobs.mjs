@@ -4,6 +4,7 @@
 import crypto from "node:crypto";
 import { getAgentChappieDb } from "./db.mjs";
 import { callOllamaJson } from "../llm.mjs";
+import { normalizeRecommendedTasks, persistChecklistAndCards } from "./checklist-persist.mjs";
 
 const SIGNAL_TYPES = new Set([
   "pricing_change",
@@ -208,126 +209,14 @@ ${rawText.slice(0, 14000)}`;
     .all(projectId);
   const validRef = new Set(allObs.map((r) => r.signal_id));
 
-  /** @type {Array<{rank:number,title:string,why_now:string,expected_advantage:string,evidence_refs:string[]}>} */
-  let tasks = tasksIn
-    .filter((t) => t && typeof t === "object")
-    .map((t) => ({
-      rank: Number(t.rank),
-      title: String(t.title || "").slice(0, 500),
-      why_now: String(t.why_now || "").slice(0, 800),
-      expected_advantage: String(t.expected_advantage || "").slice(0, 800),
-      evidence_refs: Array.isArray(t.evidence_refs)
-        ? t.evidence_refs.map((x) => String(x)).filter((x) => validRef.has(x))
-        : []
-    }))
-    .filter((t) => t.title);
+  const tasks = normalizeRecommendedTasks(projectId, tasksIn, validRef, sourceRef);
 
-  if (tasks.length < 3) {
-    const filler = Array.from(validRef)[0] || "obs_placeholder";
-    while (tasks.length < 3) {
-      const r = tasks.length + 1;
-      tasks.push({
-        rank: r,
-        title: `Follow up on source ${sourceRef.slice(0, 40)}`,
-        why_now: "MeiMei native worker generated a fallback task to preserve the three-move contract.",
-        expected_advantage: "Keeps the workspace actionable while you add richer source text.",
-        evidence_refs: [filler].filter((x) => validRef.has(x))
-      });
-    }
-  }
-  tasks = tasks.slice(0, 3);
-  const firstEvidence = Array.from(validRef)[0];
-  for (let i = 0; i < 3; i++) {
-    const refs =
-      tasks[i].evidence_refs && tasks[i].evidence_refs.length
-        ? tasks[i].evidence_refs
-        : firstEvidence
-          ? [firstEvidence]
-          : [];
-    tasks[i] = { ...tasks[i], rank: i + 1, evidence_refs: refs };
-  }
-
-  db.prepare(`delete from intelligence_cards where project_id = ?`).run(projectId);
-  db.prepare(`delete from card_scores where project_id = ?`).run(projectId);
-
-  const insCard = db.prepare(`
-    insert into intelligence_cards (
-      card_id, project_id, insight, implication, potential_moves_json, segment, competitor, channel,
-      fact_refs_json, source_refs_json, state, expires_at, created_at, updated_at
-    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', null,
-      strftime('%Y-%m-%dT%H:%M:%fZ','now'), strftime('%Y-%m-%dT%H:%M:%fZ','now'))
-  `);
-  const insScore = db.prepare(`
-    insert into card_scores (card_id, project_id, confidence, impact_score, freshness_score, evidence_strength, rank_score)
-    values (?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  for (let i = 0; i < tasks.length; i++) {
-    const t = tasks[i];
-    const cardId = `meimei:${jobId}:${t.rank}`;
-    const moves = [t.why_now.slice(0, 200), t.expected_advantage.slice(0, 200)];
-    insCard.run(
-      cardId,
-      projectId,
-      t.title,
-      t.why_now,
-      JSON.stringify(moves),
-      "meimei_native",
-      null,
-      null,
-      JSON.stringify(t.evidence_refs),
-      JSON.stringify([sourceRef])
-    );
-    const rs = 0.95 - i * 0.05;
-    insScore.run(cardId, projectId, 0.75, 0.7, 0.65, 0.72, rs);
-  }
-
-  db.prepare(
-    `insert into project_active_checklist (project_id, job_id, tasks_json, updated_at)
-     values (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'))
-     on conflict(project_id) do update set job_id = excluded.job_id, tasks_json = excluded.tasks_json`
-  ).run(projectId, jobId, JSON.stringify(tasks));
-
-  const traceRefs = [...new Set(tasks.flatMap((t) => t.evidence_refs))];
-
-  db.prepare(
-    `update source_snapshots set
-      status = ?, processing_summary = ?, key_takeaway = ?, business_impact = ?,
-      linked_task_titles_json = ?, source_confidence = ?, signal_count = ?, knowledge_count = ?,
-      last_used_in_checklist = 1
-     where source_ref = ?`
-  ).run(
-    "processed",
-    summary.slice(0, 2000),
-    summary.slice(0, 400),
-    "medium",
-    JSON.stringify(tasks.map((t) => t.title)),
-    0.72,
-    seenIds.size,
-    0,
-    sourceRef
-  );
-
-  db.prepare(
-    `insert into flashcard_pipeline_runs (run_id, job_id, project_id, pipeline_source, reason, detail_json)
-     values (?, ?, ?, 'meimei_node', '', ?)`
-  ).run(`run_${jobId}`, jobId, projectId, JSON.stringify({ engine: "meimei-node", observation_count: seenIds.size }));
-
-  const completedAt = nowIso();
-  const job_result = {
-    job_id: jobId,
-    app_id: String(jr.app_id),
-    project_id: projectId,
-    status: "complete",
-    completed_at: completedAt,
-    result_payload: {
-      recommended_tasks: tasks,
-      summary
-    },
-    decision_summary: { route: "proceed", confidence: 0.82 },
-    trace_run_id: `meimei-node-${jobId}`,
-    trace_refs: traceRefs
-  };
+  const job_result = persistChecklistAndCards(db, projectId, jobId, tasks, summary, {
+    sourceRef,
+    observationCount: seenIds.size,
+    pipelineDetail: { engine: "meimei-node", observation_count: seenIds.size }
+  });
+  job_result.app_id = String(jr.app_id);
 
   return {
     job_result,

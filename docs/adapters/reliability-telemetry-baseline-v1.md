@@ -58,7 +58,7 @@ Where:
 
 After seeding events and starting dashboard, reliability summary is visible at:
 
-- `http://127.0.0.1:3030/api/telemetry/summary`
+- `http://127.0.0.1:45285/api/telemetry/summary` (port from `config/dashboard-surface.v1.json` `defaults.port`)
 
 This is the first live, directly testable reliability telemetry surface.
 

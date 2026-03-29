@@ -1,0 +1,155 @@
+/**
+ * MeiMei design-system parity layer for Agent.Chappie Next.js (consultant-followup-web).
+ * Import AFTER ./globals.css in app/layout.tsx.
+ * Source tokens aligned with agent.meimei public/styles/design-system.css (green / checklist theme).
+ */
+
+:root {
+  --bg-top: #04070d;
+  --bg-bottom: #03060b;
+  --surface: rgba(11, 17, 31, 0.94);
+  --surface-strong: rgba(15, 22, 39, 0.98);
+  --surface-muted: rgba(15, 22, 39, 0.72);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(52, 211, 153, 0.35);
+  --ink: #f3f6ff;
+  --muted: rgba(243, 246, 255, 0.72);
+  --accent: #34d399;
+  --accent-strong: #10b981;
+  --accent-soft: rgba(52, 211, 153, 0.14);
+  --warm: #60a5fa;
+  --warm-soft: rgba(96, 165, 250, 0.14);
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.14);
+  --ok: #34d399;
+  --ok-soft: rgba(52, 211, 153, 0.14);
+  --sidebar-bg: #070b14;
+  --sidebar-surface: rgba(255, 255, 255, 0.04);
+  --sidebar-line: rgba(255, 255, 255, 0.1);
+  --sidebar-ink: #f3f6ff;
+  --sidebar-muted: rgba(243, 246, 255, 0.62);
+  --shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+}
+
+html {
+  background: #04070d;
+  background-image:
+    radial-gradient(circle at top right, rgba(52, 211, 153, 0.14), transparent 34%),
+    linear-gradient(180deg, #04070d 0%, #070b14 55%, #03060b 100%);
+}
+
+body {
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(52, 211, 153, 0.06), transparent 42%),
+    linear-gradient(180deg, rgba(6, 10, 18, 0.4), transparent 100%);
+}
+
+.site-footer {
+  border-top-color: var(--line);
+  background: rgba(4, 7, 13, 0.88);
+}
+
+.site-footer-inner,
+.site-footer-links a {
+  color: var(--muted);
+}
+
+.site-footer-links a {
+  color: var(--accent);
+}
+
+.site-footer-links a:hover {
+  color: var(--warm);
+}
+
+.panel {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.toolbar-chip {
+  border-color: var(--line);
+  background: rgba(11, 17, 31, 0.85);
+}
+
+.toolbar-chip span {
+  color: var(--muted);
+}
+
+.toolbar-chip strong {
+  color: var(--ink);
+}
+
+.sidebar-logo {
+  background: linear-gradient(135deg, #34d399 0%, #2563eb 100%);
+}
+
+.sidebar-tab.active {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.22), rgba(96, 165, 250, 0.18));
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #fff;
+}
+
+.sidebar-tab.active small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.eyebrow {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.22);
+  color: var(--accent);
+}
+
+.decision-header-copy p {
+  color: var(--muted);
+}
+
+.status-stack {
+  background: var(--surface-muted);
+  border-color: var(--line);
+}
+
+.workspace-sidebar {
+  background: transparent;
+}
+
+.decision-shell {
+  color: var(--ink);
+}
+
+/* Primary buttons often use purple in base CSS — nudge toward Mei accent */
+.button.primary,
+button.primary,
+.btn-primary {
+  background: linear-gradient(135deg, #059669, #34d399) !important;
+  border-color: rgba(52, 211, 153, 0.5) !important;
+  color: #04120c !important;
+}
+
+.button.secondary,
+button.secondary {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+}
+
+/* Task / flashcard surfaces */
+.task-card,
+.flashcard-surface,
+.section-card {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.notice.error {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.notice.success,
+.notice.ok {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(52, 211, 153, 0.08);
+}

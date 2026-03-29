@@ -1,90 +1,11 @@
 #!/usr/bin/env bash
+# Canonical MeiMei stack: HTTPS proxy + dashboard UI + interval health probe.
+# (Former separate dashboard+watchdog-only install is unified to avoid duplicate LaunchAgents on the same port.)
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-plist_dir="$HOME/Library/LaunchAgents"
-logs_dir="$HOME/Library/Logs/agent.meimei"
-dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
-watchdog_label="${MEIMEI_DASHBOARD_WATCHDOG_LABEL:-com.agent.meimei.dashboard-health}"
-dashboard_plist="$plist_dir/$dashboard_label.plist"
-watchdog_plist="$plist_dir/$watchdog_label.plist"
-dashboard_port="${PORT:-3030}"
-health_interval="${MEIMEI_DASHBOARD_HEALTH_INTERVAL:-30}"
 
-mkdir -p "$plist_dir" "$logs_dir"
-
-cat >"$dashboard_plist" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>$dashboard_label</string>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>KeepAlive</key>
-  <true/>
-  <key>WorkingDirectory</key>
-  <string>$repo_root</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/bin/bash</string>
-    <string>-lc</string>
-    <string>PORT=$dashboard_port npm run dashboard</string>
-  </array>
-  <key>EnvironmentVariables</key>
-  <dict>
-    <key>PORT</key>
-    <string>$dashboard_port</string>
-  </dict>
-  <key>StandardOutPath</key>
-  <string>$logs_dir/dashboard.out.log</string>
-  <key>StandardErrorPath</key>
-  <string>$logs_dir/dashboard.err.log</string>
-</dict>
-</plist>
-EOF
-
-cat >"$watchdog_plist" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>$watchdog_label</string>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>StartInterval</key>
-  <integer>$health_interval</integer>
-  <key>WorkingDirectory</key>
-  <string>$repo_root</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/bin/bash</string>
-    <string>-lc</string>
-    <string>PORT=$dashboard_port ./scripts/meimei-dashboard-watchdog-probe</string>
-  </array>
-  <key>EnvironmentVariables</key>
-  <dict>
-    <key>PORT</key>
-    <string>$dashboard_port</string>
-    <key>MEIMEI_DASHBOARD_LABEL</key>
-    <string>$dashboard_label</string>
-  </dict>
-  <key>StandardOutPath</key>
-  <string>$logs_dir/dashboard-watchdog.out.log</string>
-  <key>StandardErrorPath</key>
-  <string>$logs_dir/dashboard-watchdog.err.log</string>
-</dict>
-</plist>
-EOF
-
-launchctl unload "$watchdog_plist" >/dev/null 2>&1 || true
-launchctl unload "$dashboard_plist" >/dev/null 2>&1 || true
-launchctl load "$dashboard_plist"
-launchctl load "$watchdog_plist"
-
-echo "Installed dashboard always-on + watchdog services."
-echo "Dashboard label: $dashboard_label"
-echo "Watchdog label:  $watchdog_label"
-echo "Dashboard URL:   http://127.0.0.1:$dashboard_port"
+echo "Installing MeiMei platform LaunchAgents (see docs/operations/meimei-platform-launchd.v1.md)…" >&2
+"$repo_root/scripts/meimei-domain" install
+"$repo_root/scripts/meimei-openclaw-dashboard-watchdog-install.sh"
+echo "Labels: com.agent.meimei.dashboard-ui, com.agent.meimei.dashboard-proxy, com.agent.meimei.dashboard-health"

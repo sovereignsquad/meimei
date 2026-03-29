@@ -2,7 +2,19 @@
 
 ## Unreleased
 
-- Nothing yet.
+- **Milestone G (inter-app bus):** SQLite schema v2 — `payload_kind`, `target_adapter`, `source_adapter`; inference worker claims **`inference_v1`** only; **`claimNextAppTaskForTarget`** + **`getJobByIdForParty`**, **`listAppTasksForTraceParty`**, **`listInboxAppTasksForTarget`**. **`meimei_correlation`** on inference enqueues reply **`app_task`** (Claim Check over 64 KiB → `data/meimei/artifacts/<trace_id>/digest.md`). **`startReferenceApp2Inbox`** (env **`MEIMEI_APP_INBOX_WORKER`**, **`MEIMEI_APP_INBOX_POLL_MS`**). Registry **`reference-app-2`** (`/791/Reference_app_2`). Reference App 1 UI: ping/pong + standup digest. Script **`npm run test:mas-handshake`**. Docs: **`adapter-contract.v1.md`**, **`functions/reference-app-1.md`**, **`functions/reference-app-2.md`**.
+- **Operations (headless server epic):** Runbook **`docs/operations/mac-headless-server.md`** (power recovery, sleep, FileVault vs auto-login, LaunchAgents login trap, Ollama bootstrap, post-reboot checks). Developer backlog handoff **`docs/operations/handoff-roadmap-headless-server.v1.md`**. Linked from **`docs/operations/runbook.md`**.
+- **Architecture (Milestone G prep):** **`inter-app-message-bus.v1.md`** — event bus + `app_task`, **§4 Claim Check** (~64 KiB control-plane limit, `data/meimei/artifacts/<trace_id>/`), **§5 correlation** (`trace_id`, `parent_job_id`, `reply_to`, Standup test mandate), traceability §8, Milestone G (ping/pong → Standup Digest). Handoff **`handoff-milestone-g-inter-app-bus.v1.md`**. Pointers in **`adapter-contract.v1.md`**, **`meimei-app-development-guide.v1.md`**.
+- **Reference app 1 (Phase 4):** Registry miniapp **`reference-app-1`** — `/790/Reference_app_1`, API **`/dashboard/api/functions/reference-app-1`**. Gated by **`REFAPP_FEATURE_TOGGLE`**; enqueues **`inference_v1`** to **`meimei_jobs`** (`adapter_name` **`reference-app-1`**) and polls **`status`** (scoped `getJobByIdForAdapter`). Handler: `dashboard/lib/reference-app-queue-api.mjs`. Contract: `functions/reference-app-1.md`.
+- **Environment variables:** Soft naming hints in the Tools → Environment variables UI (`!` flag + yellow text for non-`APP_VAR` keys); optional **`MEIMEI_ENV_STRICT_KEY_NAMES=1`** rejects `upsert` unless the key matches `/^[A-Z0-9]+_[A-Z0-9_]+$/` or is on **`MEIMEI_ENV_SYSTEM_ALLOWLIST`** (`PORT`, `HOME`, `USER`, …). `list` / `catalog` return **`keyNaming`**. Contract appendix: `docs/architecture/meimei-env-ui-contract.v1.md`.
+- **Dashboard:** Removed duplicate `checklistRoute` / checklist constants in `dashboard/server.mjs`; registry fallback API path is `/dashboard/api/functions/checklist`.
+- **Obsidian adapter (Milestone E v1):** `scripts/meimei-adapter-obsidian.mjs` — `chokidar` on vault, **2s** debounce, triggers `_meimei_inbox/**/*.md` or `#meimei-summarize`, egress poll appends MeiMei callout and **deletes** completed rows. Queue helpers: `listCompletedForAdapter`, `deleteJob`. Doc: `docs/architecture/adapter-obsidian.v1.md`. Dependency: **`chokidar@4`**.
+- **Adapter quarantine (Milestone D v1):** SQLite `meimei_jobs` spooler (`node:sqlite` + **WAL** / `busy_timeout` for multi-process enqueue), in-process worker (`dashboard/lib/meimei-job-worker.mjs`), contract `docs/architecture/adapter-contract.v1.md`. Demos: `npm run jobs:demo-enqueue`, `npm run jobs:demo-file-drop` (polls `data/meimei-demo-in/*.json`). Env: `MEIMEI_JOB_POLL_MS`, `MEIMEI_JOB_MAX_FAILURES`, `MEIMEI_JOB_WORKER=0`, `MEIMEI_FILE_DROP_POLL_MS`.
+- **Inference plane (Milestone C v1):** `POST /api/meimei/route` — OpenAI Chat Completions–shaped blocking router to Ollama (`/v1/chat/completions`), cheap token estimate guard (`413`), `stream: true` and `localOnly: false` → `501`, `meimei_meta` on success. Spec: `docs/api/inference-route.v1.md`. HTTPS proxy routes `/api/meimei/*` to the dashboard.
+- **Menubar (Milestone B):** Start / Stop / Restart platform (async scripts, no main-thread `waitUntilExit`), `GET` polling of configurable health URL (default loopback `/api/health`), menu bar icon tint by status, `~/.meimei/logs/MeiMeiControl.log`, Preferences field **Health check URL**.
+- **Milestone A — MeiMei LaunchAgents:** Canonical labels `com.agent.meimei.dashboard-ui`, `com.agent.meimei.dashboard-proxy`, `com.agent.meimei.dashboard-health`; logs under `~/.meimei/logs/`. Retired `ai.openclaw.meimei.dashboard-*` plists removed on `meimei-domain install` / migrator `scripts/meimei-platform-migrate.sh` (`--force`). LLSD: `docs/operations/meimei-platform-launchd.v1.md`.
+- **`GET /api/health`:** Fast liveness JSON (`config/dashboard-surface.v1.json` `api.health`); HTTPS proxy routes it to the dashboard (not OpenClaw gateway). Health watchdog probes this path by default (interval default 60s).
+- **`npm run dashboard:watchdog:install`:** Delegates to `meimei-domain install` + `meimei-openclaw-dashboard-watchdog-install.sh` to avoid a second dashboard on the same port.
 
 ## 2026-03-28 - AI-Native Platform: 100% LLM-based system (`0.9.0`)
 
@@ -34,7 +46,7 @@
 - **Daily Briefing**: `callOllamaJson()` with Brain context + Mail data. Writes to `briefing.md`.
 
 ### Proxy & Infrastructure
-- **Proxy routing fix**: `/api/functions/*`, `/api/command/*`, `/api/llm/*`, `/api/brain/*` route to dashboard (port 3030), not OpenClaw gateway (port 18789). (`scripts/meimei-domain.mjs`).
+- **Proxy routing fix**: `/api/functions/*`, `/api/command/*`, `/api/llm/*`, `/api/brain/*` route to the dashboard HTTP server (`config/dashboard-surface.v1.json` `defaults.port`), not OpenClaw gateway (port 18789). (`scripts/meimei-domain.mjs`).
 - **Design system**: `.ds-markdown` component for markdown rendering. No hardcoded styles in miniapps.
 
 ### Documentation

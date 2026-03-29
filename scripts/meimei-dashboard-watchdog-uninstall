@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
-watchdog_label="${MEIMEI_DASHBOARD_WATCHDOG_LABEL:-com.agent.meimei.dashboard-health}"
+uid="$(id -u)"
 plist_dir="$HOME/Library/LaunchAgents"
-dashboard_plist="$plist_dir/$dashboard_label.plist"
-watchdog_plist="$plist_dir/$watchdog_label.plist"
 
-launchctl unload "$watchdog_plist" >/dev/null 2>&1 || true
-launchctl unload "$dashboard_plist" >/dev/null 2>&1 || true
-rm -f "$watchdog_plist" "$dashboard_plist"
+for label in \
+  com.agent.meimei.dashboard-health \
+  com.agent.meimei.dashboard-ui \
+  com.agent.meimei.dashboard-proxy \
+  com.agent.meimei.dashboard; do
+  f="$plist_dir/${label}.plist"
+  launchctl bootout "gui/${uid}" "$f" 2>/dev/null || true
+  rm -f "$f"
+done
 
-echo "Uninstalled dashboard always-on services."
-echo "Removed: $dashboard_plist"
-echo "Removed: $watchdog_plist"
+# Retired namespace (optional cleanup)
+for f in \
+  "$plist_dir/ai.openclaw.meimei.dashboard-health.plist" \
+  "$plist_dir/ai.openclaw.meimei.dashboard-ui.plist" \
+  "$plist_dir/ai.openclaw.meimei.dashboard-proxy.plist"; do
+  launchctl bootout "gui/${uid}" "$f" 2>/dev/null || true
+  rm -f "$f"
+done
+
+echo "Uninstalled MeiMei dashboard/proxy/health LaunchAgents (and legacy names if present)."

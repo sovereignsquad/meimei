@@ -26,7 +26,7 @@
         { "key": "OPENCLAW_CONFIG_PATH", "hint": "Path to openclaw.json" },
         { "key": "OPENCLAW_BIN", "hint": "openclaw binary" },
         { "key": "OPENCLAW_GATEWAY_PORT", "hint": "Gateway port" },
-        { "key": "PORT", "hint": "Dashboard port (surface default 3030)" },
+        { "key": "PORT", "hint": "Dashboard listen port (defaults.port in config/dashboard-surface.v1.json; HTTPS proxy may use MEIMEI_DASHBOARD_PORT)" },
         { "key": "MEIMEI_DASHBOARD_PORT", "hint": "Alt dashboard port name" },
         { "key": "MEIMEI_PUBLIC_URL", "hint": "Public base URL" },
         { "key": "MEIMEI_PUBLIC_HOST", "hint": "Host" },
@@ -53,8 +53,14 @@
         { "key": "MEIMEI_SUPABASE_SERVICE_ROLE", "hint": "Service role key" },
         { "key": "MEIMEI_SUPABASE_ANON_KEY", "hint": "Anon key + RLS" },
         { "key": "MEIMEI_ENV_PROFILE", "hint": "development | preview | production — which scoped vars apply to process.env" },
+        { "key": "MEIMEI_ENV_STRICT_KEY_NAMES", "hint": "Set to 1 / true / yes to reject new keys that are not APP_IDENTIFIER_VARNAME or POSIX allowlist (PORT, HOME, …)" },
+        { "key": "REFAPP_FEATURE_TOGGLE", "hint": "Reference app (queue): 1/true/yes/on to enable /790/Reference_app_1 enqueue UI" },
+        { "key": "REFAPP_MAX_PROMPT_CHARS", "hint": "Optional max prompt length for reference app (default 8000)" },
+        { "key": "MEIMEI_APP_INBOX_WORKER", "hint": "Set to 0 to disable Reference App 2 inbox loop in dashboard process" },
+        { "key": "MEIMEI_APP_INBOX_POLL_MS", "hint": "Poll interval ms for app_task inbox (default 2500)" },
         { "key": "MEIMEI_LLM_GATEWAY_SECRET", "hint": "Optional shared secret for POST /api/llm/gateway/generate (header x-meimei-llm-secret). If unset, only loopback may call the gateway." },
-        { "key": "MEIMEI_CHECKLIST_APP_URL", "hint": "Deployed Next.js checklist UI (iframe) — default agent-chappie" },
+        { "key": "MEIMEI_CHECKLIST_LOCAL_UPSTREAM", "hint": "Local Next.js origin for checklist reverse proxy (default http://127.0.0.1:3000). Set none|false|0|off to show runtime shell only at /727/Checklist" },
+        { "key": "MEIMEI_CHECKLIST_UPSTREAM_PATH_PREFIX", "hint": "Path on Next app (default /checklist) — must match next.config basePath" },
         { "key": "MEIMEI_AGENT_CHAPPIE_ENGINE", "hint": "node (default, in-MeiMei SQLite+Ollama) or python (legacy HTTP worker + MEIMEI_AGENT_CHAPPIE_ROOT)" },
         { "key": "MEIMEI_AGENT_CHAPPIE_ROOT", "hint": "Path to moldovancsaba/checklist clone — required only when ENGINE=python" },
         { "key": "MEIMEI_AGENT_CHAPPIE_AUTO_START", "hint": "Set to 1 so MeiMei spawns python3 scripts/worker_bridge.py on first bridge request" },
@@ -62,7 +68,12 @@
         { "key": "MEIMEI_AGENT_CHAPPIE_WORKER_PORT", "hint": "Worker listen port (default 8787)" },
         { "key": "MEIMEI_AGENT_CHAPPIE_PYTHON", "hint": "Python binary (default python3)" },
         { "key": "MEIMEI_AGENT_CHAPPIE_DB_PATH", "hint": "Optional override for AGENT_LOCAL_DB_PATH (SQLite)" },
-        { "key": "MEIMEI_AGENT_CHAPPIE_DATABASE_URL", "hint": "Neon Postgres URL for worker + online queue (mirrors checklist DATABASE_URL)" }
+        { "key": "MEIMEI_AGENT_CHAPPIE_DATABASE_URL", "hint": "Neon Postgres URL for worker + online queue (mirrors checklist DATABASE_URL)" },
+        { "key": "APP_QUEUE_BASE_URL", "hint": "Hosted checklist origin (no trailing path), e.g. https://checklist.messmass.com — for npm run agent-chappie:queue-consumer" },
+        { "key": "WORKER_QUEUE_SHARED_SECRET", "hint": "Same secret as hosted app worker queue (x-agent-worker-secret); pairs with APP_QUEUE_BASE_URL" },
+        { "key": "ORIGINAL_PIPELINE_MEIMEI_GATEWAY_URL", "hint": "Checklist weekly pipeline: full URL to POST /api/llm/gateway/generate (MeiMei dashboard). Same contract as MEIMEI_LLM_GATEWAY_URL." },
+        { "key": "ORIGINAL_PIPELINE_MEIMEI_MODEL", "hint": "Ollama model name for weekly pipeline when using MeiMei gateway (falls back to OLLAMA_MODEL / LOCAL_LLM_MODEL)" },
+        { "key": "ORIGINAL_PIPELINE_MEIMEI_GATEWAY_SECRET", "hint": "Optional x-meimei-llm-secret for Next server → gateway when not loopback; mirrors MEIMEI_LLM_GATEWAY_SECRET" }
       ]
     }
   ]

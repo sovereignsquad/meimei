@@ -133,7 +133,7 @@ Runtime truth table for **OpenClaw vs Ollama vs rules vs sample data**; keep at 
 1. **Issue lists and “created on board” ranges** — change weekly; if kept, need **owner + review date** in file header.  
 2. **`VERSION.md` vs `package.json` vs `CHANGELOG`** — must bump together at release.  
 3. **Miniapp copy** duplicated in `server` (forbidden) vs **registry** (allowed) — already enforced in code; docs should never tell contributors to edit catalog copy in `server.mjs`.  
-4. **URLs** — `meimei.localhost:8443`, port `3030`, paths `/apps`, `/tools` — verify against `config/dashboard-surface.v1.json` when paths change.
+4. **URLs** — `meimei.localhost:8443`, dashboard `defaults.port`, paths `/apps`, `/tools` — verify against `config/dashboard-surface.v1.json` when paths change.
 
 ---
 

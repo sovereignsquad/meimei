@@ -10,6 +10,44 @@ const STORE_FILE = "meimei-environment.v1.json";
 export const VALID_TARGETS = ["production", "preview", "development"];
 const KEY_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
+/** Regex-exception allowlist: single-segment POSIX / shell keys that must not require APP_PREFIX. */
+export const MEIMEI_ENV_SYSTEM_ALLOWLIST = Object.freeze([
+  "PORT",
+  "HOME",
+  "USER",
+  "LOGNAME",
+  "TMPDIR",
+  "PATH",
+  "SHELL",
+  "LANG",
+  "CI"
+]);
+
+/** Recommended new keys: <APPIDENTIFIER>_<REST> (uppercase segments). */
+export const MEIMEI_ENV_RECOMMENDED_KEY_RE = /^[A-Z0-9]+_[A-Z0-9_]+$/;
+
+export function meimeiEnvStrictNamesEnabled() {
+  const v = String(process.env.MEIMEI_ENV_STRICT_KEY_NAMES || "")
+    .trim()
+    .toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+
+export function meimeiEnvKeyMeetsStrictConvention(key) {
+  const k = String(key || "").trim();
+  if (!k) return false;
+  if (MEIMEI_ENV_SYSTEM_ALLOWLIST.includes(k)) return true;
+  return MEIMEI_ENV_RECOMMENDED_KEY_RE.test(k);
+}
+
+export function meimeiEnvKeyNamingMeta() {
+  return {
+    recommendedPattern: String(MEIMEI_ENV_RECOMMENDED_KEY_RE).slice(1, -1),
+    systemAllowlist: [...MEIMEI_ENV_SYSTEM_ALLOWLIST],
+    strictNamesEnabled: meimeiEnvStrictNamesEnabled()
+  };
+}
+
 export function meimeiEnvStorePath(repoRoot) {
   return path.join(repoRoot, "data", STORE_FILE);
 }
@@ -119,7 +157,8 @@ export async function handleMeimeiEnvApiRequest(body, repoRoot) {
     return {
       ok: true,
       catalog: loadCatalogSync(repoRoot),
-      activeProfile: getActiveProfile()
+      activeProfile: getActiveProfile(),
+      keyNaming: meimeiEnvKeyNamingMeta()
     };
   }
 
@@ -138,7 +177,8 @@ export async function handleMeimeiEnvApiRequest(body, repoRoot) {
       ok: true,
       activeProfile: getActiveProfile(),
       storePath: `data/${STORE_FILE}`,
-      entries
+      entries,
+      keyNaming: meimeiEnvKeyNamingMeta()
     };
   }
 
@@ -174,6 +214,16 @@ export async function handleMeimeiEnvApiRequest(body, repoRoot) {
       if (!entry) return { ok: false, error: "Variable not found." };
       if (keyRaw && keyRaw !== entry.key) {
         if (!KEY_RE.test(keyRaw)) return { ok: false, error: "Invalid key name." };
+        if (
+          meimeiEnvStrictNamesEnabled() &&
+          !meimeiEnvKeyMeetsStrictConvention(keyRaw)
+        ) {
+          return {
+            ok: false,
+            error:
+              "Key must match APP_IDENTIFIER_VARNAME (e.g. MYAPP_SECRET_KEY) or be a POSIX allowlist name (PORT, HOME, …). Disable with MEIMEI_ENV_STRICT_KEY_NAMES=0."
+          };
+        }
         if (store.entries.some((x) => x.key === keyRaw && x.id !== id)) {
           return { ok: false, error: "Another variable already uses this key." };
         }
@@ -184,6 +234,16 @@ export async function handleMeimeiEnvApiRequest(body, repoRoot) {
       entry.updatedAt = new Date().toISOString();
     } else {
       if (!KEY_RE.test(keyRaw)) return { ok: false, error: "Invalid key name (use A-Z, 0-9, _)." };
+      if (
+        meimeiEnvStrictNamesEnabled() &&
+        !meimeiEnvKeyMeetsStrictConvention(keyRaw)
+      ) {
+        return {
+          ok: false,
+          error:
+            "Key must match APP_IDENTIFIER_VARNAME (e.g. MYAPP_SECRET_KEY) or be a POSIX allowlist name (PORT, HOME, …). Disable with MEIMEI_ENV_STRICT_KEY_NAMES=0."
+        };
+      }
       let entry = store.entries.find((x) => x.key === keyRaw);
       if (!entry) {
         entry = {

@@ -73,7 +73,9 @@ Escalate to OC when:
 
 - Run `npm run dashboard` from the repo root.
 - After `git pull`, reload launchd services so new code runs: `npm run dashboard:reload` (or `./scripts/meimei-domain restart` when using `meimei.localhost:8443`).
-- Open `http://127.0.0.1:3030` in a browser.
+- **LaunchAgent namespace:** MeiMei-owned jobs use `com.agent.meimei.dashboard-*` (see `docs/operations/meimei-platform-launchd.v1.md`). To retire old `ai.openclaw.meimei.dashboard-*` plists: `./scripts/meimei-platform-migrate.sh` (dry run), then `./scripts/meimei-platform-migrate.sh --force` and `./scripts/meimei-domain install`.
+- **Headless Mac mini / closet server:** Auto-login, power recovery, sleep, Ollama at login — **`docs/operations/mac-headless-server.md`**. Backlog handoff: **`docs/operations/handoff-roadmap-headless-server.v1.md`**.
+- Open `http://127.0.0.1:<defaults.port>` in a browser (`defaults.port` in `config/dashboard-surface.v1.json`, commonly `45285`).
 - Use the settings form to update the repo-local OpenClaw config.
 - Use the operations panel to run status, skills, doctor, and launch checks.
 - **Page layout** (grid columns, block order, row breaks): **Admin → Page layout**; spec and CSS classes in `design-system-v1.md` (**Global layout system**); data in `config/page-layout.v1.json`.

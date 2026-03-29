@@ -29,9 +29,9 @@ Vercel-style **name / value / environment** CRUD for everything MeiMei tools and
 
 | Action | Purpose |
 |--------|---------|
-| `list` | Rows with masked values + targets + `appliesNow` |
-| `catalog` | Suggested key groups |
-| `upsert` | Create/update (`key`, optional `id`, `value`, `targets[]`) |
+| `list` | Rows with masked values + targets + `appliesNow` + `keyNaming` (recommended pattern, POSIX allowlist, whether strict mode is on) |
+| `catalog` | Suggested key groups + `keyNaming` |
+| `upsert` | Create/update (`key`, optional `id`, `value`, `targets[]`). If `MEIMEI_ENV_STRICT_KEY_NAMES` is enabled, `key` must match `APP_IDENTIFIER_VARNAME` or be on the POSIX allowlist (`PORT`, `HOME`, …). |
 | `reveal` | Plaintext value for one `id` (dashboard-only; do not expose publicly) |
 | `delete` | Remove by `id` |
 | `export_dotenv` | Optional `target` filter; returns `.env`-style text |

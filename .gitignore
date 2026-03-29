@@ -6,5 +6,7 @@ data/agent-chappie/
 data/sdr-outbound.jsonl
 data/lead-enrichment-workflow.v1.json
 data/meimei-environment.v1.json
+data/meimei/meimei-jobs.sqlite
+data/meimei/artifacts/
 macos/MeiMei/.build/
 macos/MeiMei/build/

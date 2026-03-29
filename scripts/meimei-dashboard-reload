@@ -5,19 +5,23 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-PROXY_PLIST="${HOME}/Library/LaunchAgents/ai.openclaw.meimei.dashboard-proxy.plist"
-if [[ -f "$PROXY_PLIST" ]]; then
+LA="${HOME}/Library/LaunchAgents"
+PROXY_PLIST_NEW="${LA}/com.agent.meimei.dashboard-proxy.plist"
+PROXY_PLIST_LEGACY="${LA}/ai.openclaw.meimei.dashboard-proxy.plist"
+
+if [[ -f "$PROXY_PLIST_NEW" ]] || [[ -f "$PROXY_PLIST_LEGACY" ]]; then
   exec "${ROOT_DIR}/scripts/meimei-domain" restart
 fi
 
 UID_NUM="$(id -u)"
-DASH_LABEL="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
+DASH_LABEL="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard-ui}"
 WATCH_LABEL="${MEIMEI_DASHBOARD_WATCHDOG_LABEL:-com.agent.meimei.dashboard-health}"
 if launchctl print "gui/${UID_NUM}/${DASH_LABEL}" &>/dev/null; then
   echo "Kicking ${DASH_LABEL} (and watchdog if present)…"
   launchctl kickstart -k "gui/${UID_NUM}/${DASH_LABEL}" || true
   launchctl kickstart -k "gui/${UID_NUM}/${WATCH_LABEL}" 2>/dev/null || true
-  echo "Done. Try http://127.0.0.1:${PORT:-3030}"
+  dp="${PORT:-$(node "${ROOT_DIR}/config/print-dashboard-default-port.mjs")}"
+  echo "Done. Try http://127.0.0.1:${dp}"
   exit 0
 fi
 

@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 uid="$(id -u)"
-dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard}"
-dashboard_port="${PORT:-3030}"
-health_url="${MEIMEI_DASHBOARD_HEALTH_URL:-http://127.0.0.1:${dashboard_port}/api/telemetry/summary}"
+dashboard_label="${MEIMEI_DASHBOARD_LABEL:-com.agent.meimei.dashboard-ui}"
+if [[ -n "${PORT:-}" ]]; then
+  dashboard_port="$PORT"
+else
+  dashboard_port="$(node "${ROOT_DIR}/config/print-dashboard-default-port.mjs")"
+fi
+health_url="${MEIMEI_DASHBOARD_HEALTH_URL:-http://127.0.0.1:${dashboard_port}/api/health}"
 
 if curl -fsS --max-time 5 "$health_url" >/dev/null 2>&1; then
   exit 0

@@ -33,7 +33,7 @@
 │                    │ • API Access │                                      │
 │                    └──────────────┘                                      │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                      DASHBOARD SERVER (Node.js :3030)                    │
+│                   DASHBOARD SERVER (Node.js :defaults.port)              │
 │  ┌─────────────────┐  ┌──────────────┐  ┌──────────────────────────┐   │
 │  │  Route Handlers │  │ API Endpoints│  │   LLM Integration Layer  │   │
 │  │  • /649         │  │ • /api/func/*│  │  • callOllama()          │   │
@@ -328,17 +328,17 @@ Return JSON + markdown to user
 │           meimei-domain.mjs (HTTPS Proxy)                    │
 │                                                              │
 │  Routing Logic:                                              │
-│  • /api/functions/*  → Dashboard (:3030)                    │
-│  • /api/command/*    → Dashboard (:3030)                    │
+│  • /api/functions/*  → Dashboard (defaults.port)            │
+│  • /api/command/*    → Dashboard (defaults.port)            │
 │  • /api/*            → OpenClaw Gateway (:18789)            │
-│  • /*                → Dashboard (:3030)                    │
+│  • /*                → Dashboard (defaults.port)            │
 └────────────────────┬────────────────────────────────────────┘
                      │
          ┌───────────┴───────────┐
          ↓                       ↓
 ┌─────────────────┐    ┌─────────────────┐
 │  DASHBOARD      │    │  OPENCLAW       │
-│  (:3030)        │    │  (:18789)       │
+│  (dashboard)    │    │  (:18789)       │
 │  Node.js        │    │  Gateway        │
 │  server.mjs     │    │  Agent runtime  │
 └────────┬────────┘    └─────────────────┘

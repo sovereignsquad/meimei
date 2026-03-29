@@ -80,7 +80,10 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 - `scripts/meimei-always-on-install` - installs macOS `launchd` always-on gateway service.
 - `scripts/meimei-always-on-uninstall` - removes macOS always-on gateway service.
 - `scripts/meimei-always-on-status` - prints always-on service state and gateway probe.
-- `scripts/meimei-dashboard-watchdog-install` - installs dashboard auto-start + auto-restart + health watcher.
+- `scripts/meimei-dashboard-watchdog-install` - installs `meimei-domain` stack + MeiMei health watcher (`com.agent.meimei.*`).
+- `scripts/meimei-platform-migrate.sh` - dry-run / `--force` cleanup of retired `ai.openclaw.meimei.dashboard-*` LaunchAgents.
+- `docs/architecture/adapter-contract.v1.md` - SQLite job spooler + adapter quarantine; `npm run jobs:demo-enqueue` enqueues a sample job; `npm run jobs:demo-file-drop` scans `data/meimei-demo-in/*.json` in a **separate process** (dashboard + Ollama still required for job completion).
+- `docs/architecture/adapter-obsidian.v1.md` - Obsidian vault watcher (`npm run adapter:obsidian` + `MEIMEI_OBSIDIAN_VAULT`); uses **`chokidar`** (see `package.json` dependencies).
 - `scripts/meimei-dashboard-watchdog-status` - prints dashboard/watchdog service state and health probe.
 - `scripts/meimei-dashboard-watchdog-uninstall` - removes dashboard watcher services.
 - `scripts/web-search` - local DuckDuckGo-based web search fallback.
@@ -120,7 +123,7 @@ Use one of these from the repo root:
 - `./scripts/oc-launch`
 - `make status`
 - `make launch`
-- `npm run dashboard` then open `http://127.0.0.1:3030`
+- `npm run dashboard` then open `http://127.0.0.1:45285` (or whatever `defaults.port` is in `config/dashboard-surface.v1.json`)
 - `./scripts/meimei-domain` then open `https://meimei.localhost:8443/dashboard/`
 - `npm run setup` for the one-step local domain start/open flow
 - `npm run bootstrap` for the full target-machine bootstrap and verification flow
