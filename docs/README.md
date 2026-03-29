@@ -49,7 +49,7 @@ System design, technical contracts, and standards.
 | [meimei-https-full-integration-program.v1.md](planning/meimei-https-full-integration-program.v1.md) | **Program:** full HTTPS integration — rationale, show-stopper framing, micro-deliverables **TLS-001–TLS-071** |
 | [planning/examples/meimei.app.example.json](planning/examples/meimei.app.example.json) | Example **meimei.app** manifest (MM-KERNEL-201); schema in `schemas/meimei.app.manifest.v1.json` |
 | [planning/meimei-docs-code-sync-audit.v1.md](planning/meimei-docs-code-sync-audit.v1.md) | **Living audit:** code ↔ docs ↔ comments matrix; operator chrome + dispatch order; PR maintenance rule |
-| [full_comprehensive_detailed_documents_audit.md](../full_comprehensive_detailed_documents_audit.md) | **Full markdown inventory (145):** path, UTC audit timestamp, action — recursive doc health ledger |
+| [full_comprehensive_detailed_documents_audit.md](../full_comprehensive_detailed_documents_audit.md) | **Full markdown inventory (149):** path, UTC audit timestamp, action — recursive doc health ledger |
 | [data/kernel/apps/README.md](../data/kernel/apps/README.md) | Kernel **external app registry** local state (`registry.json` — MM-KERNEL-202) |
 | [model-routing-spec.md](architecture/model-routing-spec.md) | Brain-muscle model routing architecture |
 | [naming-conventions.md](architecture/naming-conventions.md) | File naming and code conventions |
@@ -57,6 +57,7 @@ System design, technical contracts, and standards.
 | [inference-route.v1.md](api/inference-route.v1.md) | `POST /api/meimei/route` — OpenAI-shaped inference contract (v1) |
 | [adapter-contract.v1.md](architecture/adapter-contract.v1.md) | Job spooler + adapter quarantine (ingress/egress, dead letters) |
 | [adapter-obsidian.v1.md](architecture/adapter-obsidian.v1.md) | Vault watcher daemon (`chokidar`), ingress/egress rules |
+| [meimei-kernel-external-app-shells-v1.md](architecture/meimei-kernel-external-app-shells-v1.md) | External kernel apps — UI / static shell strategy (MM-KERNEL-502) |
 
 ## Developers
 
@@ -66,6 +67,7 @@ Kernel technical documentation for implementers and external integrators.
 |------|-------------|
 | [developers/README.md](developers/README.md) | Index: handbook, audit, related architecture links |
 | [developers/meimei-kernel-handbook.v1.md](developers/meimei-kernel-handbook.v1.md) | Kernel handbook: invariants, boot, config, HTTP dispatch, inference, jobs, persistence, integration, observability |
+| [meimei-app-facades-v1.md](api/meimei-app-facades-v1.md) | App-scoped HTTP façades — `POST /api/meimei/v1/apps/{app_id}/…` (inference, jobs, env, fs placeholder) |
 
 ## Governance
 
@@ -95,6 +97,7 @@ How to run, deploy, maintain, and troubleshoot.
 | [mac-mini-migration-audit.md](operations/mac-mini-migration-audit.md) | Migration audit |
 | [second-mac-mini-handoff.md](operations/second-mac-mini-handoff.md) | Multi-machine setup |
 | [vercel-env-inventory.md](operations/vercel-env-inventory.md) | Environment variables |
+| [kernel-apps.v1.md](operations/kernel-apps.v1.md) | Kernel external apps — register, HTTPS URLs, catalog merge, pilot, CI hooks |
 
 ## Agent Identity
 
@@ -137,6 +140,7 @@ Security, audits, validations, and policy.
 | [documentation-audit.md](compliance/documentation-audit.md) | Documentation quality audit |
 | [doc_meimei.md](compliance/doc_meimei.md) | Documentation standards |
 | [ice_meimei.md](compliance/ice_meimei.md) | ICE compliance |
+| [meimei-kernel-threat-model-v1.md](security/meimei-kernel-threat-model-v1.md) | Kernel external apps — lightweight threat model (MM-KERNEL-701) |
 
 ## Ideabank
 

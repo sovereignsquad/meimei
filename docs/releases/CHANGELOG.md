@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-03-30 — Docs: full-corpus wave 3 (149 `.md`, cross-doc path hygiene)
+
+- **Ledger:** **149** paths; regen base **`2026-03-30T12:00:00Z`** — [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
+- **`docs/governance/AGENTS.md`**, **`docs/compliance/doc_meimei.md`**, **`docs/compliance/documentation-audit.md`**, **`docs/compliance/foundation-contradiction-audit.md`** (C-001 closed as historical).
+- **`docs/README.md`** (149 count + kernel doc index rows), **`docs/developers/README.md`**, **`docs/planning/meimei-docs-code-sync-audit.v1.md`** (matrix rows for façades / shells / runbook / threat model).
+- **`VERSION.md`** — delivery bullet count **149**.
+
 ## 2026-03-29 — Kernel program: policy, app façades, SDK, catalog merge, monitor `app_id`
 
 - **`dashboard/lib/kernel-app-http-facades.mjs`** — `POST /api/meimei/v1/apps/{app_id}/inference|jobs/enqueue`, `GET …/env`, `GET …/fs/roots` (**501** placeholder).

@@ -20,10 +20,10 @@
 
 ## What to read first
 
-- `README.md`
-- `agent.md`
-- `architecture.md`
-- `skills/catalog.md`
-- `runbook.md`
-- `docs/README.md` (documentation map) and `documentation-audit.md` when changing or adding many `.md` files
+- [`README.md`](../../README.md)
+- [`docs/agent-identity/agent.md`](../agent-identity/agent.md) (identity contract — not at repo root)
+- [`docs/architecture/system-overview.md`](../architecture/system-overview.md) (system shape — successor to informal `architecture.md` at root)
+- [`skills/catalog.md`](../../skills/catalog.md)
+- [`docs/operations/runbook.md`](../operations/runbook.md)
+- [`docs/README.md`](../README.md) (documentation map), [`docs/compliance/documentation-audit.md`](../compliance/documentation-audit.md), and [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md) when changing or adding many `.md` files
 

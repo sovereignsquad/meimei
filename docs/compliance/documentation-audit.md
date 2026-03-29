@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-28 (original pass); **superseded inventory:** 2026-03-29  
 **Scope (original):** All `*.md` files under the repository (**84** files at that time).  
-**Scope (current):** **145** repo-owned markdown files (excluding `node_modules/**`) — canonical table with **per-file audit timestamps** in **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** at repo root.  
+**Scope (current):** **149** repo-owned markdown files (excluding `node_modules/**`) — canonical table with **per-file audit timestamps** in **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** at repo root.  
 **Goal:** Surface overlap, staleness risk, and a **practical** path to a unified doc system without breaking OC/repo conventions.
 
 ---
@@ -17,7 +17,7 @@
 | **Large ideation corpora** (`10hrs.md`, `ice_meimei.md`, `idea-support-map.md`) are valuable **backlog intelligence** but clutter **operator** search if kept at repo root. | Medium |
 | **Canonical engineering docs** (`architecture.md`, `design-system-v1.md`, `miniapp-contract-v1.md`, `runbook.md`, `CHANGELOG.md`) are in good shape relative to code; link graph from `README.md` is incomplete. | Low (structure) |
 
-**Recommendation:** Treat docs as **layers** (entry → operations → product → governance → archive). Move or namespace **archive/ideation** first; add **`docs/README.md` as a map**; keep **`README.md`, `AGENTS.md`, `agent.md`** at root for tooling expectations.
+**Recommendation:** Treat docs as **layers** (entry → operations → product → governance → archive). Move or namespace **archive/ideation** first; add **`docs/README.md` as a map**; keep **`README.md`**, **`docs/governance/AGENTS.md`**, and identity under **`docs/agent-identity/`** (some tooling still expects `AGENTS.md` under `docs/governance/`).
 
 ---
 

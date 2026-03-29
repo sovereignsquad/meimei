@@ -35,6 +35,10 @@ Code comments should **point to docs** for specs; avoid duplicating long prose i
 | **Kernel external registry** | `data/kernel/apps/registry.json` (gitignored); `kernel-app-registry.mjs` | `data/kernel/apps/README.md`; handbook §6–7; CHANGELOG | — | **Default on**; `MEIMEI_KERNEL_EXTERNAL_APPS=0` / `false` / `off` / `""` disables |
 | **Kernel external dispatch** | `kernel-external-app-dispatch.mjs`; `tryKernelExternalAppPost` | Handbook §6; planning kernel program docs | — | Order relative to static checklist branches — see audit §4 |
 | **Manifest validation** | `meimei-app-manifest-validate.mjs`; `schemas/meimei.app.manifest.v1.json` | `kernel:validate-app-manifest`; example manifest in `docs/planning/examples/` | — | CI validates example + `apps/*/meimei.app.json` |
+| **App-scoped façades** | `dashboard/server.mjs` branches + `kernel-app-*` | [meimei-app-facades-v1.md](../api/meimei-app-facades-v1.md) | — | `/api/meimei/v1/apps/{app_id}/inference`, `jobs/enqueue`, `env`, `fs` placeholder |
+| **External app shells** | `kernel-catalog-merge.mjs`; proxy / catalog | [meimei-kernel-external-app-shells-v1.md](../architecture/meimei-kernel-external-app-shells-v1.md) | — | MM-KERNEL-502 UX note |
+| **Kernel apps runbook** | `kernel:app-registry`, policy validators, SDK selftest | [kernel-apps.v1.md](../operations/kernel-apps.v1.md) | — | Operator steps + `MEIMEI_KERNEL_BASE_URL` |
+| **Kernel apps threat model** | Registry, jobs, env store, auth | [meimei-kernel-threat-model-v1.md](../security/meimei-kernel-threat-model-v1.md) | — | MM-KERNEL-701 |
 
 ---
 
@@ -92,3 +96,4 @@ Exact order drifts with edits; verify with `grep -n normalizedPath dashboard/ser
 | 2026-03-29 | P1 closed: kernel audit anchors + dispatch §5; miniapp-contract `serverApiPath`; `surface:validate-api` + CI |
 | 2026-03-31 | v1 initial matrix + P0 fixes linked to design-system, runbook, handbook, platform README, CI Node 22, CHANGELOG |
 | 2026-03-29 | Full markdown inventory: [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md) — use for completeness; this file remains **normative** for code↔doc matrix. |
+| 2026-03-30 | Matrix rows: app façades, external app shells, kernel-apps runbook, threat model + `docs/README` / `developers/README` index. |

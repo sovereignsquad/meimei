@@ -11,6 +11,10 @@ Documentation for engineers who **design against**, **extend**, or **operate** t
 | [../architecture/meimei-repo-boundaries.v1.md](../architecture/meimei-repo-boundaries.v1.md) | Contributors | Layer model, `dashboard/lib` allowlist, `server.mjs` rules |
 | [../api/inference-route.v1.md](../api/inference-route.v1.md) | API consumers | Normative `POST /api/meimei/route` contract |
 | [../compliance/ai-runtime-audit.md](../compliance/ai-runtime-audit.md) | Product and engineering leadership | Which surfaces use Ollama, OpenClaw, rules, or non-LLM data — use before external claims |
+| [../api/meimei-app-facades-v1.md](../api/meimei-app-facades-v1.md) | Integrators, external app authors | App-scoped kernel HTTP façades (`/api/meimei/v1/apps/{app_id}/…`) |
+| [../operations/kernel-apps.v1.md](../operations/kernel-apps.v1.md) | Operators, integrators | Register apps, env secrets, HTTPS base URL, catalog, pilot package |
+| [../security/meimei-kernel-threat-model-v1.md](../security/meimei-kernel-threat-model-v1.md) | Security review | Trust boundaries and misuse mitigations for kernel apps |
+| [../architecture/meimei-kernel-external-app-shells-v1.md](../architecture/meimei-kernel-external-app-shells-v1.md) | Architects, app authors | How external apps ship browser UI vs in-repo miniapps |
 
 **Reading order**
 

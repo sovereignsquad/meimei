@@ -26,7 +26,8 @@ It is intended to be a deterministic starting point for foundation remediation. 
 
 ### C-001
 
-- Severity: `High`
+- **2026-03-30 — Closed (historical):** The repository now has a full **`docs/`** tree; the contradiction below describes an **earlier** snapshot. Retained for audit trail only.
+- Severity: `High` *(at time of finding)*
 - Contradiction: Architecture claims a `docs/` directory defines the human contract, but no `docs/` directory exists in this repository.
 - Evidence:
   - `architecture.md` states: "`docs/` define the human contract."

@@ -1,5 +1,7 @@
 # Agentic Work Docs for Agent MeiMei
 
+**Repo note (`agent.meimei`):** Below lists **generic** filenames. In this repository, many live under **`docs/`** (e.g. `docs/agent-identity/agent.md`, `docs/architecture/system-overview.md`, `docs/operations/runbook.md`). See [`docs/README.md`](../README.md) and [`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md).
+
 This is the recommended document set for a clean, maintainable agentic workspace. The names below use common industry conventions where possible, and map your examples to the standard form.
 
 ## Core Repository Docs
