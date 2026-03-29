@@ -30,8 +30,8 @@
 | reference-app-1 | apps | API: `reference-app-queue-api.mjs` + worker; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | Canonical queue + `handleMeimeiInferenceRoute` in worker. |
 | reference-app-2 | apps | API: `reference-app-2-queue-api.mjs` + `meimei-reference-app-inbox.mjs`; GET shell: **`platform-pages/reference-app-pages.mjs`** | G | G | G | G | G | G | G | Y | P2 | SQLite `app_task` only; correlation replies per bus doc. |
 | environment-variables | tools | `meimei-env-store.mjs` | — | — | — | G | G | — | G | Y | P2 | Platform SoT; `reveal` is intentional plaintext server-side. |
-| ai-routing | tools | `routeViaApiAdapter` + `previewModelRouting` (bash); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | Y | — | Y | G | — | Y | Y | P2 | Preview via `oc-agent --route-not-llm-router`; not `/api/meimei/route`. |
-| api-access | tools | Same as ai-routing (`routeViaApiAdapter`); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |
+| ai-routing | tools | `routeViaApiAdapter` + **`openclaw-routing-preview.mjs`** (default); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | G | — | Y | G | — | G | Y | P2 | **R2:** Preview is **deterministic rules** (no LLM), in-process parity with `oc-agent --route-only`. Legacy subprocess: `MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1`. |
+| api-access | tools | Same as ai-routing (`routeViaApiAdapter`); settings GET **`platform-pages/routing-settings-pages.mjs`** | — | G | — | Y | G | — | G | Y | P2 | Same preview implementation as ai-routing row. |
 | supabase-connector | tools | `apps/supabase-connector/index.mjs` | — | — | — | G | G | — | G | G | P2 | **R4:** Operator text in **`functions/supabase-connector.md`** — prefer env store for `MEIMEI_SUPABASE_*`; handler reads `process.env` only (no second SoT). |
 | mission-control | tools | `apps/mission-control/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | — | — | — | G | Y | G | Y | P2 | OpenClaw/telemetry read-only; not on `meimei_jobs` feed. |
 | memory | tools | `apps/memory/index.mjs` → `brain/*`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | G | — | — | G | — | G | Y | P2 | **`meimei-inference-client`** in `brain/memory.mjs` (kernel K3). |
@@ -51,7 +51,7 @@
 | ai-routing | Uses `per-channel-model-routing-by-task-type-and-cost.md` (+ addon) — **name mismatch**; link from registry or rename for discoverability. |
 | api-access | Uses `api-channel-adapter.md` — **name mismatch**. |
 | explain-it | Uses `any-url-summarization-in-seconds.md` (+ addon) — **name mismatch**. |
-| what-next | Uses `daily-briefing.md` in older notes — **wrong file** for What next; use registry + issue #724; optional dedicated `functions/what-next.md` TBD. **`functions/daily-briefing.md`** is for the Daily briefing route only. |
+| what-next | **`functions/what-next.md`** (registry id aligned). |
 
 ---
 
@@ -60,7 +60,7 @@
 | Surface | Route / API | Handler | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | Pri | Notes |
 |---------|-------------|---------|----|----|----|----|----|----|----|----|-----|-------|
 | knowmore | `config/dashboard-surface.v1.json` → `/knowmore` | **`renderKnowmorePage`** in **`dashboard/lib/platform-pages/catalog-pages.mjs`** (thin call from `server.mjs`) | — | — | — | — | G | — | G | Y | P2 | **`docs/operations/knowmore-content-refresh.md`** — operational refresh; no queue. |
-| admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | G | — | — | G | — | Y | Y | P2 | Home command + **`home-suggestions`** use **`meimei-inference-client`** (K3). Routing **preview** still **`oc-agent`** (see ai-routing row). Split: **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`**. |
+| admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | G | — | — | G | — | Y | Y | P2 | Home command + **`home-suggestions`** (inference client). Routing preview: **`openclaw-routing-preview.mjs`**. Split: **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`**. |
 | System monitor | `/api/meimei/monitor/*` (and shell page) | Feed: `meimei-monitor-feed.mjs`; GET shell: **`platform-pages/system-monitor-page.mjs`** | — | — | — | — | — | G | G | Y | P2 | **Platform chrome** — reference for R6 when migrating apps. |
 | Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `apps/daily-briefing/index.mjs` | — | G | — | — | G | — | G | Y | P2 | **Not in registry**; contract **`functions/daily-briefing.md`**; **`meimei-inference-client`**. |
 
@@ -76,8 +76,8 @@
 
 1. **P0 — Checklist:** Remaining **R1/R5/R6** — **R2** on **`meimei-inference-client`** as of kernel K3 **`0.8.13`**; **R3/R4** **G**.
 2. **P1 — Lead workflow R1:** Enqueue workflow steps to `meimei_jobs` or keep **documented exception** (`functions/lead-enrichment.md`); review by **2027-06-30**.
-3. **P2 — Routing preview:** ai-routing / api-access **R2** still **Y** (`oc-agent` bash) — optional move behind inference or documented forever.
-4. **P2 — R7:** Add `functions/what-next.md` or registry `contractDoc` links for name-aligned discoverability.
+3. **Routing preview:** Default **in-process** (`openclaw-routing-preview.mjs`); legacy **`MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1`**.
+4. **R7:** **`functions/what-next.md`** added for registry id alignment (other filename mismatches remain in table above where noted).
 5. **Smoke:** `MEIMEI_SMOKE_STRICT=1` validates **`GET /api/meimei/monitor/feed`** JSON shape (kernel K4).
 
 ---

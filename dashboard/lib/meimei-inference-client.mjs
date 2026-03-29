@@ -2,7 +2,7 @@
  * In-process client for the MeiMei inference plane (`handleMeimeiInferenceRoute`).
  * Use instead of `callOllama` / `callOllamaJson` on miniapp hot paths (kernel K3).
  * @see docs/api/inference-route.v1.md
- * @aligned package agent-meimei 0.8.13
+ * @aligned package agent-meimei 0.8.14
  */
 
 import crypto from "node:crypto";

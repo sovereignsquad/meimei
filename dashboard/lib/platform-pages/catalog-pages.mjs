@@ -3,7 +3,7 @@
  * Injected dependencies keep `dashboard/server.mjs` thin for these routes (Phase 0).
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.13
+ * @aligned package agent-meimei 0.8.14
  */
 
 /**

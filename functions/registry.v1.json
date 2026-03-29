@@ -3,9 +3,10 @@
   "generatedAt": "2026-03-29",
   "platformAlignment": {
     "asOf": "2026-03-30",
-    "package": "0.8.13",
+    "package": "0.8.14",
     "inferenceHotPath": "dashboard/lib/meimei-inference-client.mjs → handleMeimeiInferenceRoute",
-    "notes": "Kernel K3: registry apps/tools use the inference plane for blocking LLM calls. dashboard/lib/llm.mjs remains for routing config, health, gateway, and utilities."
+    "routingPreview": "dashboard/lib/openclaw-routing-preview.mjs (default); MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1 restores subprocess",
+    "notes": "Kernel K3: blocking LLM via inference client. Deterministic routing preview in-process. llm.mjs: routing config, health, gateway, utilities."
   },
   "functions": [
     {

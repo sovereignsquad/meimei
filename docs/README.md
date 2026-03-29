@@ -141,6 +141,7 @@ Feature inventory, operations, and runbook.
 | [operations-manual.md](ideabank/operations-manual.md) | How to manage ideabank |
 | [runbook.md](ideabank/runbook.md) | Ideabank runbook |
 | [idea-support-map.md](ideabank/idea-support-map.md) | Feature mapping |
+| [steal_from_sovereign_plan.md](ideabank/steal_from_sovereign_plan.md) | Research-backed adoption plan vs `{sovereign}` (code + constitutional docs): invariants, judge loop, risk gates, compute matrix, pgvector, Nexus patterns |
 
 ## Releases
 

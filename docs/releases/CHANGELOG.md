@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-03-30 — OpenClaw routing preview in Node + what-next contract (`0.8.14`)
+
+- **`dashboard/lib/openclaw-routing-preview.mjs`** — deterministic routing preview (parity with **`scripts/oc-agent --route-only`**); **`previewModelRouting`** in **`server.mjs`** uses it by default. Set **`MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1`** to restore the bash/`openclaw` subprocess path.
+- **`functions/what-next.md`** — R7 registry-aligned contract doc.
+- **Docs:** **`miniapp-platform-audit.v1.md`**, **`ai-runtime-audit.md`**, kernel plan/audit, **`meimei-repo-boundaries.v1.md`**, registry **`platformAlignment.routingPreview`**.
+- **Version:** package **0.8.14**; **`@aligned`** headers **0.8.14** on aligned modules.
+
 ## 2026-03-30 — Ideabank: steal-from-Sovereign research plan
 
 - **`docs/ideabank/steal_from_sovereign_plan.md`** — Research on `/Users/chappie/Projects/sovereign` (orchestrator, bridge, DAG nodes, `providers.py`, Prisma `AgentTask`/`ProjectMemory`, pgvector migrations, `sovereign-dag.ts`, `memory.ts`, `tasks.ts`, `discord_vanguard.py`) plus `sovereign_audit.zip` constitutional specs: 14 adoption items, MeiMei analogues, phased roadmap, non-copy caveats. **`docs/README.md`** ideabank index updated.

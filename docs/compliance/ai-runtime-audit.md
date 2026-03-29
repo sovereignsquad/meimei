@@ -35,7 +35,7 @@
 | Explain it (URL/PDF) | `POST` explain-it API → `summarizeUrlSource` | **Ollama** via `callOllamaJson`; Brain layers `identity`/`user`/`context`/`durable` for OC emphasis | Ollama + file context |
 | Dashboard “agent” command | `POST /api/run` `cmd: agent` | **OpenClaw** via `oc-agent --message …` | OpenClaw agent turn |
 | iMessage inbound (delivery) | `imessage-adapter` → `runAgentTurn` | **OpenClaw** via `oc-agent` with channel args | OpenClaw agent turn |
-| Model routing preview | `GET/POST` routing / API adapter APIs → `previewModelRouting` | **`oc-agent --route-only`** (bash `select_route`, heuristics) | Deterministic |
+| Model routing preview | `GET/POST` routing / API adapter APIs → `previewModelRouting` | **`openclaw-routing-preview.mjs`** (default; parity with **`oc-agent --route-only`**). Legacy: `MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1` | Deterministic |
 | API channel adapter | `routeViaApiAdapter` | Policy + audit + telemetry + call to `previewModelRouting` | Deterministic + rules |
 | Lead enrichment | `POST` lead-enrichment → `enrichLead` | **Ollama** `callOllamaJson` (e.g. `qwen3.5:0.8b`) | Ollama (synthetic JSON) |
 | Inbox list (AI sort) | `POST` inbox `useAI: true` | **Ollama** optional; else order unchanged | Ollama optional |

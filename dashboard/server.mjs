@@ -51,6 +51,7 @@ import {
   MODELS
 } from "./lib/llm.mjs";
 import { inferenceCallOllamaJson } from "./lib/meimei-inference-client.mjs";
+import { buildOpenclawRoutingPreview } from "./lib/openclaw-routing-preview.mjs";
 import brain from "./lib/brain/index.mjs";
 import {
   getInboxMessages,
@@ -617,17 +618,25 @@ function humanizeRoutingChannel(value) {
   }
 }
 
-async function previewModelRouting({ channel, taskType, costTarget, message }) {
-  const result = await runScript("bash", [
-    agentScript,
-    "--route-only",
-    "--channel", channel,
-    "--task-type", taskType,
-    "--cost-target", costTarget,
-    "--message", message || ""
-  ], {
-    timeoutMs: 15000
-  });
+async function previewModelRoutingViaOcAgent({ channel, taskType, costTarget, message }) {
+  const result = await runScript(
+    "bash",
+    [
+      agentScript,
+      "--route-only",
+      "--channel",
+      channel,
+      "--task-type",
+      taskType,
+      "--cost-target",
+      costTarget,
+      "--message",
+      message || ""
+    ],
+    {
+      timeoutMs: 15000
+    }
+  );
 
   if (result.code !== 0) {
     throw new Error(result.stderr || "Could not calculate the routing preview.");
@@ -639,6 +648,18 @@ async function previewModelRouting({ channel, taskType, costTarget, message }) {
   }
 
   return route;
+}
+
+async function previewModelRouting({ channel, taskType, costTarget, message }) {
+  if (String(process.env.MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT || "").trim() === "1") {
+    return previewModelRoutingViaOcAgent({ channel, taskType, costTarget, message });
+  }
+  return buildOpenclawRoutingPreview({
+    channel,
+    taskType,
+    costTarget,
+    message
+  });
 }
 
 async function fetchPdfText(response, url) {

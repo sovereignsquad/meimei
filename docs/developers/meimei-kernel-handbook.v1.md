@@ -172,6 +172,8 @@ Protect these paths with host-level permissions and backup policy.
 
 **OpenClaw** agent execution (`scripts/oc-agent`, gateway) is **orthogonal** to the inference route contract — see [ai-runtime-audit.md](../compliance/ai-runtime-audit.md).
 
+**Routing preview** (AI routing / API access tools): default implementation is [`openclaw-routing-preview.mjs`](../../dashboard/lib/openclaw-routing-preview.mjs) in **`server.mjs`** — deterministic rules, no LLM, parity with `oc-agent --route-only`. Legacy subprocess: **`MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1`**.
+
 ---
 
 ## 12. Integrating external platforms

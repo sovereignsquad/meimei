@@ -1,6 +1,6 @@
 # MeiMei kernel completion plan — v1
 
-**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.13**).  
+**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.14**).  
 **Goal:** A **clear kernel** (runtime + contracts + shared libraries) with **all product surfaces** owned as **modules** (apps, tools, platform GET shells, integrations) — not a growing monolith in `dashboard/server.mjs`.  
 **Companion docs:** [`meimei-repo-boundaries.v1.md`](meimei-repo-boundaries.v1.md) (layers + allowlist), [`meimei-system-vision-and-platform-audit.v3.md`](meimei-system-vision-and-platform-audit.v3.md) (vision + theory + application layer), [`meimei-kernel-code-audit.v1.md`](meimei-kernel-code-audit.v1.md) (evidence-based kernel baseline + inventory), [`../developers/meimei-kernel-handbook.v1.md`](../developers/meimei-kernel-handbook.v1.md) (integration handbook), [`meimei-platform-alignment-roadmap.v1.md`](meimei-platform-alignment-roadmap.v1.md) (Phases A–E), [`miniapp-platform-audit.v1.md`](../compliance/miniapp-platform-audit.v1.md) (R1–R8 scorecard).
 
@@ -91,7 +91,7 @@ Suggested **file batches** (names indicative):
 
 Per **`meimei-platform-alignment-roadmap.v1.md`** §6 Phase C and **`miniapp-platform-audit.v1.md`**:
 
-1. **R2:** Miniapp LLM hot paths use **`dashboard/lib/meimei-inference-client.mjs`** (in-process **`handleMeimeiInferenceRoute`** — same contract as **`POST /api/meimei/route`**). Migrated: inbox, what-next, explain-it, memory/brain, lead-enrichment, lead-outreach, checklist (legacy JSON + **`checklist-node`** jobs/regenerate), daily-briefing, home command (**`command-interface`**), home suggestions, operator URL summary in **`server.mjs`**. **Exception:** ai-routing / api-access **preview** still **`oc-agent`** (audit **Y**).
+1. **R2:** Miniapp LLM hot paths use **`dashboard/lib/meimei-inference-client.mjs`**. **Routing preview** (not LLM) uses **`openclaw-routing-preview.mjs`** in-process (parity with **`oc-agent --route-only`**; legacy env **`MEIMEI_ROUTING_PREVIEW_LEGACY_OC_AGENT=1`**).
 2. **R1:** Lead enrichment **`workflow_run`** — **documented exception** in **`functions/lead-enrichment.md`** (sunset **2027-06-30**). Checklist R1 remains **Y** per audit.
 3. **Docs:** **`functions/daily-briefing.md`**, **`functions/lead-enrichment.md`** (R1), **`functions/checklist.md`** (inference note); registry **`platformAlignment`** object; audit §1/§2/§4 refreshed.
 
