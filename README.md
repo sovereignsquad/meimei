@@ -22,7 +22,7 @@ The project is intentionally markdown-first so it can grow from a clean foundati
 
 ## What is in the repo
 
-Many governance and architecture files below live under **`docs/`** (same or similar basename). The canonical map is **`docs/README.md`**; a **complete markdown inventory** (**149** `.md` files, excl. `node_modules`) with per-file audit timestamps is **`full_comprehensive_detailed_documents_audit.md`**.
+Many governance and architecture files below live under **`docs/`** (same or similar basename). The canonical map is **`docs/README.md`**; a **complete markdown inventory** (**150** `.md` files, excl. `node_modules`) with per-file audit timestamps is **`full_comprehensive_detailed_documents_audit.md`**.
 
 - `docs/agent-identity/agent.md` — identity and behavioral contract (also summarized at repo root patterns in older notes).
 - `docs/architecture/system-overview.md` — system shape and boundaries (successor to ad-hoc `ARCHITECTURE.md` references in older coordination notes).

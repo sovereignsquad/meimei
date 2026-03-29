@@ -1,8 +1,20 @@
 # CHANGELOG
 
+## 2026-03-29 — MM-KERNEL-602: pilot miniapp under `packages/daily-briefing`
+
+- **`packages/daily-briefing/`** — `meimei.app.json` + `index.mjs` moved from **`apps/daily-briefing/`**; workspace package **`@meimei/daily-briefing`**.
+- **`dashboard/lib/kernel-builtin-apps.mjs`** — discovers manifests under **`packages/*`** as well as **`apps/*`**.
+- **`kernel:registry:drift-check`**, **`kernel:validate-app-manifest`** — parity and validation include **`packages/<pkg>/meimei.app.json`** (no duplicate id under both trees).
+- **`scripts/meimei-dashboard-miniapps-smoke.mjs`** — safe POST body for **`daily-briefing`** (`sink: markdown`).
+
+## 2026-03-29 — Docs: markdown inventory **150** (`packages/README` in ledger)
+
+- **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** — **`150`** paths; regen base **`2026-03-29T22:00:00Z`**; new row **[`packages/README.md`](../../packages/README.md)**.
+- **`README.md`**, **`docs/README.md`** (index row), **`docs/compliance/documentation-audit.md`**, **`VERSION.md`** — scope counts aligned to **150**.
+
 ## 2026-03-29 — MM-KERNEL-604/602: registry drift CI, daily-briefing contract, migration playbook
 
-- **`functions/registry.v1.json`** — **`daily-briefing`** row (`/dashboard/518/Daily_briefing`); **`apps/daily-briefing/meimei.app.json`** `routes` for catalog/layout.
+- **`functions/registry.v1.json`** — **`daily-briefing`** row (`/dashboard/518/Daily_briefing`); manifest `routes` for catalog/layout (live path: **`packages/daily-briefing/meimei.app.json`**).
 - **`dashboard/server.mjs`** — `GET` **`/518/Daily_briefing`** → `renderDailyBriefingPage`.
 - **`npm run kernel:registry:drift-check`**, **`config/kernel-registry-drift-allowlists.v1.json`**, **`packages/README.md`**, **`kernel-apps.v1.md`** (drift + migrate-to-`packages/*`).
 

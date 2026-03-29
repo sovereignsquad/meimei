@@ -49,7 +49,8 @@ System design, technical contracts, and standards.
 | [meimei-https-full-integration-program.v1.md](planning/meimei-https-full-integration-program.v1.md) | **Program:** full HTTPS integration — rationale, show-stopper framing, micro-deliverables **TLS-001–TLS-071** |
 | [planning/examples/meimei.app.example.json](planning/examples/meimei.app.example.json) | Example **meimei.app** manifest (MM-KERNEL-201); schema in `schemas/meimei.app.manifest.v1.json` |
 | [planning/meimei-docs-code-sync-audit.v1.md](planning/meimei-docs-code-sync-audit.v1.md) | **Living audit:** code ↔ docs ↔ comments matrix; operator chrome + dispatch order; PR maintenance rule |
-| [full_comprehensive_detailed_documents_audit.md](../full_comprehensive_detailed_documents_audit.md) | **Full markdown inventory (149):** path, UTC audit timestamp, action — recursive doc health ledger |
+| [full_comprehensive_detailed_documents_audit.md](../full_comprehensive_detailed_documents_audit.md) | **Full markdown inventory (150):** path, UTC audit timestamp, action — recursive doc health ledger |
+| [packages/README.md](../packages/README.md) | **`@meimei/*` workspace packages** — SDK + pilot app; migration note vs `kernel-apps.v1.md` |
 | [data/kernel/apps/README.md](../data/kernel/apps/README.md) | Kernel **external app registry** local state (`registry.json` — MM-KERNEL-202) |
 | [model-routing-spec.md](architecture/model-routing-spec.md) | Brain-muscle model routing architecture |
 | [naming-conventions.md](architecture/naming-conventions.md) | File naming and code conventions |

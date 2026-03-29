@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-28 (original pass); **superseded inventory:** 2026-03-29  
 **Scope (original):** All `*.md` files under the repository (**84** files at that time).  
-**Scope (current):** **149** repo-owned markdown files (excluding `node_modules/**`) — canonical table with **per-file audit timestamps** in **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** at repo root.  
+**Scope (current):** **150** repo-owned markdown files (excluding `node_modules/**`) — canonical table with **per-file audit timestamps** in **[`full_comprehensive_detailed_documents_audit.md`](../../full_comprehensive_detailed_documents_audit.md)** at repo root.  
 **Goal:** Surface overlap, staleness risk, and a **practical** path to a unified doc system without breaking OC/repo conventions.
 
 **Wave 4 (2026-03-30):** Tier tables below are updated so **canonical paths** match today’s tree (**`docs/…`**). Older prose that said “root `agent.md`” described a **prior layout**.

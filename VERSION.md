@@ -9,7 +9,8 @@
 
 ## Included issue deliveries
 
-- **2026-03-29 — Recursive documentation ledger:** [`full_comprehensive_detailed_documents_audit.md`](full_comprehensive_detailed_documents_audit.md) — **149** repo `.md` files (excl. `node_modules`), per-file UTC audit table; root `README` path hygiene; `ARCHITECTURE.md` → [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md); `apps/lead-enrichment/README` vs `registry.v1.json`; `brain/durable` theme note vs design-system.
+- **2026-03-29 — Markdown inventory 150:** [`packages/README.md`](packages/README.md) added to corpus; [`full_comprehensive_detailed_documents_audit.md`](full_comprehensive_detailed_documents_audit.md) regen **`2026-03-29T22:00:00Z`**; `README.md`, [`docs/README.md`](docs/README.md), [`docs/compliance/documentation-audit.md`](docs/compliance/documentation-audit.md), and this file — scope count **150**.
+- **2026-03-29 — Recursive documentation ledger:** [`full_comprehensive_detailed_documents_audit.md`](full_comprehensive_detailed_documents_audit.md) — repo `.md` files (excl. `node_modules`), per-file UTC audit table; root `README` path hygiene; `ARCHITECTURE.md` → [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md); `apps/lead-enrichment/README` vs `registry.v1.json`; `brain/durable` theme note vs design-system.
 
 - **2026-03-30 — Kernel plan K1e (`0.8.11`):** **`dashboard/lib/platform-pages/home-admin-pages.mjs`** — Home shell (`renderPage`), admin/settings page, layout editor section out of `server.mjs` (`homeAdminPageDeps()`). **`renderGlobalNav`** / **`renderFlashcard`** remain in `server.mjs` for catalog (K2). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1d (`0.8.10`):** **`dashboard/lib/platform-pages/routing-settings-pages.mjs`** — AI routing + API access **settings** GET HTML out of `server.mjs` (`routingSettingsPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.

@@ -21,7 +21,7 @@ const raw = execSync(
 if (!raw.includes(LEDGER)) raw.push(LEDGER);
 raw.sort((a, b) => a.localeCompare(b, "en"));
 
-const baseSec = Math.floor(Date.parse("2026-03-29T20:00:00Z") / 1000);
+const baseSec = Math.floor(Date.parse("2026-03-29T22:00:00Z") / 1000);
 const ledgerGeneratedIso = new Date(baseSec * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
 const ts = (i) => new Date((baseSec + i) * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
 
@@ -30,9 +30,9 @@ const SPECIFIC = {
   [LEDGER]:
     "Self-ledger — regenerate after add/remove `.md` via this script; link in `docs/README.md`.",
   "README.md":
-    "**Completed (wave 3):** Ledger count **149** in repo overview; `docs/` path corrections; **0.8.15**.",
+    "**Completed (wave 3):** Ledger count **150** in repo overview; `docs/` path corrections; **0.8.15**.",
   "VERSION.md":
-    "**Completed:** `Current` **0.8.15**; ledger count **149**; delivery bullet for recursive audit.",
+    "**Completed:** `Current` **0.8.15**; ledger count **150**; delivery bullets for recursive audit + `packages/README.md` inventory.",
   "apps/lead-enrichment/README.md":
     "**Completed:** Route/API aligned to `functions/registry.v1.json` + `miniapp-contract` (`/dashboard` + `serverApiPath` note).",
   "brain/durable.md":
@@ -44,7 +44,7 @@ const SPECIFIC = {
   "docs/architecture/system-overview.md":
     "**Completed:** Dev workflow doc pointer → this file instead of missing `ARCHITECTURE.md`.",
   "docs/compliance/documentation-audit.md":
-    "**Completed (wave 3–4):** Scope **149**; tier tables → canonical `docs/…` markdown links; Wave 4 executive summary.",
+    "**Completed (wave 3–4):** Scope **150**; tier tables → canonical `docs/…` markdown links; Wave 4 executive summary.",
   "docs/compliance/doc_meimei.md":
     "**Completed (wave 3–4):** Generic filename → `agent.meimei` path table + ledger link.",
   "docs/compliance/foundation-contradiction-audit.md":
@@ -74,11 +74,13 @@ const SPECIFIC = {
   "docs/developers/README.md":
     "**Completed (wave 3):** Table rows for facades, kernel-apps, threat model, external shells.",
   "docs/planning/meimei-docs-code-sync-audit.v1.md":
-    "**Completed (2nd pass + wave 3–4):** Ledger link; matrix rows; Wave 4 revision history row.",
+    "**Completed (2nd pass + wave 3–4):** Ledger link; matrix rows; Wave 4 + **inventory 150** revision rows.",
   "docs/releases/CHANGELOG.md":
-    "**Completed (wave 3–4):** Full-corpus hygiene; Wave 4 historical footnotes; **2026-03-29** §Documentation `ARCHITECTURE.md` → system-overview footnote + this ledger regen.",
+    "**Completed (wave 3–4):** Full-corpus hygiene; Wave 4 historical footnotes; **2026-03-29** §Documentation `ARCHITECTURE.md` footnote; ledger regen **20:00Z**; inventory **150** (**22:00Z**).",
   "releases/0.9.0.md":
     "**Completed:** `ARCHITECTURE.md` bullet → `docs/architecture/system-overview.md`.",
+  "packages/README.md":
+    "**Completed (2026-03-29):** `@meimei/*` workspace packages index; kernel-apps migration pointer.",
 };
 
 function action(p) {
@@ -143,7 +145,7 @@ md += `
 
 ## N+M+1 — Report to maintainers
 
-**Healthness:** **${raw.length}** markdown files listed. **Wave 3** closed the worst cross-doc drift (\`AGENTS\` / meta-doc root paths) and indexed **kernel app** docs. **Wave 4** normalized bare \`agent.md\` / \`architecture.md\` / \`runbook.md\` references in normative docs to canonical \`docs/…\` links. Not every long architecture file was re-read line-by-line in these waves.
+**Healthness:** **${raw.length}** markdown files listed (includes \`packages/README.md\`). **Wave 3** closed the worst cross-doc drift (\`AGENTS\` / meta-doc root paths) and indexed **kernel app** docs. **Wave 4** normalized bare \`agent.md\` / \`architecture.md\` / \`runbook.md\` references in normative docs to canonical \`docs/…\` links. Not every long architecture file was re-read line-by-line in these waves.
 
 **Proof:** Column 2 **${ts(0)}** → **${lastTs}** (this regen).
 
