@@ -33,10 +33,10 @@
 | ai-routing | tools | `routeViaApiAdapter` + `previewModelRouting` (bash) | — | Y | — | Y | G | — | Y | Y | P2 | Preview via `oc-agent --route-not-llm-router`; not `/api/meimei/route`. |
 | api-access | tools | Same as ai-routing (`routeViaApiAdapter`) | — | Y | — | Y | G | — | Y | Y | P2 | Shares routing preview path; adapter lifecycle only. |
 | supabase-connector | tools | `apps/supabase-connector/index.mjs` | — | — | — | G | G | — | G | G | P2 | **R4:** Operator text in **`functions/supabase-connector.md`** — prefer env store for `MEIMEI_SUPABASE_*`; handler reads `process.env` only (no second SoT). |
-| mission-control | tools | `apps/mission-control/index.mjs` | — | — | — | — | G | Y | G | Y | P2 | OpenClaw/telemetry read-only; not on `meimei_jobs` feed. |
-| memory | tools | `apps/memory/index.mjs` → `brain/*` | — | Y | — | — | G | — | G | Y | P1 | `brain/memory.mjs` uses `callOllama` for summarization / queries. |
+| mission-control | tools | `apps/mission-control/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | — | — | — | G | Y | G | Y | P2 | OpenClaw/telemetry read-only; not on `meimei_jobs` feed. |
+| memory | tools | `apps/memory/index.mjs` → `brain/*`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | `brain/memory.mjs` uses `callOllama` for summarization / queries. |
 | ai-sdr-analytics | apps | `apps/ai-sdr-analytics/index.mjs` | — | — | — | — | G | — | G | Y | P2 | Reads gitignored JSONL + workflow file; no LLM. |
-| inbox | apps | `apps/inbox/index.mjs` | — | Y | — | — | G | — | G | Y | P1 | Uses `callOllama` for prioritization; Mail/AppleScript side effects. |
+| inbox | apps | `apps/inbox/index.mjs`; GET shell **`platform-pages/ops-tool-pages.mjs`** | — | Y | — | — | G | — | G | Y | P1 | Uses `callOllama` for prioritization; Mail/AppleScript side effects. |
 | what-next | apps | `apps/what-next/index.mjs` | — | Y | — | — | G | — | Y | Y | P1 | `callOllamaJson`; no queue. |
 | explain-it | apps | `apps/explain-it/index.mjs` | — | Y | — | — | G | — | Y | Y | P1 | Fetches URL + `callOllamaJson`; untrusted content path. |
 | lead-enrichment | apps | `apps/lead-enrichment/index.mjs` (single-shot + `workflow_*`) | Y | Y | — | Y | G | — | G | Y | P1 | `enrichLead` + workflow queue consolidated in app; `runWorkflowItem` still sync on handler thread — not `meimei_jobs`. |

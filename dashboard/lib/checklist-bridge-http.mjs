@@ -3,7 +3,7 @@
  * Wired from `dashboard/server.mjs`; core logic remains in `checklist-bridge.mjs`.
  *
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.6
+ * @aligned package agent-meimei 0.8.7
  */
 import {
   CHECKLIST_BRIDGE_PREFIX,

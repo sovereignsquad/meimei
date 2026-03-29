@@ -33,6 +33,10 @@ System design, technical contracts, and standards.
 | File | Description |
 |------|-------------|
 | [system-overview.md](architecture/system-overview.md) | Core architecture with LLM layer, Brain system, design patterns |
+| [meimei-kernel-completion-plan.v1.md](architecture/meimei-kernel-completion-plan.v1.md) | Plan from current state → clean kernel + modular apps/tools (K1–K4) |
+| [meimei-repo-boundaries.v1.md](architecture/meimei-repo-boundaries.v1.md) | Core vs miniapp vs platform UI vs integrations (allowlist, `server.mjs` rules) |
+| [meimei-platform-alignment-roadmap.v1.md](architecture/meimei-platform-alignment-roadmap.v1.md) | Alignment program Phases A–E (audit, Phase 0–B delivered; C–E open) |
+| [miniapp-platform-audit.v1.md](compliance/miniapp-platform-audit.v1.md) | Registry + surfaces R1–R8 scorecard (P0/P1/P2) |
 | [design-system-v1.md](architecture/design-system-v1.md) | UI components, tokens, layout system |
 | [miniapp-contract-v1.md](architecture/miniapp-contract-v1.md) | Miniapp/app/tool contract specification |
 | [function-lifecycle.md](architecture/function-lifecycle.md) | How functions are created, registered, served |
@@ -133,7 +137,7 @@ Changelog, roadmap, and version history.
 | File | Description |
 |------|-------------|
 | [CHANGELOG.md](releases/CHANGELOG.md) | Full changelog with all releases |
-| [DELIVERY-phase-0-2026-03-29.v1.md](releases/DELIVERY-phase-0-2026-03-29.v1.md) | Phase 0 / Phase B (`0.8.1`–`0.8.6` — boundaries, Checklist stack, platform pages incl. reference apps) |
+| [DELIVERY-phase-0-2026-03-29.v1.md](releases/DELIVERY-phase-0-2026-03-29.v1.md) | Phase 0 / kernel extractions (`0.8.1`–`0.8.7` — boundaries, Checklist stack, platform pages) |
 | [0.9.0.md](releases/0.9.0.md) | Release 0.9.0 notes (AI-Native Platform) |
 | [product_roadmap.md](releases/product_roadmap.md) | Product roadmap |
 | [roadmap.md](releases/roadmap.md) | Technical roadmap |

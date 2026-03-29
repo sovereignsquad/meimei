@@ -113,7 +113,7 @@ Miniapps that are **only** API backends still follow registry + contract docs fo
 ## 7. Registry, routes, and APIs
 
 1. Add or update **`functions/registry.v1.json`** (`id`, `route`, `api.path`, safety, capabilities).
-2. Wire **`dashboard/server.mjs`** (thin router) and put product logic in **`apps/<registry-id>/index.mjs`** or an allowed **`dashboard/lib/*`** module per **`meimei-repo-boundaries.v1.md`**. Large catalog / tool GET HTML belongs in **`dashboard/lib/platform-pages/*`** (e.g. **`catalog-pages.mjs`**, **`tool-surface-pages.mjs`**, **`system-monitor-page.mjs`**, **`reference-app-pages.mjs`**), not inline in `server.mjs`. **No** `apps/foo` importing **`apps/bar`** (CI: `meimei-apps-cross-import-check.mjs`).
+2. Wire **`dashboard/server.mjs`** (thin router) and put product logic in **`apps/<registry-id>/index.mjs`** or an allowed **`dashboard/lib/*`** module per **`meimei-repo-boundaries.v1.md`**. Large catalog / tool GET HTML belongs in **`dashboard/lib/platform-pages/*`** (e.g. **`catalog-pages.mjs`**, **`tool-surface-pages.mjs`**, **`system-monitor-page.mjs`**, **`reference-app-pages.mjs`**, **`ops-tool-pages.mjs`**), not inline in `server.mjs`. **No** `apps/foo` importing **`apps/bar`** (CI: `meimei-apps-cross-import-check.mjs`).
 3. Document the function in **`functions/<id>.md`** with API actions, env vars, and **operator transport / secrets (R8 / R4)** (loopback vs TLS prefix, env SoT).
 
 ---

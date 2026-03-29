@@ -1,9 +1,16 @@
 # CHANGELOG
 
+## 2026-03-30 — Kernel K1a: Inbox, Memory, Mission Control shells (`0.8.7`)
+
+- **`dashboard/lib/platform-pages/ops-tool-pages.mjs`** — GET HTML for **Inbox**, **Memory**, **Mission Control** (main + settings) moved out of `server.mjs` (`opsToolPageDeps()` thin wrappers).
+- **Docs:** `meimei-repo-boundaries.v1.md` allowlist; **`miniapp-platform-audit.v1.md`** handler column; **`meimei-kernel-completion-plan.v1.md`** K1a marked delivered; `platform-pages/README.md`.
+- **Version:** package **0.8.7**; checklist + platform modules **`@aligned package agent-meimei 0.8.7`**.
+
 ## 2026-03-30 — Platform pages: Reference app 1 & 2 shells (`0.8.6`)
 
 - **`dashboard/lib/platform-pages/reference-app-pages.mjs`** — GET HTML for **Reference app 1** and **Reference app 2** moved out of `server.mjs` (`referenceAppPageDeps()` thin wrappers).
 - **Docs:** `meimei-repo-boundaries.v1.md` allowlist; **`miniapp-platform-audit.v1.md`** — handler column cites API modules + GET shell path; `platform-pages/README.md`.
+- **Planning:** **`docs/architecture/meimei-kernel-completion-plan.v1.md`** — phased path (K1–K4) from current state to a clean **MeiMei kernel** and modular surfaces; linked from **`meimei-platform-alignment-roadmap.v1.md`** §9 and **`docs/README.md`**.
 - **Version:** package **0.8.6**; checklist + platform modules **`@aligned package agent-meimei 0.8.6`**.
 
 ## 2026-03-30 — Phase 0 + Phase B: Tool surface pages + monitor kinds + audit (`0.8.5`)

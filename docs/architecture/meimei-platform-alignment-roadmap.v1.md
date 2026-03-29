@@ -197,6 +197,7 @@ When comparing a surface to the core platform, score each dimension **Green / Ye
 
 ## 9. References
 
+- [`meimei-kernel-completion-plan.v1.md`](meimei-kernel-completion-plan.v1.md) — **From current repo state → clean kernel + modular surfaces** (phases K1–K4, exit criteria).  
 - `docs/architecture/meimei-repo-boundaries.v1.md` — Phase 0 boundary map (landed; refine as extractions continue).  
 - `docs/compliance/miniapp-platform-audit.v1.md` — Phase A scorecard (registry + knowmore + admin).  
 - `docs/architecture/meimei-app-development-guide.v1.md`  
