@@ -1,10 +1,11 @@
 # MeiMei kernel — architectural and code audit
 
-**Document revision:** v1.3  
+**Document revision:** v1.4  
 **Status:** Controlled baseline — update when the kernel allowlist, inference contract, or job schema changes materially.  
-**Repository:** `agent-meimei` **0.8.10** (measurements taken **2026-03-30** against the then-current `main` tree).  
+**Repository:** `agent-meimei` **0.8.11** (measurements taken **2026-03-30** against the then-current `main` tree).  
 **Companion architecture:** [meimei-kernel-completion-plan.v1.md](meimei-kernel-completion-plan.v1.md), [meimei-repo-boundaries.v1.md](meimei-repo-boundaries.v1.md).  
 **Integration handbook:** [../developers/meimei-kernel-handbook.v1.md](../developers/meimei-kernel-handbook.v1.md).  
+**Vision, theory, application-layer opportunity (v3 audit):** [meimei-system-vision-and-platform-audit.v3.md](meimei-system-vision-and-platform-audit.v3.md).  
 **Runtime disclosure (full product):** [../compliance/ai-runtime-audit.md](../compliance/ai-runtime-audit.md).
 
 ---
@@ -108,18 +109,18 @@ Solid lines: kernel inference and job data path. Dotted: product features that i
 
 ### 3.1 HTTP entry — verified anchors (snapshot)
 
-Measurements: **`wc -l dashboard/server.mjs` → 2680 lines.**
+Measurements: **`wc -l dashboard/server.mjs` → 2244 lines.**
 
 | Symbol / constant | Approx. line | Role |
 |-------------------|-------------|------|
-| `meimeiInferenceRoute` | 282 | Path constant `/api/meimei/route` |
-| `meimeiMonitorFeedApiRoute` | 284 | Path constant `/api/meimei/monitor/feed` |
-| `http.createServer` | 1669 | Request dispatcher start |
-| `GET` monitor feed branch | 1687 | Delegates to `meimeiJobQueueRead.listMonitorFeed` |
-| `POST` inference branch | 1714 | Trace id resolution, `handleMeimeiInferenceRoute` |
-| `server.listen` | 2676 | Bind after surface normalization |
+| `meimeiInferenceRoute` | 286 | Path constant `/api/meimei/route` |
+| `meimeiMonitorFeedApiRoute` | 288 | Path constant `/api/meimei/monitor/feed` |
+| `http.createServer` | 1233 | Request dispatcher start |
+| `GET` monitor feed branch | 1251 | Delegates to `meimeiJobQueueRead.listMonitorFeed` |
+| `POST` inference branch | 1278 | Trace id resolution, `handleMeimeiInferenceRoute` |
+| `server.listen` | 2240 | Bind after surface normalization |
 
-**`render*` functions:** 35 declarations (`grep '^function render' dashboard/server.mjs`). A substantial subset delegates to `platform-pages/*` (e.g. inbox, memory, mission control, GTM, reader, **routing settings** — AI routing / API access settings, reference apps, system monitor, tool surfaces); remaining bodies still carry large inline HTML (e.g. **admin** — see kernel completion plan **K1e** / **K2**).
+**`render*` functions:** 34 declarations (`grep '^function render' dashboard/server.mjs`). Product GET HTML delegates to `platform-pages/*` for **K1a–K1e** batches; **`renderList`**, **`renderFlashcard`**, **`renderGlobalNav`**, **`renderGlobalNavScript`** remain in `server.mjs` (catalog + nav — **K2** chrome extraction).
 
 ### 3.2 Allowlisted `dashboard/lib/*` modules (boundaries §3)
 
@@ -133,7 +134,7 @@ The following table maps **each allowlisted area** to its primary responsibility
 | Policy / channels | `api-channel-adapter.mjs`, `external-channel-policy-engine.mjs`, `imessage-adapter.mjs`, `reliability-telemetry.mjs`, `audit-trail.mjs` | API channel routing shell, policy, iMessage bridge hooks, telemetry, audit |
 | Legacy inference | `llm.mjs` | Direct Ollama client, JSON robustness, routing config, prompt cache — migration target for hot paths per K3 |
 | Checklist integration | `checklist-api-shell.mjs`, `checklist-local-integration.mjs`, `checklist-bridge-http.mjs`, `checklist-bridge.mjs`, `checklist-node/*` | Shell POST, local proxy, bridge HTTP, Node engine surface |
-| Platform pages | `platform-pages/catalog-pages.mjs`, `system-monitor-page.mjs`, `tool-surface-pages.mjs`, `reference-app-pages.mjs`, `ops-tool-pages.mjs`, `gtm-pages.mjs`, `reader-pages.mjs`, `routing-settings-pages.mjs` | Server-side HTML for catalog, monitor, tool UIs, reference demos, ops tools, GTM apps, reader surfaces, routing/API **settings** |
+| Platform pages | `platform-pages/catalog-pages.mjs`, `system-monitor-page.mjs`, `tool-surface-pages.mjs`, `reference-app-pages.mjs`, `ops-tool-pages.mjs`, `gtm-pages.mjs`, `reader-pages.mjs`, `routing-settings-pages.mjs`, `home-admin-pages.mjs` | Server-side HTML for catalog, monitor, tool UIs, reference demos, ops tools, GTM apps, reader surfaces, routing/API **settings**, home + admin |
 
 ### 3.3 `dashboard/lib/*` present but **not** on the “pure core” allowlist
 
@@ -270,8 +271,8 @@ This separation is not a weakness of the kernel; it is **accurate system documen
 
 | Phase | Objective | Audit assessment |
 |-------|-----------|------------------|
-| **K1** | Extract remaining GET/settings HTML from `server.mjs` | **In progress** — K1a–K1d landed (ops, GTM, reader, routing/API **settings**); remaining inline HTML mainly **K1e** (home/admin chrome) per completion plan. |
-| **K2** | Consolidate shared chrome (`renderPage`, nav, list/flashcard) | **Open** — still resident in `server.mjs`. |
+| **K1** | Extract remaining GET/settings HTML from `server.mjs` | **K1 complete** for planned batches (**K1a–K1e**); **`renderList` / flashcard / global nav** remain for catalog (**K2**). |
+| **K2** | Consolidate shared chrome (nav, list/flashcard) | **Open** — home/admin HTML is in **`home-admin-pages.mjs`**; **`renderGlobalNav`**, **`renderList`**, **`renderFlashcard`** still in `server.mjs` (catalog). |
 | **K3** | Prefer inference route / jobs for LLM alignment (R1/R2) | **Ongoing** — `llm.mjs` remains in active use alongside migration. |
 | **K4** | Trace propagation polish, smoke gates | **Per roadmap** — monitor and correlation foundations exist; CI smoke policies evolve per roadmap. |
 
@@ -330,3 +331,4 @@ This audit is **complete** relative to its **Document control** scope: kernel bo
 | v1.1 | 2026-03-30 | Architect-grade restructure: document control, full allowlist inventory, queue API surface, concurrency/failure domains, governance matrix, corrected `server.mjs` line anchors (3840 lines), disclosure alignment framing, completeness statement. |
 | v1.2 | 2026-03-30 | K1c reader extraction: `server.mjs` **~2924** lines; HTTP anchor refresh; allowlist + K1 table note **reader-pages.mjs**; repository baseline **0.8.9**. |
 | v1.3 | 2026-03-30 | K1d routing settings: `server.mjs` **~2680** lines; HTTP anchor refresh; allowlist + **routing-settings-pages.mjs**; repository baseline **0.8.10**. |
+| v1.4 | 2026-03-30 | K1e home/admin: `server.mjs` **~2244** lines; **34** `render*`; HTTP anchor refresh; allowlist + **home-admin-pages.mjs**; K1 batch table complete; repository baseline **0.8.11**. |

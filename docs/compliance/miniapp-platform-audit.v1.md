@@ -60,7 +60,7 @@
 | Surface | Route / API | Handler | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | Pri | Notes |
 |---------|-------------|---------|----|----|----|----|----|----|----|----|-----|-------|
 | knowmore | `config/dashboard-surface.v1.json` → `/knowmore` | **`renderKnowmorePage`** in **`dashboard/lib/platform-pages/catalog-pages.mjs`** (thin call from `server.mjs`) | — | — | — | — | G | — | Y | Y | P2 | Static cards from `config/knowmore-releases.v1.json`; no queue. Refresh cadence is operational, not code. |
-| admin / settings | `/admin`, `*/settings` | `server.mjs` + `admin-layout-editor.mjs` | — | Y | — | — | G | — | Y | Y | P2 | `previewModelRouting` / home command / suggestions may use LLM (`command-interface`, `home-suggestions`). Layout editor persists `page-layout.v1.json`. |
+| admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | Y | — | — | G | — | Y | Y | P2 | `previewModelRouting` / home command / suggestions may use LLM (`command-interface`, `home-suggestions`). Layout editor persists `page-layout.v1.json`. |
 | System monitor | `/api/meimei/monitor/*` (and shell page) | Feed: `meimei-monitor-feed.mjs`; GET shell: **`platform-pages/system-monitor-page.mjs`** | — | — | — | — | — | G | G | Y | P2 | **Platform chrome** — reference for R6 when migrating apps. |
 | Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `apps/daily-briefing/index.mjs` | — | Y | — | — | G | — | Y | Y | P2 | **Not in registry**; companion to Explain it; `callOllamaJson`. |
 

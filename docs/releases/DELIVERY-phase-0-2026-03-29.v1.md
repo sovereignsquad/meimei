@@ -1,7 +1,7 @@
 # Delivery record — Phase 0 alignment (cumulative `0.8.1` → `0.8.4`)
 
 **Date:** 2026-03-29  
-**Package:** `agent-meimei` **0.8.10** (release train **0.8.1** → **0.8.10**; see **`CHANGELOG.md`**)  
+**Package:** `agent-meimei` **0.8.11** (release train **0.8.1** → **0.8.11**; see **`CHANGELOG.md`**)  
 **Scope:** Mandatory separation — core vs miniapps vs platform UI vs integrations: thin `server.mjs`, Checklist integration modules, `apps/*` POST owners, catalog GET HTML in `platform-pages/`, documented boundaries + CI guards, operator R8/R4 on every function contract, VERSION/lockfile aligned with `package.json`.
 
 ---
@@ -39,6 +39,7 @@
 | `dashboard/lib/platform-pages/gtm-pages.mjs` | Lead enrichment, Lead outreach GET shells |
 | `dashboard/lib/platform-pages/reader-pages.mjs` | What next, Explain it URL/summary + settings, Daily briefing GET shells |
 | `dashboard/lib/platform-pages/routing-settings-pages.mjs` | AI routing & API access **settings** GET shells |
+| `dashboard/lib/platform-pages/home-admin-pages.mjs` | Home shell, admin/settings, layout editor section |
 | `dashboard/lib/platform-pages/README.md` | Folder contract |
 | `dashboard/lib/meimei-monitor-feed.mjs` | System monitor feed (queue lineage) |
 | `scripts/meimei-repo-boundaries-check.mjs` | Assert single `POST` + `checklistApiRoute` |
@@ -67,11 +68,11 @@
 
 | Artifact | Version / stamp |
 |----------|------------------|
-| `package.json` / `package-lock.json` → `agent-meimei` | **0.8.10** |
-| `VERSION.md` | **0.8.10**, codename **kernel-k1d-routing-settings-pages-0.8.10** |
+| `package.json` / `package-lock.json` → `agent-meimei` | **0.8.11** |
+| `VERSION.md` | **0.8.11**, codename **kernel-k1e-home-admin-pages-0.8.11** |
 | `functions/registry.v1.json` | `version: "v1"`; `generatedAt` per last registry edit |
-| Checklist stack (`checklist-api-shell`, `checklist-local-integration`, `checklist-bridge-http`, `checklist-bridge`, `checklist-node/engine`) | `@version 1.0.0`, `@aligned package agent-meimei 0.8.10` |
-| `platform-pages/*` (catalog, system-monitor, tool-surface, reference-app-pages, ops-tool-pages, gtm-pages, reader-pages, **routing-settings-pages**) | `@aligned package agent-meimei 0.8.10` |
+| Checklist stack (`checklist-api-shell`, `checklist-local-integration`, `checklist-bridge-http`, `checklist-bridge`, `checklist-node/engine`) | `@version 1.0.0`, `@aligned package agent-meimei 0.8.11` |
+| `platform-pages/*` (catalog, system-monitor, tool-surface, reference-app-pages, ops-tool-pages, gtm-pages, reader-pages, routing-settings-pages, **home-admin-pages**) | `@aligned package agent-meimei 0.8.11` |
 | `meimei-repo-boundaries.v1.md` | Document **v1** (bump per file §Versioning on breaking boundary changes) |
 
 ---

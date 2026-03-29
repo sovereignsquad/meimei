@@ -2,7 +2,7 @@
  * Platform UI — What next, URL summary (explain-it), daily briefing, explain-it settings GET shells.
  * @see docs/architecture/meimei-kernel-completion-plan.v1.md Phase K1c
  * @version 1.0.0
- * @aligned package agent-meimei 0.8.10
+ * @aligned package agent-meimei 0.8.11
  */
 
 export function renderUrlSummaryPage(layoutDoc, d) {

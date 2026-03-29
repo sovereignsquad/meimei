@@ -1,8 +1,8 @@
 # MeiMei kernel completion plan — v1
 
-**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.10**).  
+**Status:** active plan (from repo state **2026-03-30**, package **`agent-meimei` ~0.8.11**).  
 **Goal:** A **clear kernel** (runtime + contracts + shared libraries) with **all product surfaces** owned as **modules** (apps, tools, platform GET shells, integrations) — not a growing monolith in `dashboard/server.mjs`.  
-**Companion docs:** [`meimei-repo-boundaries.v1.md`](meimei-repo-boundaries.v1.md) (layers + allowlist), [`meimei-kernel-code-audit.v1.md`](meimei-kernel-code-audit.v1.md) (evidence-based kernel baseline + inventory), [`../developers/meimei-kernel-handbook.v1.md`](../developers/meimei-kernel-handbook.v1.md) (integration handbook), [`meimei-platform-alignment-roadmap.v1.md`](meimei-platform-alignment-roadmap.v1.md) (Phases A–E), [`miniapp-platform-audit.v1.md`](../compliance/miniapp-platform-audit.v1.md) (R1–R8 scorecard).
+**Companion docs:** [`meimei-repo-boundaries.v1.md`](meimei-repo-boundaries.v1.md) (layers + allowlist), [`meimei-system-vision-and-platform-audit.v3.md`](meimei-system-vision-and-platform-audit.v3.md) (vision + theory + application layer), [`meimei-kernel-code-audit.v1.md`](meimei-kernel-code-audit.v1.md) (evidence-based kernel baseline + inventory), [`../developers/meimei-kernel-handbook.v1.md`](../developers/meimei-kernel-handbook.v1.md) (integration handbook), [`meimei-platform-alignment-roadmap.v1.md`](meimei-platform-alignment-roadmap.v1.md) (Phases A–E), [`miniapp-platform-audit.v1.md`](../compliance/miniapp-platform-audit.v1.md) (R1–R8 scorecard).
 
 ---
 
@@ -72,7 +72,7 @@ Suggested **file batches** (names indicative):
 | **K1b** ✅ **`0.8.8`** | `platform-pages/gtm-pages.mjs` | `renderLeadEnrichmentPage`, `renderLeadEnrichmentSettingsPage`, `renderLeadOutreachPage`, `renderLeadOutreachSettingsPage` — **delivered** (`gtmPageDeps()` in `server.mjs`) |
 | **K1c** ✅ **`0.8.9`** | `platform-pages/reader-pages.mjs` | `renderWhatNextPage`, `renderWhatNextSettingsPage`, `renderUrlSummaryPage`, `renderDailyBriefingPage`, `renderExplainItSettingsPage` — **delivered** (`readerPageDeps()` in `server.mjs`) |
 | **K1d** ✅ **`0.8.10`** | `platform-pages/routing-settings-pages.mjs` | `renderAIRoutingSettingsPage`, `renderApiAccessSettingsPage` (tool settings only; main routing/adapter pages already in `tool-surface-pages.mjs`) — **delivered** (`routingSettingsPageDeps()` in `server.mjs`) |
-| **K1e** | `platform-pages/home-admin-pages.mjs` | `renderAdminPage`, `renderAdminLayoutEditorSection`, and optionally **`renderPage`** if kept as shell |
+| **K1e** ✅ **`0.8.11`** | `platform-pages/home-admin-pages.mjs` | `renderAdminPage`, `renderAdminLayoutEditorSection`, **`renderPage`** (home shell) — **delivered** (`homeAdminPageDeps()` in `server.mjs`; **`renderGlobalNav`** / **`renderFlashcard`** still in `server.mjs` for catalog — K2) |
 
 **Per batch:** mirror the pattern used for **`tool-surface-pages.mjs`**: exported `(layoutDoc, d)` functions; **protect** `${d.*}` template interpolations from naive `d.escapeHtml` rewrites in client `<script>` blocks.
 
@@ -80,11 +80,11 @@ Suggested **file batches** (names indicative):
 
 ### Phase K2 — **Shared dashboard chrome** (optional consolidation)
 
-**Objective:** Decide whether **`renderList`**, **`renderFlashcard`**, **`renderGlobalNav`**, **`renderGlobalNavScript`**, **`renderPage`** stay in `server.mjs` or move to e.g. **`dashboard/lib/platform-pages/chrome.mjs`** (or `dashboard/lib/dashboard-chrome.mjs` on allowlist).
+**Objective:** Decide whether **`renderList`**, **`renderFlashcard`**, **`renderGlobalNav`**, **`renderGlobalNavScript`** stay in `server.mjs` or move to e.g. **`dashboard/lib/platform-pages/chrome.mjs`** (or `dashboard/lib/dashboard-chrome.mjs` on allowlist). (**`renderPage` / `renderAdminPage`** are thin wrappers over **`home-admin-pages.mjs`** as of K1e.)
 
-**Recommendation:** Move to **one module** once K1 is done, so `server.mjs` is **imports + createServer + route switch** only.
+**Recommendation:** Move shared nav + catalog helpers to **one module** so `server.mjs` trends toward **imports + createServer + route switch** + thin `render*` delegates only.
 
-**Exit K2:** Single file (or two: chrome + server) owns global nav / home shell; boundaries §3 allowlist updated.
+**Exit K2:** Single file (or two: chrome + server) owns global nav + list/flashcard; **`catalogPageUiDeps()`** passes those into **`catalog-pages.mjs`**; boundaries §3 allowlist updated.
 
 ### Phase K3 — **Phase C** (LLM + queue alignment) — *modules stay modules*
 

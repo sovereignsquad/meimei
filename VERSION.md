@@ -3,12 +3,13 @@
 ## Current
 
 - Line: `foundation`
-- Version: `0.8.10`
+- Version: `0.8.11`
 - Date: `2026-03-30`
-- Codename: `kernel-k1d-routing-settings-pages-0.8.10`
+- Codename: `kernel-k1e-home-admin-pages-0.8.11`
 
 ## Included issue deliveries
 
+- **2026-03-30 — Kernel plan K1e (`0.8.11`):** **`dashboard/lib/platform-pages/home-admin-pages.mjs`** — Home shell (`renderPage`), admin/settings page, layout editor section out of `server.mjs` (`homeAdminPageDeps()`). **`renderGlobalNav`** / **`renderFlashcard`** remain in `server.mjs` for catalog (K2). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1d (`0.8.10`):** **`dashboard/lib/platform-pages/routing-settings-pages.mjs`** — AI routing + API access **settings** GET HTML out of `server.mjs` (`routingSettingsPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1c (`0.8.9`):** **`dashboard/lib/platform-pages/reader-pages.mjs`** — What next (main + settings), Explain it URL summary + settings, Daily briefing GET HTML out of `server.mjs` (`readerPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
 - **2026-03-30 — Kernel plan K1b (`0.8.8`):** **`dashboard/lib/platform-pages/gtm-pages.mjs`** — Lead enrichment + Lead outreach main + settings GET HTML out of `server.mjs` (`gtmPageDeps()`). See **`meimei-kernel-completion-plan.v1.md`** Phase K1.
