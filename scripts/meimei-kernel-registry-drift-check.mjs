@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * MM-KERNEL-604 — align functions/registry.v1.json with each apps/<pkg>/meimei.app.json on disk.
+ * MM-KERNEL-604 — align functions/registry.v1.json with each apps/<pkg>/ or packages/<pkg>/ meimei.app.json on disk.
  * See config/kernel-registry-drift-allowlists.v1.json
  */
 import fs from "node:fs";
@@ -10,7 +10,6 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 const registryPath = path.join(repoRoot, "functions", "registry.v1.json");
-const appsRoot = path.join(repoRoot, "apps");
 const allowPath = path.join(repoRoot, "config", "kernel-registry-drift-allowlists.v1.json");
 
 function fail(msg) {
@@ -24,6 +23,35 @@ function ok(msg) {
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, "utf8"));
+}
+
+/**
+ * @returns {Map<string, string>} pkg name -> absolute path to meimei.app.json
+ */
+function diskManifestPathsByPkg() {
+  /** @type {Map<string, string>} */
+  const byPkg = new Map();
+  for (const rootLabel of ["apps", "packages"]) {
+    const base = path.join(repoRoot, rootLabel);
+    if (!fs.existsSync(base)) continue;
+    for (const ent of fs.readdirSync(base, { withFileTypes: true })) {
+      if (!ent.isDirectory()) continue;
+      const pkg = ent.name;
+      const mf = path.join(base, pkg, "meimei.app.json");
+      if (!fs.existsSync(mf)) continue;
+      if (byPkg.has(pkg)) {
+        fail(
+          `duplicate meimei.app.json for "${pkg}" under both apps/${pkg} and packages/${pkg} — keep exactly one`
+        );
+      }
+      byPkg.set(pkg, mf);
+    }
+  }
+  return byPkg;
+}
+
+function relManifestPath(absMf) {
+  return path.relative(repoRoot, absMf).split(path.sep).join("/");
 }
 
 const allowRaw = readJson(allowPath);
@@ -41,28 +69,23 @@ const functions = Array.isArray(registry.functions)
   : fail("registry.functions must be an array");
 const registryIds = new Set(functions.map((f) => f.id));
 
-const diskPkgs = [];
-for (const name of fs.readdirSync(appsRoot, { withFileTypes: true })) {
-  if (!name.isDirectory()) continue;
-  const mf = path.join(appsRoot, name.name, "meimei.app.json");
-  if (!fs.existsSync(mf)) continue;
-  diskPkgs.push(name.name);
-}
+const diskByPkg = diskManifestPathsByPkg();
+const diskPkgs = [...diskByPkg.keys()].sort();
 
 for (const pkg of diskPkgs) {
-  const mf = path.join(appsRoot, pkg, "meimei.app.json");
+  const mf = diskByPkg.get(pkg);
+  if (!mf) continue;
   let manifest;
   try {
     manifest = readJson(mf);
   } catch (e) {
-    fail("apps/" + pkg + "/meimei.app.json: " + (e instanceof Error ? e.message : String(e)));
+    fail(relManifestPath(mf) + ": " + (e instanceof Error ? e.message : String(e)));
   }
   const mname = manifest?.name;
   if (typeof mname !== "string" || mname !== pkg) {
     fail(
-      "apps/" +
-        pkg +
-        '/meimei.app.json: manifest.name "' +
+      relManifestPath(mf) +
+        ': manifest.name "' +
         mname +
         '" must equal directory name "' +
         pkg +
@@ -70,13 +93,12 @@ for (const pkg of diskPkgs) {
     );
   }
   if (diskDeferred.has(pkg)) {
-    fail("apps/" + pkg + " is listed in diskMiniappsDeferredFromRegistry but exists - remove from allowlist");
+    fail(pkg + " is listed in diskMiniappsDeferredFromRegistry but a manifest exists on disk — remove from allowlist");
   }
   if (!registryIds.has(pkg)) {
     fail(
-      "apps/" +
-        pkg +
-        ' has meimei.app.json but no functions/registry.v1.json entry with id "' +
+      relManifestPath(mf) +
+        ' has no functions/registry.v1.json entry with id "' +
         pkg +
         '" - add contract row or defer in allowlist'
     );
@@ -89,20 +111,24 @@ for (const fn of functions) {
 
   if (cat === "apps") {
     if (registryAppsNoDisk.has(id)) {
-      const mfPath = path.join(appsRoot, id, "meimei.app.json");
-      if (fs.existsSync(mfPath)) {
+      if (diskByPkg.has(id)) {
         fail(
-          'registry app "' + id + '" is allowlisted as without disk but apps/' + id + "/meimei.app.json exists"
+          'registry app "' +
+            id +
+            '" is allowlisted as without disk but ' +
+            relManifestPath(diskByPkg.get(id)) +
+            " exists"
         );
       }
       continue;
     }
-    const mfPath = path.join(appsRoot, id, "meimei.app.json");
-    if (!fs.existsSync(mfPath)) {
+    if (!diskByPkg.has(id)) {
       fail(
         'registry apps entry "' +
           id +
           '" requires apps/' +
+          id +
+          "/meimei.app.json or packages/" +
           id +
           "/meimei.app.json (or add to registryAppsWithoutDiskManifest)"
       );
@@ -111,20 +137,21 @@ for (const fn of functions) {
     if (toolsKernel.has(id)) {
       continue;
     }
-    const mfPath = path.join(appsRoot, id, "meimei.app.json");
-    if (!fs.existsSync(mfPath)) {
+    if (!diskByPkg.has(id)) {
       fail(
         'registry tools entry "' +
           id +
           '" requires apps/' +
+          id +
+          "/meimei.app.json or packages/" +
           id +
           "/meimei.app.json or registryToolsImplementedInKernel allowlist"
       );
     }
   }
 
-  const mfPath = path.join(appsRoot, id, "meimei.app.json");
-  if (!fs.existsSync(mfPath)) continue;
+  const mfPath = diskByPkg.get(id);
+  if (!mfPath) continue;
 
   let manifest;
   try {
@@ -135,9 +162,8 @@ for (const fn of functions) {
   const suffix = manifest?.api?.pathSuffix;
   if (typeof suffix !== "string" || suffix !== id) {
     fail(
-      "apps/" +
-        id +
-        '/meimei.app.json: api.pathSuffix must equal registry id "' +
+      relManifestPath(mfPath) +
+        ': api.pathSuffix must equal registry id "' +
         id +
         '" (got "' +
         suffix +
@@ -146,4 +172,4 @@ for (const fn of functions) {
   }
 }
 
-ok("kernel registry drift check - registry.v1.json vs apps/*/meimei.app.json");
+ok("kernel registry drift check - registry.v1.json vs apps|packages/*/meimei.app.json");

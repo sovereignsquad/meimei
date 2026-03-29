@@ -54,13 +54,15 @@ function validateOne(schema, manifestPath) {
 }
 
 function collectAppManifests() {
-  const appsDir = path.join(repoRoot, "apps");
   const out = [];
-  if (!fs.existsSync(appsDir)) return out;
-  for (const name of fs.readdirSync(appsDir, { withFileTypes: true })) {
-    if (!name.isDirectory()) continue;
-    const p = path.join(appsDir, name.name, "meimei.app.json");
-    if (fs.existsSync(p)) out.push(p);
+  for (const rel of ["apps", "packages"]) {
+    const base = path.join(repoRoot, rel);
+    if (!fs.existsSync(base)) continue;
+    for (const name of fs.readdirSync(base, { withFileTypes: true })) {
+      if (!name.isDirectory()) continue;
+      const p = path.join(base, name.name, "meimei.app.json");
+      if (fs.existsSync(p)) out.push(p);
+    }
   }
   return out.sort();
 }

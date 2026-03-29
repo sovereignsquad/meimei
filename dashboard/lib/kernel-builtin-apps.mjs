@@ -1,5 +1,5 @@
 /**
- * In-repo apps: each package may ship meimei.app.json under apps/<name>/ (dynamic load, MM-KERNEL-603).
+ * In-repo apps: each package may ship meimei.app.json under apps/<name>/ or packages/<name>/ (dynamic load, MM-KERNEL-603, MM-KERNEL-602).
  * External registry (`data/kernel/apps/registry.json`) is consulted by default; set **`MEIMEI_KERNEL_EXTERNAL_APPS=0`** to skip it.
  *
  * @see docs/planning/kernel-app-separation-and-https-program.v1.md
@@ -27,45 +27,46 @@ export function builtinStableAppId(manifestName) {
  * @param {string} repoRoot
  * @returns {object[]}
  */
+function pushBuiltinFromDir(root, install_path, out) {
+  const mfPath = path.join(install_path, "meimei.app.json");
+  if (!fs.existsSync(mfPath)) return;
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(mfPath, "utf8"));
+  } catch {
+    return;
+  }
+  try {
+    assertValidManifest(root, manifest);
+  } catch {
+    return;
+  }
+  const manifest_sha256 = sha256Json(manifest);
+  const app_id = builtinStableAppId(manifest.name);
+  out.push({
+    app_id,
+    install_path,
+    manifest,
+    manifest_sha256,
+    enabled: true,
+    registered_at_ms: 0,
+    updated_at_ms: 0,
+    builtin: true
+  });
+}
+
 export function listBuiltinKernelApps(repoRoot) {
   const root = path.resolve(repoRoot);
   if (cache && cache.root === root) return cache.apps;
 
-  const appsDir = path.join(root, "apps");
   const out = [];
-  if (!fs.existsSync(appsDir)) {
-    cache = { root, apps: out };
-    return out;
-  }
-
-  for (const name of fs.readdirSync(appsDir, { withFileTypes: true })) {
-    if (!name.isDirectory()) continue;
-    const install_path = path.join(appsDir, name.name);
-    const mfPath = path.join(install_path, "meimei.app.json");
-    if (!fs.existsSync(mfPath)) continue;
-    let manifest;
-    try {
-      manifest = JSON.parse(fs.readFileSync(mfPath, "utf8"));
-    } catch {
-      continue;
+  for (const rel of ["apps", "packages"]) {
+    const base = path.join(root, rel);
+    if (!fs.existsSync(base)) continue;
+    for (const name of fs.readdirSync(base, { withFileTypes: true })) {
+      if (!name.isDirectory()) continue;
+      pushBuiltinFromDir(root, path.join(base, name.name), out);
     }
-    try {
-      assertValidManifest(root, manifest);
-    } catch {
-      continue;
-    }
-    const manifest_sha256 = sha256Json(manifest);
-    const app_id = builtinStableAppId(manifest.name);
-    out.push({
-      app_id,
-      install_path,
-      manifest,
-      manifest_sha256,
-      enabled: true,
-      registered_at_ms: 0,
-      updated_at_ms: 0,
-      builtin: true
-    });
   }
 
   cache = { root, apps: out };

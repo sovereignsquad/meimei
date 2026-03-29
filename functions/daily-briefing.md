@@ -1,7 +1,7 @@
 # Daily Briefing — operator contract (non-registry route)
 
 **Route:** `POST /dashboard/api/functions/daily-briefing` (wired in `dashboard/server.mjs`; not a row in `functions/registry.v1.json`).  
-**Handler:** `apps/daily-briefing/index.mjs`  
+**Handler:** `packages/daily-briefing/index.mjs`  
 **Inference:** Blocking LLM via **`dashboard/lib/meimei-inference-client.mjs`** (kernel K3 — same plane as `POST /api/meimei/route`).
 
 ## Behavior

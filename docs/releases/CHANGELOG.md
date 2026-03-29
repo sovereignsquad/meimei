@@ -94,7 +94,7 @@
 ## 2026-03-30 — Kernel: all in-repo miniapps on meimei.app.json + dynamic POST dispatch
 
 - **11 `apps/*/meimei.app.json`** (checklist, lead-enrichment, lead-outreach, ai-sdr-analytics, inbox, what-next, memory, mission-control, supabase-connector, daily-briefing + existing explain-it); **`kernel.app.authExempt`** on each for same-origin dashboard clients.
-- **`dashboard/server.mjs`** — no static `../apps/*` imports; miniapp **`POST /api/functions/…`** handled by **`tryKernelExternalAppPost`** (after checklist shell branch). **`daily-briefing/open`** via manifest **`api.subroutes`** + **`handleOpenPost`** in **`apps/daily-briefing/index.mjs`**.
+- **`dashboard/server.mjs`** — no static `../apps/*` imports; miniapp **`POST /api/functions/…`** handled by **`tryKernelExternalAppPost`** (after checklist shell branch). **`daily-briefing/open`** via manifest **`api.subroutes`** + **`handleOpenPost`** in **`packages/daily-briefing/index.mjs`**.
 - **`apps/ai-routing`** — **no** manifest: **`POST /api/functions/ai-routing`** remains **`routeViaApiAdapter`** (tool surface); **`loadAiRoutingHandleApi`** serves legacy **`GET`/`POST /api/llm/routing`** only.
 - **`kernel-app-api-match.mjs`**, **`checklist-app-handler.mjs`**, **`lazy-ai-routing-handler.mjs`**; dispatch supports **`result.httpStatus`**; **`meimei-dashboard-static-apps-import-check`** allowlist empty.
 

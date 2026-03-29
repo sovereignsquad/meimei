@@ -1,0 +1,7 @@
+{
+  "name": "@meimei/daily-briefing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily briefing miniapp (MM-KERNEL-602 pilot under packages/)"
+}

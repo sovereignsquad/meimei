@@ -3,7 +3,7 @@
 **Version:** v1  
 **Date:** 2026-03-29  
 **Owner:** Platform / architecture  
-**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + pilot package (**602** partial), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** full **604** (generated `registry.v1.json`); optional deeper FS APIs (read file bytes); migrating a production miniapp into **`packages/*`** beyond the SDK-only pilot.
+**Status:** **In progress (v1 kernel API track)** — **T2** registry (**201**–**203**, **301**) and **T4** dispatch (**501**, **603**) delivered; **T3** policy + app façades (**302**, **303a**–**d**), **T4** **@meimei/sdk** (**401**–**402**) + **602** pilot (**packages/daily-briefing**), **T5** merged catalog (**601**) + registry snapshot (**604** incremental), **T6** threat model + runbook + monitor **`app_id`** (**701**–**703**) delivered. **Remaining:** full **604** (generated `registry.v1.json`); optional deeper FS APIs (read file bytes); migrate additional miniapps into **`packages/*`** using the **`daily-briefing`** pilot pattern.
 
 ## Executive summary
 
@@ -19,12 +19,12 @@ Decouple MeiMei **applications** from the **kernel** so each app can live in its
 | **T2 Registry / identity** | 201–203, 301 | **Delivered** | Manifest schema, `kernel-app-registry.mjs`, tombstoned `app_id`, optional auth + audit. |
 | **T3 Policy + façades** | 302, 303a–d | **Delivered** | `schemas/meimei.app.policy.v1.json`, `POST/GET …/v1/apps/{id}/…` (inference, jobs enqueue, env, **fs/roots** read-only listing). |
 | **T4 SDK + dispatch** | 401–402, 501, 603 | **Delivered** | `@meimei/sdk` workspace, contract + HTTP smoke selftests; dynamic `POST /api/functions/…`; no static `apps/*` in `server.mjs`. |
-| **T5 Migration** | 601, 604, 602 | **Partial** | **601** merged catalog; **604** snapshot + **`npm run kernel:registry:drift-check`** (allowlists in `config/kernel-registry-drift-allowlists.v1.json`); **`daily-briefing`** added to `registry.v1.json` + GET route; **602** migration playbook in `kernel-apps.v1.md` + `packages/README.md`. |
+| **T5 Migration** | 601, 604, 602 | **Partial** | **601** merged catalog; **604** snapshot + **`npm run kernel:registry:drift-check`** (allowlists; scans **`apps/*`** and **`packages/*`** manifests); **`daily-briefing`** in `registry.v1.json` + GET route, pilot under **`packages/daily-briefing/`**; **602** playbook + pilot. |
 | **T6 Governance** | 502, 701–703 | **Delivered** (502 = strategy doc) | Shells ADR note, threat model, `kernel-apps.v1.md` runbook, monitor `app_id` filter + row field. |
 
 **CI hooks (kernel-related):** `kernel:registry:drift-check`, `kernel:validate-app-manifest`, `kernel:validate-app-policy`, `kernel:app-registry:selftest`, `kernel:policy:selftest`, `kernel:external-dispatch:selftest`, `kernel:sdk:selftest`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`, `kernel:registry:snapshot` (manual / audit).
 
-**Largest remaining epics:** **generate** `registry.v1.json` from manifests (604 stretch); optional **job status/query façade** for 303b; **file read** API beyond fs/roots listing; **rate limits** in policy (302 stretch); **602** — physically move a miniapp to `packages/*` (playbook ready).
+**Largest remaining epics:** **generate** `registry.v1.json` from manifests (604 stretch); optional **job status/query façade** for 303b; **file read** API beyond fs/roots listing; **rate limits** in policy (302 stretch); **602** — migrate more miniapps to `packages/*` ( **`daily-briefing`** pilot done).
 
 ---
 
@@ -479,7 +479,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 ### Deliverables
 
 - [x] Operator playbook — [`docs/operations/kernel-apps.v1.md`](../operations/kernel-apps.v1.md) § *Migrate a miniapp toward `packages/*`*; **`packages/README.md`** workspace index.
-- [ ] App lives under `packages/<pilot>/` or separate clone; E2E smoke (optional follow-up PR).
+- [x] Pilot **`daily-briefing`** under **`packages/daily-briefing/`**; kernel builtins + drift + manifest CI include **`packages/*`**; miniapp smoke POST body for **`daily-briefing`**.
 
 ---
 
@@ -571,6 +571,7 @@ Start with **reference-app-1** or smallest tool to limit blast radius.
 | Date | Change |
 |------|--------|
 | 2026-03-29 | **604 drift-check CI**, **daily-briefing** registry + GET route, **602** migration playbook (`kernel-apps.v1.md`, `packages/README.md`). |
+| 2026-03-29 | **602 pilot:** **`packages/daily-briefing/`**; builtin loader + drift + **`kernel:validate-app-manifest`** scan **`packages/*`**. |
 | 2026-03-29 | **303d read-only `fs/roots`:** `kernel-app-fs-roots.mjs`, SDK `readFilesystemRoots`, `kernel:fs-roots:selftest`, `kernel:facades:http:selftest`. |
 | 2026-03-29 | **MM-KERNEL-302–303d, 401–402, 501 policy gate, 502, 601, 604 snapshot, 701–703, pilot SDK package:** façades, merged catalog, monitor `app_id`, workspaces `@meimei/sdk`, CI selftests. |
 | 2026-03-29 | **Doc pass:** dependency graph — **ADR-003 (accepted)** (was marked proposed). |

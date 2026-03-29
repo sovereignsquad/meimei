@@ -35,7 +35,7 @@ When `MEIMEI_KERNEL_APP_AUTH=1`, set `X-MeiMei-App-Id` and `X-MeiMei-App-Secret`
 
 ## Migrate a miniapp toward `packages/*` (MM-KERNEL-602)
 
-1. Create `packages/<name>/` with the same `meimei.app.json` + `index.mjs` surface you had under `apps/<name>/` (no `dashboard/lib/*` imports in external callers — use `@meimei/sdk`).
+1. Create `packages/<name>/` with the same `meimei.app.json` + `index.mjs` surface you had under `apps/<name>/` (no `dashboard/lib/*` imports in external callers — use `@meimei/sdk`). **Pilot:** `packages/daily-briefing/`.
 2. Run `npm run kernel:validate-app-manifest` on the new tree; `npm run kernel:registry:drift-check` after you update `functions/registry.v1.json` (or register-only external flow).
 3. `npm run kernel:app-registry -- register /absolute/path/to/packages/<name>` — note the printed **`app_id`** for façades and secrets.
 4. Remove the old `apps/<name>/` tree **only after** dashboard POST routes are served via registry/builtins and `npm run ci` is green (see `meimei-dashboard-static-apps-import-check`).

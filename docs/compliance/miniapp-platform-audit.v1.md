@@ -62,7 +62,7 @@
 | knowmore | `config/dashboard-surface.v1.json` → `/knowmore` | **`renderKnowmorePage`** in **`dashboard/lib/platform-pages/catalog-pages.mjs`** (thin call from `server.mjs`) | — | — | — | — | G | — | G | Y | P2 | **`docs/operations/knowmore-content-refresh.md`** — operational refresh; no queue. |
 | admin / settings | `/admin`, `*/settings` | Home + admin GET HTML **`platform-pages/home-admin-pages.mjs`** + `admin-layout-editor.mjs` script | — | G | — | — | G | — | Y | Y | P2 | Home command + **`home-suggestions`** (inference client). Routing preview: **`openclaw-routing-preview.mjs`**. Split: **`docs/architecture/meimei-admin-vs-miniapp-ops.v1.md`**. |
 | System monitor | `/api/meimei/monitor/*` (and shell page) | Feed: `meimei-monitor-feed.mjs`; GET shell: **`platform-pages/system-monitor-page.mjs`** | — | — | — | — | — | G | G | Y | P2 | **Platform chrome** — reference for R6 when migrating apps. |
-| Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `apps/daily-briefing/index.mjs` | — | G | — | — | G | — | G | Y | P2 | **Not in registry**; contract **`functions/daily-briefing.md`**; **`meimei-inference-client`**. |
+| Daily briefing | `POST /dashboard/api/functions/daily-briefing`; GET shell **`platform-pages/reader-pages.mjs`** | `packages/daily-briefing/index.mjs` | — | G | — | — | G | — | G | Y | P2 | Registry row + contract **`functions/daily-briefing.md`**; **`meimei-inference-client`**. |
 
 ---
 

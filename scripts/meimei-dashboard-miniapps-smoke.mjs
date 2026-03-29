@@ -97,6 +97,7 @@ const apiBodies = {
   inbox: { action: "list", limit: 1 },
   "what-next": { sources: ["tasks"] },
   "explain-it": { url: "https://example.com" },
+  "daily-briefing": { sink: "markdown" },
   "ai-routing": { channel: "dashboard", taskType: "chat", costTarget: "low" },
   "api-access": {
     channel: "dashboard",
