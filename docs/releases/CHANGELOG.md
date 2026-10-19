@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-10-19 — Repository CI navigation
+
+### New Features
+- No application features added; this is a documentation correction.
+
+### Fixed Bugs
+- Point the root README CI badge image and workflow link at the current `sovereignsquad/meimei` repository instead of the previous repository path.
+
+### Known Issues
+- This change does not verify the external homepage, local runtime readiness or macOS installation. The application version remains unchanged.
+
+### Future Roadmap
+- Continue the separate portfolio identity, destination and welcome review in the canonical control tracker.
+
 ## 2026-03-29 — Docs: registry generation workflow (dev guide, handbook, miniapp contract)
 
 - **`meimei-app-development-guide.v1.md`**, **`meimei-kernel-handbook.v1.md`**, **`miniapp-contract-v1.md`**, **`kernel-apps.v1.md`**, **`documentation-audit.md`**, **`kernel-app-separation-and-https-program.v1.md`** — document generated **`registry.v1.json`**, **`kernel:registry:generate`** / **`generate-check`**, and **`packages/*`** handler paths.
