@@ -1,6 +1,6 @@
 # agent.meimei
 
-[![CI](https://github.com/moldovancsaba/agent.meimei/actions/workflows/ci.yml/badge.svg)](https://github.com/moldovancsaba/agent.meimei/actions/workflows/ci.yml)
+[![CI](https://github.com/sovereignsquad/meimei/actions/workflows/ci.yml/badge.svg)](https://github.com/sovereignsquad/meimei/actions/workflows/ci.yml)
 
 `agent.meimei` is a fresh OpenClaw workspace and product shell for a large-skill agent system.
 
