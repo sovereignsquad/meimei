@@ -6,6 +6,7 @@
 - No application features added; this is a documentation correction.
 
 ### Fixed Bugs
+- Prepare synthetic hash-chained audit records in the disposable CI checkout because operator-local logs are intentionally ignored. The existing validator still rejects modified content and broken links in the hash chain; production validation is unchanged.
 - Point the root README CI badge image and workflow link at the current `sovereignsquad/meimei` repository instead of the previous repository path.
 
 ### Known Issues

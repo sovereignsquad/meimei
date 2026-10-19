@@ -26,5 +26,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare synthetic audit records and verify tamper rejection
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+          import { tmpdir } from 'node:os';
+          import path from 'node:path';
+          import { spawnSync } from 'node:child_process';
+          import { createHash } from 'node:crypto';
+          import { createAuditTrail } from './dashboard/lib/audit-trail.mjs';
+          assert.equal(process.env.GITHUB_ACTIONS, 'true');
+          const audit = createAuditTrail(process.cwd());
+          assert.equal(existsSync(audit.logPath), false, 'CI must not overwrite an existing audit trail');
+          await audit.appendAuditEvent({type:'ci-fixture',eventId:'synthetic-1',outcome:'blocked',reason:'synthetic CI record; no external action'});
+          await audit.appendAuditEvent({type:'ci-fixture',eventId:'synthetic-2',outcome:'blocked',reason:'synthetic CI record; no external action'});
+          const check = file => spawnSync(process.execPath,['scripts/validate-audit-trail.mjs',file],{encoding:'utf8'});
+          assert.equal(check(audit.logPath).status,0,'valid writer output must pass');
+          const original=readFileSync(audit.logPath,'utf8').trim().split('\n').map(JSON.parse);
+          const dir=mkdtempSync(path.join(tmpdir(),'meimei-audit-ci-'));
+          for(const variant of ['content','chain']){
+            const records=structuredClone(original);
+            if(variant==='content') records[0].reason='tampered';
+            else {
+              records[1].prevHash='GENESIS';
+              const {hash,...material}=records[1];
+              records[1].hash=createHash('sha256').update(JSON.stringify(material)).digest('hex');
+            }
+            const file=path.join(dir,variant+'.jsonl');
+            writeFileSync(file,records.map(r=>JSON.stringify(r)).join('\n')+'\n');
+            const result=check(file);
+            assert.equal(result.status,1,variant+' tampering must fail');
+            assert.ok(result.stderr.includes(variant==='content'?'hash mismatch':'prevHash chain mismatch'));
+          }
+          console.log('PASS: synthetic writer output validates; content and chain tampering are rejected');
+          JS
+
       - name: Run validators
         run: npm run ci
