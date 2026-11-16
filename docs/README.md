@@ -235,3 +235,7 @@ Core skills catalog.
 
 **Maintained by:** KILO + CURSOR
 **Last updated:** 2026-03-30
+
+## Dated planning review
+
+[Project board review and manual movement journal](PROJECT_BOARD_MOVEMENT_LOG.md) records a snapshot and conditional owner proposals; the board remains canonical.

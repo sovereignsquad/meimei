@@ -160,3 +160,5 @@ Use one of these from the repo root:
 - `npm run dashboard:watchdog:install` to keep dashboard always-on (boot/login, crash restart, health-triggered restart)
 - `npm run dashboard:watchdog:status` to inspect dashboard watcher services and health
 - `npm run dashboard:watchdog:uninstall` to remove dashboard watcher services
+
+[Read-only project board review and manual movement journal](docs/PROJECT_BOARD_MOVEMENT_LOG.md).
